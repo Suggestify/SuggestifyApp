@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-
+import { Schema } from "mongoose";
+import Thread from "./Thread.js";
 
 const userSchema = new mongoose.Schema({
     email:{
@@ -20,8 +21,11 @@ const userSchema = new mongoose.Schema({
         type: Date,
         immutable: true,
         default: ()=> new Date()
-    }
-    
+    },
+    thread: {type: 
+        Schema.Types.ObjectID,
+         ref: "Thread"
+        }
 });
 
 

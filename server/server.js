@@ -5,16 +5,16 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from 'cors';
 import authRoutes from './auth.js'
+import Thread from "./models/Thread.js";
 
-
-
-import aiRoutes from "./assistant.js";
 
 const pwd = process.env.MONGO_Y;
 const uri = `mongodb+srv://yamenmoh250:${pwd}@cluster0.blp3ok9.mongodb.net/?retryWrites=true&w=majority`;
 
 mongoose.set('strictQuery', false);
 mongoose.connect(uri).then(console.log("Connected")).catch( (err)=>console.log("error connecting to database"));
+
+
 
 let refreshTokens = [];
 
@@ -36,6 +36,7 @@ app.use((req,res,next) =>{
 })
 
 app.use("/ai", aiRoutes);
+import aiRoutes from "./assistant.js";
 
 app.listen(port, ()=>{
     console.log(`Server Running On Port: ${port}`);

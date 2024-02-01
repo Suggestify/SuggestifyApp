@@ -4,6 +4,7 @@ import User from "./models/User.js";
 import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from 'dotenv';
+import Thread from './models/Thread.js';
 dotenv.config();
 const router = express.Router()
 router.post("/SignUp", async (req,res)=>{
@@ -15,8 +16,9 @@ router.post("/SignUp", async (req,res)=>{
 
         const curEmail = req.body.email;
         const curUserName = req.body.userName;
+        const newThread = new Thread();
 
-        const data = {email: curEmail, userName: curUserName, password: hashedPWD };  // email, username, password for database
+        const data = {email: curEmail, userName: curUserName, password: hashedPWD, thread: newThread._id };  // email, username, password for database
         const currentUser = new User(data);
         await currentUser.save();
         res.sendStatus(200);
