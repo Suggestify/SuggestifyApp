@@ -1,20 +1,22 @@
-
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 
-const options = ["Fantasy", "Mystery", "Thriller", "Science Fiction", "Romance", "Historical Fiction", "Biography", "Self-Help", "Young Adult", "Graphic Novel", "Horror", "Poetry", "Crime", "Adventure", "Classics", "Non-Fiction", "Children's", "Humor", "Satire", "Dystopian", "Memoir", "Literary Fiction", "Political", "Philosophy", "Travel", "Nature & Ecology", "Religion & Spirituality"];
-function Book(props) {
+function PreferenceSelection({ options, Next , navigation }) {
     const [selectedOptions, setSelectedOptions] = useState([]);
 
     const handleSelect = (item) => {
-        setSelectedOptions(prevSelected => {
+        setSelectedOptions((prevSelected) => {
             if (prevSelected.includes(item)) {
-                return prevSelected.filter(option => option !== item);
+                return prevSelected.filter((option) => option !== item);
             } else {
                 return [...prevSelected, item];
             }
         });
     };
+
+    async function handlePress(){
+        navigation.navigate(Next)
+    }
 
     const renderItem = ({ item }) => {
         const isSelected = selectedOptions.includes(item);
@@ -37,7 +39,7 @@ function Book(props) {
                 numColumns={2}
             />
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity style={styles.button} onPress={handlePress}>
                     <Text style={styles.buttonText}>Skip</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.button, styles.nextButton]}>
@@ -46,7 +48,7 @@ function Book(props) {
             </View>
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -61,30 +63,29 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderWidth: 1,
         borderColor: '#ccc',
-        borderRadius: 10
+        borderRadius: 10,
     },
     itemSelected: {
         backgroundColor: '#e9e9e9',
     },
     itemText: {
-        textAlign: 'center'
+        textAlign: 'center',
     },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        padding: 10
+        padding: 10,
     },
     button: {
         padding: 15,
         borderRadius: 25,
     },
     nextButton: {
-        backgroundColor: 'pink'
+        backgroundColor: 'pink',
     },
     buttonText: {
-        color: 'black'
-    }
+        color: 'black',
+    },
 });
 
-export default Book;
-
+export default PreferenceSelection;

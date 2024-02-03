@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import axios from 'axios';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
     StyleSheet,
     Text,
     View,
     Image,
     TextInput,
-    Button,
     Alert,
     TouchableOpacity,
 } from "react-native";
@@ -46,10 +45,11 @@ function SignUp({navigation}) {
                 password: password
             })
             if (response.status !== 200){
+                console.log("checl")
                 console.log(response.status)
 
             }else{
-                navigation.navigate('Home');
+                navigation.navigate('Music');
             }
         } catch(err){
             console.log(err)
@@ -57,7 +57,7 @@ function SignUp({navigation}) {
     }
 
     const goToLogIn = () => {
-        navigation.navigate('LogIn');
+        navigation.navigate('SignIn');
     };
 
     return (

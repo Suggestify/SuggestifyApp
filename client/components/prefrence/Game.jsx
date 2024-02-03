@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 
 const options = ["RPG", "FPS", "Puzzle", "Strategy", "Sports", "Racing", "Adventure", "Simulation", "Platformer", "MOBA", "Sandbox", "Fighting", "Stealth", "Survival", "Card & Board", "Educational", "Interactive Fiction", "MMO", "Rhythm", "Visual Novel", "Text-Based", "Tower Defense"];
-function Music(props) {
+function Game(props) {
     const [selectedOptions, setSelectedOptions] = useState([]);
 
     const handleSelect = (item) => {
@@ -86,5 +86,5 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Music;
+export default Game;
 
