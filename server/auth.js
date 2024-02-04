@@ -4,19 +4,29 @@ import User from "./models/User.js";
 import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from 'dotenv';
+import AIMap from './models/AIMap.js';
 dotenv.config();
 const router = express.Router()
+
+const saltrounds = 10;
+
 router.post("/SignUp", async (req,res)=>{
 
+    
     try{
+        
         const secret = process.env.B_SECRET;
         var pwdDB = secret + req.body.password;
         const hashedPWD = await bcryptjs.hash(pwdDB, saltrounds)  // hashed password to pass into database
-
+    
         const curEmail = req.body.email;
         const curUserName = req.body.userName;
-
-        const data = {email: curEmail, userName: curUserName, password: hashedPWD };  // email, username, password for database
+       
+        const initData = {Book:"NULL", Music:"NULL", Shows:"NULL", Game:"NULL", Hobbie:"NULL", Podcast:"NULL", Movie:"NULL"}
+        const newAIMap = new AIMap(initData);
+        await newAIMap.save();
+        
+        const data = {email: curEmail, userName: curUserName, password: hashedPWD, AIMap: newAIMap.id };  // email, username, password for database
         const currentUser = new User(data);
         await currentUser.save();
         res.sendStatus(200);

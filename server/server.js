@@ -5,16 +5,17 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from 'cors';
 import authRoutes from './auth.js'
-
-
-
+import AIMap from "./models/AIMap.js";
 import aiRoutes from "./assistant.js";
+
 
 const pwd = process.env.MONGO_Y;
 const uri = `mongodb+srv://yamenmoh250:${pwd}@cluster0.blp3ok9.mongodb.net/?retryWrites=true&w=majority`;
 
-mongoose.set('strictQuery', false);
+mongoose.set('strictQuery', true);
 mongoose.connect(uri).then(console.log("Connected")).catch( (err)=>console.log("error connecting to database"));
+
+
 
 let refreshTokens = [];
 
@@ -26,9 +27,9 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/auth', authRoutes)
 
-const saltrounds = 10;
+
+
 
 app.use((req,res,next) =>{
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -36,6 +37,9 @@ app.use((req,res,next) =>{
 })
 
 app.use("/ai", aiRoutes);
+app.use('/auth', authRoutes)
+
+
 
 app.listen(port, ()=>{
     console.log(`Server Running On Port: ${port}`);
