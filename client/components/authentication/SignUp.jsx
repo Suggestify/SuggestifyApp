@@ -22,6 +22,7 @@ function SignUp({navigation}) {
         setShowPassword(!showPassword);
     };
     async function onSubmit(){
+        console.log("1")
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const usernameRegex = /^[a-zA-Z0-9]+$/
 
@@ -37,19 +38,24 @@ function SignUp({navigation}) {
             );
             return;
         }
+        console.log("2")
 
         try {
-            const response = await axios.post("http://192.168.2.19:4000/auth/SignUp", {
+            console.log("3")
+            const response = await axios.post("http://192.168.2.18:4000/auth/SignUp", {
                 email: email,
                 userName: userName,
                 password: password
             })
+            console.log("4")
+            console.log("hello")
             if (response.status !== 200){
                 console.log("checl")
                 console.log(response.status)
 
             }else{
-                navigation.navigate('Music');
+                console.log("hello")
+                navigation.navigate('Preference');
             }
         } catch(err){
             console.log(err)

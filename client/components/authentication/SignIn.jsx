@@ -14,7 +14,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
-function SignIn({handleLogIn, navigation }) {
+function SignIn({isAuthenticated, setIsAuthenticated, navigation }) {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -25,9 +25,8 @@ function SignIn({handleLogIn, navigation }) {
     }
     async function onSubmit() {
         try {
-            console.log("yeehaw")
-
-            const response = await axios.post('http://192.168.2.19:4000/auth/SignIn', {
+            console.log(isAuthenticated)
+            const response = await axios.post('http://192.168.2.18:4000/auth/SignIn', {
                 UserId: email,
                 password: password
             })
@@ -40,7 +39,8 @@ function SignIn({handleLogIn, navigation }) {
 
                 await AsyncStorage.setItem('accessToken', accessToken);
                 await AsyncStorage.setItem('refreshToken', refreshToken);
-                handleLogIn();
+                setIsAuthenticated(true);
+
 
             }
         } catch (err) {

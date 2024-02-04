@@ -21,7 +21,7 @@ router.post('/token', (req, res) => {
 });
 router.post("/SignUp", async (req,res)=>{
     try{
-
+        console.log("hello")
         const secret = process.env.B_SECRET;
         var pwdDB = secret + req.body.password;
         const hashedPWD = await bcryptjs.hash(pwdDB, saltRounds)  // hashed password to pass into database
