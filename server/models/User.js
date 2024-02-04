@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
-import Thread from "./Thread.js";
+import Thread from "./AIMap.js";
 
 const userSchema = new mongoose.Schema({
     email:{
@@ -22,9 +22,9 @@ const userSchema = new mongoose.Schema({
         immutable: true,
         default: ()=> new Date()
     },
-    thread: {type: 
+    AIMap: {type: 
         Schema.Types.ObjectID,
-         ref: "Thread"
+         ref: "AIMap"
         }
 });
 

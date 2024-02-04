@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from 'dotenv';
 import Nedb from "Nedb"
 import {OpenAI} from 'OpenAI';
-import Thread from "./models/Thread.js";
+import AIMap from "./models/AIMap.js";
 import User from "./models/User.js";
 
 dotenv.config();
@@ -10,36 +10,44 @@ const router = express.Router();
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const apiKey = process.env.OPENAI_API;
-const assistants = [{Test: process.env.A_T_ID}]; // show as "${x}"
-
+const assistants = {Book: process.env.A_B_ID, Music: process.env.A_M_ID};
 
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API,
-  });
-
+  });  
   
 // check logical flow, error handling, looping of array / assistandId translation on backend most likley
 
-async function createThread(assistant_id, currAssistant, userId){  // should check existence in database per user per assistant
+//async function to find threadid per type for a user
 
-  try{
-     //const myUser = await User.findById(`${userId}`)
-    const myUser = await User.findById("65bb011f4acfa86163e05e87")
-    const threadId = myUser.thread;
-    const myThread = await Thread.findById(threadId);
-    const curThread = myThread.thread[3];
+
+async function createThread(prefrenceType, userId){  // should check existence in database per user per assistant
+
+  try{  //
+
+    const myUser = await User.findById(`${userId}`)
     
-    if(typeof(curThread) == 'undefined'){ // if thread does not exist then create new thread
-      const thread = await openai.beta.threads.create();
-      console.log(thread.id);
-      const assistantIdToSend = assistants[0].Test; // can also be name, this might be better
-      const threadToSend = thread.id
-      const updatedThread = await Thread.findByIdAndUpdate(
-        threadId, 
-        {$push: {thread: {assistantId: assistantIdToSend, threadId: threadToSend}}}
-      );
+    const AIMapId = myUser.AIMap;
+    const myAIMap = await AIMap.findById(AIMapId);
+    //preference type is passed in as a String, can be offloaded here if needed
+
+
+    if(myAIMap[prefrenceType] == 'NULL'){ // if thread does not exist then create new thread
+      try{
+        const thread = await openai.beta.threads.create();
+        console.log(thread.id);
+        let threadToSend = String(thread.id);
+        const data = {[prefrenceType]: threadToSend};
+        // add error handling for object.keys if exist in set
+        const updatedThread = await AIMap.findByIdAndUpdate(
+        AIMapId, data
+    );
       console.log("created");
+      }
+      catch(err){
+        //
+      }
     }
     else{
       console.log("thread exists");
@@ -47,54 +55,84 @@ async function createThread(assistant_id, currAssistant, userId){  // should che
     
   }
   catch(err){
+    console.log(err);
     //
   }
 }
 
-async function sendMessageAndRun(threadId, messageContent, assistantId){ // can incorporate thread, run, and message into one call. createAndRun
-  const message = await openai.beta.threads.messages.create(threadId, { // create message
-    role: "user",
-    content: messageContent
+async function sendMessageAndRun(userId, messageContent, assistantType){ // can incorporate thread, run, and message into one call. createAndRun
+  // create function for finding thread id from user id
+    
+    try{
+    const myUser = await User.findById(`${userId}`)
+    
+    const AIMapId = myUser.AIMap;
+    const myAIMap = await AIMap.findById(AIMapId);
+
+    const assistantId = assistants[assistantType];
+    console.log(assistantId)
+    
+    const curAIMap = myAIMap[assistantType];  // can be named thread find similar
+    console.log(curAIMap);
+    console.log(messageContent);
+
+  const message = await openai.beta.threads.messages.create(curAIMap, { // create message
+      role: "user",
+      content: messageContent
   });
-  const run = await openai.beta.runs.create(threadId, {assisatnt_id: assistantId});
-  return run;
+  // create and run thread in one? if needed
+    const run = await openai.beta.threads.runs.create(curAIMap, {assistant_id: assistantId});
+    return run;  // need to run?
 }
+catch(err){
+  console.log(err);
+}
+}
+
 
 async function checkStatus(threadId, runId){ // could remove as a function?
   const runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
-  return runStatus.data.status;
+  //console.log(runStatus.status);
+  return runStatus.status;
 }
-
-
 
 
 router.post("/create", (req,res)=>{ // creates thread per assistant
   //req contains user, prefrences,
-  //createThread();
+  const assistantType = req.body.type;
+  const userId = req.body.userId;
+  //createThread(assistantType, userId);
+  //send initial message per thread
+  //sendMessageAndRun(userId, messageContent, assistantType); // move inside createthread function for single run inside try?
 });
 
-router.post("/sendMessage", async (req,res)=>{
-  let currMsgStatus = "pending"
-  const currUser = req.body.userId;
 
-  const pendingThread = Thread.findById(currUser.thread); // rename?
+// keep seperate function but this is for recieving as well?
+router.post("/sendMessage", async (req,res)=>{  // try catch block
+  let currMsgStatus = "pending";
+  const userId = req.body.userId;
+  const currUser = await User.findById(userId);
 
+  // have backend map assistant somehow? no need tho
+  //console.log(threadToRun[req.body.type]);  // rename preference type to assistant somtn cast to string?---
   const message = req.body.messageContent;
-  const currAssistant = pendingThread[0].assisatnt_id // assistand id translation in front or backend
-  const currThread = pendingThread[0].threadId
-  //const currRun = sendMessageAndRun(currThrad, message, currAssistant);
+  
+  //const currAssistant = assistants[req.body.type] // assistand id translation in front or backend ---
+  //console.log(currAssistant);
+  const currRun = await sendMessageAndRun(userId, message, req.body.type);
+  //console.log(currRun);
 
   //retrieve message
   while(currMsgStatus !== "completed"){
-    currMsgStatus = await checkStatus(currThread,currRun.id); // check syntax
+    currMsgStatus = await checkStatus(currRun.thread_id,currRun.id); // check syntax
     await delay(500);
    }
 
-   const messages = await openai.beta.threads.messages.list(currThread);
-   
-   //messages.body.data.forEach(message =>{
-    //console.log(message.content);
-   //});
+   const messages = await openai.beta.threads.messages.list(currRun.thread_id);
+   //console.log(messages);
+   messages.body.data.forEach(message =>{
+    console.log(message.content);
+   });
 
 });
 
