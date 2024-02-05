@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 
+
 // Array of arrays containing different options
 const allOptions = [
     ["Pop", "Rock", "Hip Hop", "Jazz", "Electronic", "Country", "R&B", "Classical", "Reggae", "Blues", "Folk", "Metal", "Lo-fi", "Punk", "Soul", "Indie", "EDM", "Latin", "K-pop", "Gospel", "Reggaeton", "Funk", "House", "Techno", "Alternative", "Trance"],
@@ -12,7 +13,7 @@ const allOptions = [
     ["RPG", "FPS", "Puzzle", "Strategy", "Sports", "Racing", "Adventure", "Simulation", "Platformer", "MOBA", "Sandbox", "Fighting", "Stealth", "Survival", "Card & Board", "Educational", "Interactive Fiction", "MMO", "Rhythm", "Visual Novel", "Text-Based", "Tower Defense"]
 ];
 
-function Preference({isAuthenticated, setIsAuthenticated}) {
+function Preference({navigation}) {
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [currentArrayIndex, setCurrentArrayIndex] = useState(0); // Index to track the current array of options
     const [currentOptions, setCurrentOptions] = useState(allOptions[currentArrayIndex]);
@@ -37,10 +38,10 @@ function Preference({isAuthenticated, setIsAuthenticated}) {
     const handleNextOrSkip = () => {
 
         if (currentArrayIndex < allOptions.length - 1) {
-            // Move to the next array of options
             setCurrentArrayIndex(currentArrayIndex + 1);
         } else {
-            setIsAuthenticated(true)
+
+            navigation.navigate("Home")
 
         }
     };

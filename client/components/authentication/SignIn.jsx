@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useContext, useEffect} from "react";
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import axios from 'axios';
 import {
@@ -13,8 +13,7 @@ import {
 import {LinearGradient} from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
-function SignIn({isAuthenticated, setIsAuthenticated, navigation }) {
+function SignIn({navigation }) {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -25,7 +24,6 @@ function SignIn({isAuthenticated, setIsAuthenticated, navigation }) {
     }
     async function onSubmit() {
         try {
-            console.log(isAuthenticated)
             const response = await axios.post('http://192.168.2.18:4000/auth/SignIn', {
                 UserId: email,
                 password: password
@@ -39,8 +37,7 @@ function SignIn({isAuthenticated, setIsAuthenticated, navigation }) {
 
                 await AsyncStorage.setItem('accessToken', accessToken);
                 await AsyncStorage.setItem('refreshToken', refreshToken);
-                setIsAuthenticated(true);
-
+                navigation.navigate('Home')
 
             }
         } catch (err) {

@@ -1,21 +1,17 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Text, TouchableOpacity, StyleSheet} from "react-native";
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from 'expo-linear-gradient';
 
-
-function Home({ isAuthenticated, setIsAuthenticated }) {
+function Home({navigation}) {
     async function onSubmit(){
         try{
-            console.log("ca")
             const response = await axios.delete("http://192.168.2.18:4000/auth/SignOut")
             await AsyncStorage.removeItem('accessToken');
             await AsyncStorage.removeItem('refreshToken');
-            console.log(isAuthenticated)
             if(response.status === 204){
-
-                setIsAuthenticated(false);
+                navigation.navigate('SignIn')
             }
         }catch(err){
             console.log(err)
