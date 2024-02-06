@@ -1,4 +1,4 @@
-import React, {useState, useContext, useEffect} from "react";
+import React, {useState} from "react";
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import axios from 'axios';
 import {
@@ -7,7 +7,6 @@ import {
     View,
     Image,
     TextInput,
-    Alert,
     TouchableOpacity,
 } from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
@@ -29,7 +28,7 @@ function SignIn({navigation }) {
                 password: password
             })
             if (response.status !== 200) {
-                console.log()
+                console.log(response.status)
 
             } else {
                 const accessToken = response.data.access;

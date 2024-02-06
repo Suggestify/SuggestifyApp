@@ -21,7 +21,6 @@ router.post('/token', (req, res) => {
 });
 router.post("/SignUp", async (req,res)=>{
     try{
-        console.log("hello")
         const secret = process.env.B_SECRET;
         var pwdDB = secret + req.body.password;
         const hashedPWD = await bcryptjs.hash(pwdDB, saltRounds)  // hashed password to pass into database
@@ -32,8 +31,14 @@ router.post("/SignUp", async (req,res)=>{
         const data = {email: curEmail, userName: curUserName, password: hashedPWD};  // email, username, password for database
         const currentUser = new User(data);
         await currentUser.save();
-        console.log(currentUser)
-        res.sendStatus(200);
+
+        const accessToken = jwt.sign({ username: curUserName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+        const refreshToken = jwt.sign({ username: curUserName }, process.env.REFRESH_TOKEN_SECRET);
+        const token = {
+            access: accessToken,
+            refresh: refreshToken
+        }
+        res.json(token).status(200);
     }
 
     catch(err){
@@ -45,7 +50,6 @@ router.post("/SignUp", async (req,res)=>{
 
 
 router.post("/SignIn", async (req,res)=>{
-    console.log("called");
     try{
         const userId = req.body.UserId;
         var user;
@@ -67,11 +71,8 @@ router.post("/SignIn", async (req,res)=>{
                 console.log(err)
             }
             if(match){
-                console.log(user)
                 const accessToken = jwt.sign({ username: user.userName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-                console.log("good1")
                 const refreshToken = jwt.sign({ username: user.userName }, process.env.REFRESH_TOKEN_SECRET);
-                console.log("good2")
                 const token = {
                     access: accessToken,
                     refresh: refreshToken

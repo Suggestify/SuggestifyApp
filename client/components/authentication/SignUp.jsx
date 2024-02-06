@@ -11,6 +11,7 @@ import {
     TouchableOpacity,
 } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function SignUp({navigation}) {
     const [email, setEmail] = useState("");
@@ -22,7 +23,6 @@ function SignUp({navigation}) {
         setShowPassword(!showPassword);
     };
     async function onSubmit(){
-        console.log("1")
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const usernameRegex = /^[a-zA-Z0-9]+$/
 
@@ -38,24 +38,25 @@ function SignUp({navigation}) {
             );
             return;
         }
-        console.log("2")
 
         try {
-            console.log("3")
             const response = await axios.post("http://192.168.2.18:4000/auth/SignUp", {
                 email: email,
                 userName: userName,
                 password: password
             })
-            console.log("4")
-            console.log("hello")
             if (response.status !== 200){
-                console.log("checl")
                 console.log(response.status)
 
             }else{
-                console.log("hello")
-                navigation.navigate('Preference');
+                const accessToken = response.data.access;
+                const refreshToken = response.data.refresh;
+
+                await AsyncStorage.setItem('accessToken', accessToken);
+                await AsyncStorage.setItem('refreshToken', refreshToken);
+                navigation.navigate('Preference', {
+                    userName: userName
+                });
             }
         } catch(err){
             console.log(err)

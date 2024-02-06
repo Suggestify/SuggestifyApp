@@ -4,7 +4,7 @@ import SignIn from "./components/authentication/SignIn";
 import SignUp from "./components/authentication/SignUp";
 import Home from "./components/home/Home";
 import Preference from "./components/prefrence/Preference";
-import React, {useContext} from 'react'
+import React from 'react'
 
 import Loading from "./components/Loading";
 
@@ -15,11 +15,13 @@ export default function App() {
     return (
             <NavigationContainer>
                 <Stack.Navigator screenOptions={{headerShown: false}}>
+
                     <Stack.Screen name="Loading" component={Loading} />
                     <Stack.Screen name="SignIn" component={SignIn} />
                     <Stack.Screen name="Home" component={Home} />
                     <Stack.Screen name="SignUp" component={SignUp}/>
                     <Stack.Screen name="Preference" component={Preference}/>
+
                 </Stack.Navigator>
             </NavigationContainer>
     );
