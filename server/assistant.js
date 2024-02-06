@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from 'dotenv';
 import Nedb from "Nedb"
+import jwt from "jsonwebtoken";
 import {OpenAI} from 'OpenAI';
 import AIMap from "./models/AIMap.js";
 import User from "./models/User.js";
@@ -137,5 +138,8 @@ router.post("/sendMessage", async (req,res)=>{  // try catch block
 });
 
 
+
+router.post('/create', (req, res) => {
+});
 
 export default router;

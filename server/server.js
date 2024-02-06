@@ -16,7 +16,6 @@ mongoose.set('strictQuery', true);
 mongoose.connect(uri).then(console.log("Connected")).catch( (err)=>console.log("error connecting to database"));
 
 
-
 let refreshTokens = [];
 
 
@@ -26,9 +25,6 @@ const port = 4000;
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-
-
 
 
 app.use((req,res,next) =>{

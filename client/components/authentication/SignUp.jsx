@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import axios from 'axios';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
     StyleSheet,
     Text,
     View,
     Image,
     TextInput,
-    Button,
     Alert,
     TouchableOpacity,
 } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function SignUp({navigation}) {
     const [email, setEmail] = useState("");
@@ -40,7 +40,7 @@ function SignUp({navigation}) {
         }
 
         try {
-            const response = await axios.post("http://192.168.2.19:4000/auth/SignUp", {
+            const response = await axios.post("http://192.168.2.18:4000/auth/SignUp", {
                 email: email,
                 userName: userName,
                 password: password
@@ -49,7 +49,14 @@ function SignUp({navigation}) {
                 console.log(response.status)
 
             }else{
-                navigation.navigate('Home');
+                const accessToken = response.data.access;
+                const refreshToken = response.data.refresh;
+
+                await AsyncStorage.setItem('accessToken', accessToken);
+                await AsyncStorage.setItem('refreshToken', refreshToken);
+                navigation.navigate('Preference', {
+                    userName: userName
+                });
             }
         } catch(err){
             console.log(err)
@@ -57,7 +64,7 @@ function SignUp({navigation}) {
     }
 
     const goToLogIn = () => {
-        navigation.navigate('LogIn');
+        navigation.navigate('SignIn');
     };
 
     return (

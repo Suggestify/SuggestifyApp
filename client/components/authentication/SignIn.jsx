@@ -7,35 +7,37 @@ import {
     View,
     Image,
     TextInput,
-    Button,
-    Alert,
     TouchableOpacity,
 } from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-function SignIn({navigation}) {
+function SignIn({navigation }) {
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
-    function toggleShowPassword({navigation}) {
+    function toggleShowPassword() {
         setShowPassword(!showPassword);
-    };
-
-    axios.get('http://192.168.2.19:4000/auth')
-    Alert.alert("running")
+    }
     async function onSubmit() {
         try {
-
-            const response = await axios.post('http://192.168.2.19:4000/auth/SignIn', {
+            const response = await axios.post('http://192.168.2.18:4000/auth/SignIn', {
                 UserId: email,
                 password: password
             })
             if (response.status !== 200) {
-                console.log()
+                console.log(response.status)
 
             } else {
-                navigation.navigate('Home');
+                const accessToken = response.data.access;
+                const refreshToken = response.data.refresh;
+
+                await AsyncStorage.setItem('accessToken', accessToken);
+                await AsyncStorage.setItem('refreshToken', refreshToken);
+                navigation.navigate('Home')
+
             }
         } catch (err) {
             console.log(err)

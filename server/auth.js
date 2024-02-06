@@ -1,12 +1,26 @@
 import express from 'express'
 import bcryptjs from "bcryptjs";
 import User from "./models/User.js";
-import cors from "cors";
-import bodyParser from "body-parser";
+import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv';
 import AIMap from './models/AIMap.js';
 dotenv.config();
 const router = express.Router()
+
+let refreshTokens = [];
+const saltRounds = 10;
+
+router.post('/token', (req, res) => {
+    const refreshToken = req.body.token;
+    if (!refreshToken || !refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        const accessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+        res.json({ accessToken });
+    });
+});
+
 
 const saltrounds = 10;
 
@@ -17,8 +31,8 @@ router.post("/SignUp", async (req,res)=>{
         
         const secret = process.env.B_SECRET;
         var pwdDB = secret + req.body.password;
-        const hashedPWD = await bcryptjs.hash(pwdDB, saltrounds)  // hashed password to pass into database
-    
+
+        const hashedPWD = await bcryptjs.hash(pwdDB, saltRounds)  // hashed password to pass into database
         const curEmail = req.body.email;
         const curUserName = req.body.userName;
        
@@ -29,8 +43,14 @@ router.post("/SignUp", async (req,res)=>{
         const data = {email: curEmail, userName: curUserName, password: hashedPWD, AIMap: newAIMap.id };  // email, username, password for database
         const currentUser = new User(data);
         await currentUser.save();
-        res.sendStatus(200);
 
+        const accessToken = jwt.sign({ username: curUserName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+        const refreshToken = jwt.sign({ username: curUserName }, process.env.REFRESH_TOKEN_SECRET);
+        const token = {
+            access: accessToken,
+            refresh: refreshToken
+        }
+        res.json(token).status(200);
     }
 
     catch(err){
@@ -58,16 +78,18 @@ router.post("/SignIn", async (req,res)=>{
         const secret = process.env.B_SECRET;
         const pwdUser = secret + req.body.password;  // password on current input
 
-
         bcryptjs.compare(pwdUser, pwdDB, function(err, match){
             if(err){
                 console.log(err)
             }
             if(match){
-                // const accessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' });
-                // const refreshToken = jwt.sign({ username: user.username }, process.env.REFRESH_TOKEN_SECRET);
-                console.log("match");
-                res.sendStatus(200);
+                const accessToken = jwt.sign({ username: user.userName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+                const refreshToken = jwt.sign({ username: user.userName }, process.env.REFRESH_TOKEN_SECRET);
+                const token = {
+                    access: accessToken,
+                    refresh: refreshToken
+                }
+                res.json(token).status(200);
             }
             else{
                 console.log("no match");
@@ -79,8 +101,23 @@ router.post("/SignIn", async (req,res)=>{
     }
 });
 
-router.get("/", (req,res) =>{
-    console.log("test")
-})
+router.delete('/SignOut', (req, res) => {
+    refreshTokens = refreshTokens.filter(token => token !== req.body.token);
+    res.sendStatus(204);
+});
+
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    if (!token) return res.sendStatus(401); // No token, unauthorized
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403); // Invalid token
+        req.user = user;
+        next(); // Proceed to the protected route
+    });
+}
+
+
 
 export default router
