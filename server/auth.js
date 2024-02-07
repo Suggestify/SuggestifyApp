@@ -10,6 +10,7 @@ const router = express.Router()
 let refreshTokens = [];
 const saltRounds = 10;
 
+
 router.post('/token', (req, res) => {
     const refreshToken = req.body.token;
     if (!refreshToken || !refreshTokens.includes(refreshToken)) return res.sendStatus(403);
@@ -22,15 +23,12 @@ router.post('/token', (req, res) => {
 });
 
 
-const saltrounds = 10;
 
 router.post("/SignUp", async (req,res)=>{
 
-    
     try{
-        
         const secret = process.env.B_SECRET;
-        var pwdDB = secret + req.body.password;
+        const pwdDB = secret + req.body.password;
 
         const hashedPWD = await bcryptjs.hash(pwdDB, saltRounds)  // hashed password to pass into database
         const curEmail = req.body.email;
@@ -74,7 +72,6 @@ router.post("/SignIn", async (req,res)=>{
 
         const pwdDB = user.password;  // password from database
 
-
         const secret = process.env.B_SECRET;
         const pwdUser = secret + req.body.password;  // password on current input
 
@@ -83,6 +80,7 @@ router.post("/SignIn", async (req,res)=>{
                 console.log(err)
             }
             if(match){
+                console.log(process.env.ACCESS_TOKEN_SECRET)
                 const accessToken = jwt.sign({ username: user.userName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
                 const refreshToken = jwt.sign({ username: user.userName }, process.env.REFRESH_TOKEN_SECRET);
                 const token = {
