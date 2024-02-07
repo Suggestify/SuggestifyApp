@@ -99,9 +99,12 @@ async function checkStatus(threadId, runId){ // could remove as a function?
 
 
 router.post("/create", (req,res)=>{ // creates thread per assistant
+
   //req contains user, prefrences,
-  const assistantType = req.body.type;
-  const userId = req.body.userId;
+  const assistantType = req.body.medium;
+  const userName = req.body.userName;
+  const options = req.body.options;
+  res.sendStatus(200)
   //createThread(assistantType, userId);
   //send initial message per thread
   //sendMessageAndRun(userId, messageContent, assistantType); // move inside createthread function for single run inside try?
@@ -136,10 +139,4 @@ router.post("/sendMessage", async (req,res)=>{  // try catch block
    });
 
 });
-
-
-
-router.post('/create', (req, res) => {
-});
-
 export default router;

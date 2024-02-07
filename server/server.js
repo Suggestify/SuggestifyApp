@@ -36,7 +36,6 @@ app.use("/ai", aiRoutes);
 app.use('/auth', authRoutes)
 
 
-
 app.listen(port, ()=>{
     console.log(`Server Running On Port: ${port}`);
 })
