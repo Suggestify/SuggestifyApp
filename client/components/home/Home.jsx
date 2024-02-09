@@ -5,8 +5,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
 
-
-
 function Home({navigation}) {
     const [myArray, setMyArray] = useState(["Music", "Books", "Podcasts", "Shows", "Movies", "Hobbies", "Games"]);
 
@@ -30,12 +28,10 @@ function Home({navigation}) {
         }
     }
     function handleClick(index) {
-
         return () => {
             moveToFrontAndShift(myArray, index);
             setMyArray([...myArray]);
         };
-        //navigation.navigate("Loading")
     }
 
     return (
