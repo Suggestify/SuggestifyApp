@@ -10,13 +10,10 @@ import Loading from "./components/Loading";
 import ChatScreen from "./components/chat/ChatScreen";
 import ChatPreview from "./components/home/ChatPreview";
 
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-
     return (
-
             <NavigationContainer>
                 <Stack.Navigator screenOptions={{headerShown: false}}>
                     <Stack.Screen name="Loading" component={Loading} />
@@ -24,14 +21,8 @@ export default function App() {
                     <Stack.Screen name="Home" component={Home} />
                     <Stack.Screen name="SignUp" component={SignUp}/>
                     <Stack.Screen name="Preference" component={Preference}/>
-
-
                     <Stack.Screen name="ChatPreview" component={ChatPreview}></Stack.Screen>
-
                 </Stack.Navigator>
             </NavigationContainer>
-
-           
-
     );
 }
