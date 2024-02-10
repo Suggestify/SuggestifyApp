@@ -66,6 +66,7 @@ function Preference({ route ,navigation}) {
 
     return (
         <View style={styles.container}>
+            <Text style={styles.title}>{allOptions[currentArrayIndex].title}</Text>
             <FlatList
                 data={currentOptions}
                 renderItem={renderItem}
@@ -88,6 +89,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         marginTop: 100,
+    },
+    title:{
+        textAlign: "center",
+        fontSize: 30,
+        fontWeight: 'bold',
+        paddingBottom: 10
     },
     item: {
         flex: 1,
