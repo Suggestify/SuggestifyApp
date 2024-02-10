@@ -52,8 +52,10 @@ router.post("/SignUp", async (req,res)=>{
     }
 
     catch(err){
-        res.status(400)
-        res.json(err);
+        if(err.code === 11000){
+            const field = Object.keys(err.keyValue)[0];
+            res.status(400).send({ field: field,  message: `An account with that ${field} already exists.` });
+        }
     }
 
 });
@@ -62,10 +64,9 @@ router.post("/SignUp", async (req,res)=>{
 router.post("/SignIn", async (req,res)=>{
     try{
         const userId = req.body.UserId;
-        var user;
+        let user;
         if(userId.includes("@")){
             user = await User.findOne({email: userId});
-
         }else{
             user = await User.findOne({userName: UserId});
         }
@@ -91,11 +92,11 @@ router.post("/SignIn", async (req,res)=>{
             }
             else{
                 console.log("no match");
-                res.sendStatus(401);
+                res.status(401).send({message: "login or password is incorrect"});
             }
         });
     } catch(err){
-        res.status(400);
+        res.status(400).send({message: "login or password is incorrect"});
     }
 });
 

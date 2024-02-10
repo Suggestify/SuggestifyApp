@@ -4,6 +4,7 @@ import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
+import {Button, Header, Icon} from "react-native-elements";
 
 function Home({navigation}) {
     const [myArray, setMyArray] = useState(["Music", "Books", "Podcasts", "Shows", "Movies", "Hobbies", "Games"]);
