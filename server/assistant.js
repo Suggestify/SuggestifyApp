@@ -1,7 +1,5 @@
 import express from "express";
 import dotenv from 'dotenv';
-import Nedb from "Nedb"
-import jwt from "jsonwebtoken";
 import {OpenAI} from 'OpenAI';
 import AIMap from "./models/AIMap.js";
 import User from "./models/User.js";
@@ -10,42 +8,45 @@ dotenv.config();
 const router = express.Router();
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-const apiKey = process.env.OPENAI_API;
 const assistants = {Book: process.env.A_B_ID, Music: process.env.A_M_ID};
-
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API,
   });  
-  
-// check logical flow, error handling, looping of array / assistandId translation on backend most likley
-
-//async function to find threadid per type for a user
 
 
-async function createThread(prefrenceType, userId){  // should check existence in database per user per assistant
+async function getMapFromUser(userName) {
+    try {
+        const myUser = await User.findOne({userName: userName});
+        const curAIMapID = myUser.AIMap;
+        const curAIMap = await AIMap.findById(curAIMapID);
+        return curAIMap;
+    }
+    catch(err){
+        //
+    }
+}
 
-  try{  //
+function convertToMessage(options){
+    //converts to prompt manually
+}
 
-    const myUser = await User.findById(`${userId}`)
-    
-    const AIMapId = myUser.AIMap;
-    const myAIMap = await AIMap.findById(AIMapId);
-    //preference type is passed in as a String, can be offloaded here if needed
+async function createThread(userName, chatType, messageContent){  // should check existence in database per user per assistant
 
+  try{
+   const myAIMap = await getMapFromUser(userName);
 
-    if(myAIMap[prefrenceType] == 'NULL'){ // if thread does not exist then create new thread
+    if(myAIMap[chatType] == 'NULL'){ // if thread does not exist then create new thread
       try{
         const thread = await openai.beta.threads.create();
-        console.log(thread.id);
         let threadToSend = String(thread.id);
-        const data = {[prefrenceType]: threadToSend};
+        const data = {[chatType]: threadToSend};
         // add error handling for object.keys if exist in set
-        const updatedThread = await AIMap.findByIdAndUpdate(
-        AIMapId, data
-    );
-      console.log("created");
+        await AIMap.findByIdAndUpdate(myAIMap.id, data);
+        await sendMessage(userName, chatType, messageContent, true);
       }
+
+      // send init first message and run / dont?
       catch(err){
         //
       }
@@ -53,7 +54,6 @@ async function createThread(prefrenceType, userId){  // should check existence i
     else{
       console.log("thread exists");
     }
-    
   }
   catch(err){
     console.log(err);
@@ -61,82 +61,86 @@ async function createThread(prefrenceType, userId){  // should check existence i
   }
 }
 
-async function sendMessageAndRun(userId, messageContent, assistantType){ // can incorporate thread, run, and message into one call. createAndRun
-  // create function for finding thread id from user id
-    
-    try{
-    const myUser = await User.findById(`${userId}`)
-    
-    const AIMapId = myUser.AIMap;
-    const myAIMap = await AIMap.findById(AIMapId);
-
-    const assistantId = assistants[assistantType];
-    console.log(assistantId)
-    
-    const curAIMap = myAIMap[assistantType];  // can be named thread find similar
-    console.log(curAIMap);
-    console.log(messageContent);
-
-  const message = await openai.beta.threads.messages.create(curAIMap, { // create message
-      role: "user",
-      content: messageContent
-  });
-  // create and run thread in one? if needed
-    const run = await openai.beta.threads.runs.create(curAIMap, {assistant_id: assistantId});
-    return run;  // need to run?
-}
-catch(err){
-  console.log(err);
-}
+// incorporate into loading call
+async function fetchMessages(userName, chatType){
+    const currAIMap = await getMapFromUser(userName);
+    const threadMessages = await openai.beta.threads.messages.list(
+        currAIMap[chatType]
+    );
+    threadMessages.body.data.forEach(message => {
+        console.log(message.content);
+     });
 }
 
 
 async function checkStatus(threadId, runId){ // could remove as a function?
   const runStatus = await openai.beta.threads.runs.retrieve(threadId, runId);
-  //console.log(runStatus.status);
   return runStatus.status;
 }
 
+async function sendMessage(userName, chatType, messageContent, init){
+    try{
 
-router.post("/create", (req,res)=>{ // creates thread per assistant
+        const myAIMap = await getMapFromUser(userName);
+        const assistantId = assistants[chatType];
+        const curThread = myAIMap[chatType];
 
-  //req contains user, prefrences,
-  const assistantType = req.body.medium;
+        await openai.beta.threads.messages.create(curThread, { // create message // dont need as const?
+            role: "user",
+            content: messageContent
+        });
+        const run = await openai.beta.threads.runs.create(curThread, {assistant_id: assistantId});  // store in db
+
+        if(!init) {
+            let currMsgStatus = "pending";
+            while (currMsgStatus !== "completed") {
+                currMsgStatus = await checkStatus(curThread, run.id); // check syntax
+                console.log(currMsgStatus);
+                await delay(1000);
+            }
+
+            const messages = await openai.beta.threads.messages.list(curThread);// make single fetch
+            console.log(messages.body.data[0].content[0].text.value);
+        }
+
+    }catch(err){
+        console.log(err);
+    }
+
+}
+
+router.post("/create", async (req,res)=>{ // creates thread per assistant
+
+  const chatType = req.body.medium;
   const userName = req.body.userName;
   const options = req.body.options;
-  res.sendStatus(200)
-  //createThread(assistantType, userId);
+    // try
+
+    const test = "hello"
+    // to convert in function then pass in
+  await createThread(userName, chatType, test);
   //send initial message per thread
-  //sendMessageAndRun(userId, messageContent, assistantType); // move inside createthread function for single run inside try?
+    res.sendStatus(200)
 });
 
+router.post("/sendMessage", async (req,res)=>{  // for indi message
 
-// keep seperate function but this is for recieving as well?
-router.post("/sendMessage", async (req,res)=>{  // try catch block
-  let currMsgStatus = "pending";
-  const userId = req.body.userId;
-  const currUser = await User.findById(userId);
+    try {
 
-  // have backend map assistant somehow? no need tho
-  //console.log(threadToRun[req.body.type]);  // rename preference type to assistant somtn cast to string?---
-  const message = req.body.messageContent;
-  
-  //const currAssistant = assistants[req.body.type] // assistand id translation in front or backend ---
-  //console.log(currAssistant);
-  const currRun = await sendMessageAndRun(userId, message, req.body.type);
-  //console.log(currRun);
+        const userName = req.body.userName;
+        const message = req.body.messageContent;
+        const chatType = req.body.type;
 
-  //retrieve message
-  while(currMsgStatus !== "completed"){
-    currMsgStatus = await checkStatus(currRun.thread_id,currRun.id); // check syntax
-    await delay(500);
-   }
-
-   const messages = await openai.beta.threads.messages.list(currRun.thread_id);
-   //console.log(messages);
-   messages.body.data.forEach(message =>{
-    console.log(message.content);
-   });
+        await sendMessage(userName, chatType, message, false);
+    }catch(err){
+        console.log(err);
+    }
 
 });
+
+// fetch previous messages up till var
+router.post("/fetchMessages",async (req,res)=>{ // make get
+    await fetchMessages(req.body.userName, req.body.type);
+});
+
 export default router;
