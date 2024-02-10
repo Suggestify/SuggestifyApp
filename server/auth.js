@@ -33,7 +33,7 @@ router.post("/SignUp", async (req,res)=>{
         const hashedPWD = await bcryptjs.hash(pwdDB, saltRounds)  // hashed password to pass into database
         const curEmail = req.body.email;
         const curUserName = req.body.userName;
-       
+
         const initData = {Book:"NULL", Music:"NULL", Shows:"NULL", Game:"NULL", Hobbie:"NULL", Podcast:"NULL", Movie:"NULL"}
         const newAIMap = new AIMap(initData);
         await newAIMap.save();

@@ -8,7 +8,7 @@ const aiSchema = new mongoose.Schema({
     Game: String,
     Hobbie: String,
     Podcast: String,
-    Movie: String
+    Movie: String,
 }, {strict: true});
 
 let AIMap = mongoose.model('AIMap', aiSchema);
