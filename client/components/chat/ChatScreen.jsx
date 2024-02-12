@@ -5,7 +5,7 @@ import ChatIcon from "./ChatIcon";
 import ChatBubble from "./ChatBubble";
 
 function ChatScreen(props) {
-
+// take in navigation props to use as array
     let test = [
         {type: "User", message: "Hello bob", id: 1},
         {type: "AI", message: "sup shmungi", id:2}

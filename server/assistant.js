@@ -67,9 +67,12 @@ async function fetchMessages(userName, chatType){
     const threadMessages = await openai.beta.threads.messages.list(
         currAIMap[chatType]
     );
+    const returnMessages = [];
     threadMessages.body.data.forEach(message => {
-        console.log(message.content);
+        returnMessages.push(message.content[0].text.value);
      });
+    return returnMessages.reverse();
+
 }
 
 
@@ -139,8 +142,9 @@ router.post("/sendMessage", async (req,res)=>{  // for indi message
 });
 
 // fetch previous messages up till var
-router.post("/fetchMessages",async (req,res)=>{ // make get
-    await fetchMessages(req.body.userName, req.body.type);
+router.get("/fetchMessages",async (req,res)=>{ // make get
+    const response = await fetchMessages(req.body.userName, req.body.type);
+    res.send(response);
 });
 
 export default router;

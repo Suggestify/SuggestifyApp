@@ -8,7 +8,7 @@ function Loading({userName, medium, navigation }) {
     useEffect(() => {
         async function pullChat(){
             try {
-                const response = await axios.get("pull the chat info", {
+                const response = await axios.get("ip:4000/ai/fetchMessages", {
                     userName: userName,
                     medium: medium
                 })
