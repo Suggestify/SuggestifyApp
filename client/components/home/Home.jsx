@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import {Text, TouchableOpacity, StyleSheet} from "react-native";
-import axios from 'axios';
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
-import {Button, Header, Icon} from "react-native-elements";
 
 function Home({navigation}) {
     const [myArray, setMyArray] = useState(["Music", "Books", "Podcasts", "Shows", "Movies", "Hobbies", "Games"]);
@@ -17,16 +14,9 @@ function Home({navigation}) {
         arr.unshift(item); // Add it to the front of the array
     }
     async function onSubmit(){
-        try{
-            const response = await axios.delete("http://192.168.2.18:4000/auth/SignOut")
-            await AsyncStorage.removeItem('accessToken');
-            await AsyncStorage.removeItem('refreshToken');
-            if(response.status === 204){
-                navigation.navigate('SignIn')
-            }
-        }catch(err){
-            console.log(err)
-        }
+        navigation.navigate('Settings', {
+            username: us
+        })
     }
     function handleClick(index) {
         return () => {
@@ -38,7 +28,7 @@ function Home({navigation}) {
     return (
         <LinearGradient style={styles.linearGradient} colors={['#150c25', '#222222', 'black']}>
             <TouchableOpacity onPress={onSubmit}  style={styles.loginBtn} >
-                <Text>SignOut</Text>
+                <Text>Settings</Text>
             </TouchableOpacity>
             {myArray.map((item, index) => (
                 <TouchableOpacity key={item} onPress={handleClick(index)} >

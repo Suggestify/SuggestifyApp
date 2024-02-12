@@ -25,7 +25,6 @@ router.post('/token', (req, res) => {
 
 
 router.post("/SignUp", async (req,res)=>{
-
     try{
         const secret = process.env.B_SECRET;
         const pwdDB = secret + req.body.password;
@@ -104,6 +103,36 @@ router.delete('/SignOut', (req, res) => {
     refreshTokens = refreshTokens.filter(token => token !== req.body.token);
     res.sendStatus(204);
 });
+
+router.put('/changeUsername', authenticateToken, async (req, res) => {
+    try {
+        const newUsername = req.body.newUsername;
+        const currUsername =  req.body.username;
+
+        if(newUsername.includes("@") || newUsername == ""){
+            return res.status(400).send({ message: 'bad username' });
+        }
+
+        const usernameExists = await User.findOne({ userName: newUsername });
+        if (usernameExists) {
+            return res.status(400).send({ message: 'Username already taken' });
+        }
+
+        const user = await User.findOne({ userName: currUsername });
+        if (!user) {
+            return res.status(404).send({ message: 'User not found' });
+        }
+
+        user.userName = newUsername; // Update the username
+        await user.save(); // Save the updated user to the database
+
+        res.status(200).send({ message: 'Username successfully updated' });
+    } catch (err) {
+        // Handle any errors
+        res.status(500).send({ message: 'Error updating username' });
+    }
+});
+
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];

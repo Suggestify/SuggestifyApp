@@ -7,7 +7,6 @@ import {
     View,
     Image,
     TextInput,
-    Alert,
     TouchableOpacity,
 } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
