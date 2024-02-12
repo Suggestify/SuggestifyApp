@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import axios from 'axios'
+import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 
 
 // Array of arrays containing different options
@@ -14,8 +15,8 @@ const allOptions = [
     {title: "Games", options:["RPG", "FPS", "Puzzle", "Strategy", "Sports", "Racing", "Adventure", "Simulation", "Platformer", "MOBA", "Sandbox", "Fighting", "Stealth", "Survival", "Card & Board", "Educational", "Interactive Fiction", "MMO", "Rhythm", "Visual Novel", "Text-Based", "Tower Defense"]}
 ];
 
-function Preference({ route ,navigation}) {
-    const { userName } = route.params;
+function Preference({navigation}) {
+    const userName = asyncStorage.getItem("userName")
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [currentArrayIndex, setCurrentArrayIndex] = useState(0); // Index to track the current array of options
     const [currentOptions, setCurrentOptions] = useState(allOptions[currentArrayIndex].options);
