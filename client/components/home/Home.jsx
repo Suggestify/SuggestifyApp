@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {Text, TouchableOpacity, StyleSheet} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
+import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 
 function Home({navigation}) {
     const [myArray, setMyArray] = useState(["Music", "Books", "Podcasts", "Shows", "Movies", "Hobbies", "Games"]);
@@ -14,9 +15,7 @@ function Home({navigation}) {
         arr.unshift(item); // Add it to the front of the array
     }
     async function onSubmit(){
-        navigation.navigate('Settings', {
-            username: us
-        })
+        navigation.navigate('Settings')
     }
     function handleClick(index) {
         return () => {
