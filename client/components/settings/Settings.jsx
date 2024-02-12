@@ -2,7 +2,8 @@ import React, {useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View, Switch, Alert,} from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-function Settings({username,navigation}) {
+function Settings({navigation}) {
+    const userName = AsyncStorage.getItem("userName")
     const [isEnabled, setIsEnabled] = useState(false);
     const myArray = ["Music", "Books", "Podcasts", "Shows", "Movies", "Hobbies", "Games"];
 
@@ -25,7 +26,7 @@ function Settings({username,navigation}) {
         try{
             const response = await axios.put("http://192.168.2.18:4000/auth/changeUsername",{
                 newUsername: newUsername,
-                currUsername: username
+                currUsername: userName
             })
             if(response.status === 200){
                 Alert.alert("Username changed successfully");

@@ -45,7 +45,8 @@ router.post("/SignUp", async (req,res)=>{
         const refreshToken = jwt.sign({ username: curUserName }, process.env.REFRESH_TOKEN_SECRET);
         const token = {
             access: accessToken,
-            refresh: refreshToken
+            refresh: refreshToken,
+            userName: curUserName
         }
         res.json(token).status(200);
     }
@@ -85,7 +86,9 @@ router.post("/SignIn", async (req,res)=>{
                 const refreshToken = jwt.sign({ username: user.userName }, process.env.REFRESH_TOKEN_SECRET);
                 const token = {
                     access: accessToken,
-                    refresh: refreshToken
+                    refresh: refreshToken,
+                    userName: user.userName
+
                 }
                 res.json(token).status(200);
             }

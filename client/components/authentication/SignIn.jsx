@@ -32,9 +32,11 @@ function SignIn({navigation }) {
             } else {
                 const accessToken = response.data.access;
                 const refreshToken = response.data.refresh;
+                const userName = response.data.userName;
 
                 await AsyncStorage.setItem('accessToken', accessToken);
                 await AsyncStorage.setItem('refreshToken', refreshToken);
+                await AsyncStorage.setItem('userName', userName);
                 navigation.navigate('Home')
 
             }

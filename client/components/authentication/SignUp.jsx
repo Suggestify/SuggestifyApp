@@ -53,12 +53,12 @@ function SignUp({navigation}) {
             }else{
                 const accessToken = response.data.access;
                 const refreshToken = response.data.refresh;
+                const userName = response.data.userName;
 
                 await AsyncStorage.setItem('accessToken', accessToken);
                 await AsyncStorage.setItem('refreshToken', refreshToken);
-                navigation.navigate('Preference', {
-                    userName: userName
-                });
+                await AsyncStorage.setItem('userName', userName);
+                navigation.navigate('Preference');
             }
         } catch(err){
             if (err.response && err.response.status === 400) {

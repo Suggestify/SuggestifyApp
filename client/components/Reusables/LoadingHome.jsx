@@ -1,9 +1,11 @@
 import React, { useEffect,useState } from 'react';
 import { Text, View } from "react-native";
 import axios from 'axios'
+import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 
-function Loading({userName, medium, navigation }) {
+function Loading({medium, navigation }) {
     const [chatHistory, setChatHistory] = useState("");
+    const userName = asyncStorage.getItem("userName")
 
     useEffect(() => {
         async function pullChat(){
