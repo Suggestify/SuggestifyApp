@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View, Switch, Alert,} from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import Global from "../Global";
 function Settings({navigation}) {
     const userName = AsyncStorage.getItem("userName")
     const [isEnabled, setIsEnabled] = useState(false);
@@ -11,7 +13,7 @@ function Settings({navigation}) {
 
     async function logout(){
         try{
-            const response = await axios.delete("http://192.168.2.18:4000/auth/SignOut")
+            const response = await axios.delete(`${Global.ip}/auth/SignOut`)
             await AsyncStorage.removeItem('accessToken');
             await AsyncStorage.removeItem('refreshToken');
             if(response.status === 204){
@@ -24,7 +26,7 @@ function Settings({navigation}) {
 
     async function changeUserName(){
         try{
-            const response = await axios.put("http://192.168.2.18:4000/auth/changeUsername",{
+            const response = await axios.put(`${Global.ip}/auth/changeUsername`,{
                 newUsername: newUsername,
                 currUsername: userName
             })
