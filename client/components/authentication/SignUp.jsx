@@ -8,6 +8,10 @@ import axios from 'axios';
 
 const wallpaper = require('../../assets/backgrounds/bk2.png');
 
+import Global from "../Global";
+
+
+
 function SignUp({navigation}) {
     const [email, setEmail] = useState("");
     const [userName, setUserName] = useState("");
@@ -37,7 +41,7 @@ function SignUp({navigation}) {
             setUserNameError("");
         }
         try {
-            const response = await axios.post("http://192.168.2.18:4000/auth/SignUp", {
+            const response = await axios.post(`${Global.ip}/auth/SignUp`, {
                 email: email,
                 userName: userName,
                 password: password

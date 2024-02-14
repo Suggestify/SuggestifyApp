@@ -7,6 +7,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 
 const wallpaper = require('../../assets/backgrounds/bk1.png');
+
+import Global from "../Global";
+
 function SignIn({navigation }) {
 
     const [email, setEmail] = useState("");
@@ -20,7 +23,7 @@ function SignIn({navigation }) {
     }
     async function onSubmit() {
         try {
-            const response = await axios.post('http://192.168.2.18:4000/auth/SignIn', {
+            const response = await axios.post(`${Global.ip}/auth/SignIn`, {
                 UserId: email,
                 password: password
             })

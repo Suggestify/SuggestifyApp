@@ -1,20 +1,27 @@
 import React, { useEffect,useState } from 'react';
 import { Text, View } from "react-native";
+//import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 import axios from 'axios'
-import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
+import Global from "../Global";
 
-function Loading({medium, navigation }) {
+
+function Loading({route, navigation }) {
     const [chatHistory, setChatHistory] = useState("");
-    const userName = asyncStorage.getItem("userName")
+    const { userName, medium } = route.params;
+  
 
     useEffect(() => {
         async function pullChat(){
             try {
-                const response = await axios.get("pull the chat info", {
-                    userName: userName,
-                    medium: medium
+                const response = await axios.get(`${Global.ip}/ai/fetchMessages`, {
+                    params: {
+                        userName: userName,
+                        chatType: medium
+                    }
                 })
+
                 setChatHistory(response.data)
+
                 if (response.status === 200) {
                     navigation.navigate("ChatScreen", {
                         userName: userName,
