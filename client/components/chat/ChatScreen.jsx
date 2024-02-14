@@ -4,12 +4,19 @@ import {Button, Header, Icon} from "react-native-elements";
 import ChatIcon from "./ChatIcon";
 import ChatBubble from "./ChatBubble";
 
-function ChatScreen(props) {
+function ChatScreen({route, navigation}) {
 // take in navigation props to use as array
-    let test = [
-        {type: "User", message: "Hello bob", id: 1},
-        {type: "AI", message: "sup shmungi", id:2}
-    ]
+    const currHistory = route.params.chatHistory;
+
+    let chatHistory = [];
+    for(let i =0; i < currHistory.length; i++) {
+        if (i % 2 === 0) {
+            chatHistory.push({id: i, message: currHistory[i], type: "AI"});
+        } else {
+            chatHistory.push({id: i, message: currHistory[i], type: "User"});
+        }
+    }
+    // change test
 
     return ( // pass in props for menu
         <SafeAreaView>
@@ -20,7 +27,7 @@ function ChatScreen(props) {
         </View>
 
             <View>
-                {test.map((item) => (
+                {chatHistory.map((item) => (
                     <View key= {item.id}>
                         <ChatBubble message = {item.message} type = {item.type}></ChatBubble>
                     </View>

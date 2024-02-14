@@ -1,18 +1,24 @@
 import React, { useEffect,useState } from 'react';
 import { Text, View } from "react-native";
 import axios from 'axios'
+import Settings from "../Settings";
 
-function Loading({userName, medium, navigation }) {
+function Loading({route, navigation }) {
     const [chatHistory, setChatHistory] = useState("");
+    const { userName, medium } = route.params;
 
     useEffect(() => {
         async function pullChat(){
             try {
-                const response = await axios.get("ip:4000/ai/fetchMessages", {
-                    userName: userName,
-                    medium: medium
+                const response = await axios.get(`${Settings.ip}/ai/fetchMessages`, {
+                    params: {
+                        userName: userName,
+                        chatType: medium
+                    }
                 })
+
                 setChatHistory(response.data)
+
                 if (response.status === 200) {
                     navigation.navigate("ChatScreen", {
                         userName: userName,

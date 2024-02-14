@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from 'axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Settings from "../Settings";
 import {
     StyleSheet,
     Text,
@@ -40,7 +41,7 @@ function SignUp({navigation}) {
         }
 
         try {
-            const response = await axios.post("http://192.168.2.18:4000/auth/SignUp", {
+            const response = await axios.post(`${Settings.ip}/auth/SignUp`, {
                 email: email,
                 userName: userName,
                 password: password

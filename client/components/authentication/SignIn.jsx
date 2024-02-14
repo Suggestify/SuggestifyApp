@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Settings from "../Settings";
 
 function SignIn({navigation }) {
 
@@ -23,7 +24,7 @@ function SignIn({navigation }) {
     }
     async function onSubmit() {
         try {
-            const response = await axios.post('http://192.168.2.18:4000/auth/SignIn', {
+            const response = await axios.post(`${Settings.ip}/auth/SignIn`, {
                 UserId: email,
                 password: password
             })
