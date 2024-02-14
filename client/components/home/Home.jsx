@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import {Text, TouchableOpacity, StyleSheet} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
-import Global from "../Global";
-import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 
 function Home({navigation}) {
     const [myArray, setMyArray] = useState(["Music", "Books", "Podcasts", "Shows", "Movies", "Hobbies", "Games"]);
@@ -16,20 +14,7 @@ function Home({navigation}) {
         arr.unshift(item); // Add it to the front of the array
     }
     async function onSubmit(){
-
-        try{
-            const response = await axios.delete(`${Global.ip}/auth/SignOut`)
-            await AsyncStorage.removeItem('accessToken');
-            await AsyncStorage.removeItem('refreshToken');
-            if(response.status === 204){
-                navigation.navigate('SignIn')
-            }
-        }catch(err){
-            console.log(err)
-        }
-
         navigation.navigate('Settings')
-
     }
     function handleClick(index) {
         return () => {

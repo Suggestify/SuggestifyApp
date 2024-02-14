@@ -16,7 +16,6 @@ function SignIn({navigation }) {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [emailError, setEmailError] = useState("");
-    const [userNameError, setUserNameError] = useState("");
 
     function toggleShowPassword() {
         setShowPassword(!showPassword);
