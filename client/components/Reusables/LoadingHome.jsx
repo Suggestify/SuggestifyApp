@@ -1,18 +1,14 @@
 import React, { useEffect,useState } from 'react';
 import { Text, View } from "react-native";
+//import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 import axios from 'axios'
 import Global from "../Global";
+
 
 function Loading({route, navigation }) {
     const [chatHistory, setChatHistory] = useState("");
     const { userName, medium } = route.params;
   
-import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
-
-function Loading({medium, navigation }) {
-    const [chatHistory, setChatHistory] = useState("");
-    const userName = asyncStorage.getItem("userName")
-
 
     useEffect(() => {
         async function pullChat(){
