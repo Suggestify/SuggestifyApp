@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import axios from 'axios'
+import Global from "../Global";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 
 
@@ -39,7 +40,7 @@ function Preference({navigation}) {
     };
 
     async function handleNextOrSkip() {
-        const response = await axios.post('http://192.168.2.18:4000/ai/create', {
+        const response = await axios.post(`${Global.ip}/ai/create`, {
             userName: userName,
             medium: allOptions[currentArrayIndex].title,
             options: selectedOptions

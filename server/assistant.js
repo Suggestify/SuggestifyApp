@@ -63,13 +63,17 @@ async function createThread(userName, chatType, messageContent){  // should chec
 
 // incorporate into loading call
 async function fetchMessages(userName, chatType){
+
     const currAIMap = await getMapFromUser(userName);
     const threadMessages = await openai.beta.threads.messages.list(
         currAIMap[chatType]
     );
+    const returnMessages = [];
     threadMessages.body.data.forEach(message => {
-        console.log(message.content);
+        returnMessages.push(message.content[0].text.value);
      });
+    return returnMessages.reverse();
+
 }
 
 
@@ -139,8 +143,11 @@ router.post("/sendMessage", async (req,res)=>{  // for indi message
 });
 
 // fetch previous messages up till var
-router.post("/fetchMessages",async (req,res)=>{ // make get
-    await fetchMessages(req.body.userName, req.body.type);
+router.get("/fetchMessages",async (req,res)=>{ // make get
+   // console.log(req);
+
+    const response = await fetchMessages(req.query.userName, req.query.chatType);
+    res.send(response);
 });
 
 export default router;

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from 'axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Global from "../Global";
 import {
     StyleSheet,
     Text,
@@ -42,7 +43,7 @@ function SignUp({navigation}) {
             setUserNameError("");
         }
         try {
-            const response = await axios.post("http://192.168.2.18:4000/auth/SignUp", {
+            const response = await axios.post(`${Global.ip}/auth/SignUp`, {
                 email: email,
                 userName: userName,
                 password: password
