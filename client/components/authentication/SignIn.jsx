@@ -1,16 +1,13 @@
 import React, {useState} from "react";
-import {MaterialCommunityIcons} from '@expo/vector-icons';
-import axios from 'axios';
-import {
-    StyleSheet,
-    Text,
-    View,
-    Image,
-    TextInput,
-    TouchableOpacity,
-} from "react-native";
-import {LinearGradient} from 'expo-linear-gradient';
+import {ImageBackground, StyleSheet, Text, View, TouchableOpacity} from "react-native";
+
+import {TextInput} from 'react-native-paper';
+import {Heading, Button} from "native-base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from 'axios';
+
+const wallpaper = require('../../assets/backgrounds/bk1.png');
+
 import Global from "../Global";
 
 function SignIn({navigation }) {
@@ -19,6 +16,8 @@ function SignIn({navigation }) {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [emailError, setEmailError] = useState("");
+    const [userNameError, setUserNameError] = useState("");
+
     function toggleShowPassword() {
         setShowPassword(!showPassword);
     }
@@ -53,45 +52,64 @@ function SignIn({navigation }) {
 
 
     return (
-        <LinearGradient style={styles.linearGradient} colors={['rgba(255,147,56,0.8)', '#222222', 'black']}>
-            <Image style={styles.image} source={require('../../assets/Logo.png')}/>
-            <View style={styles.inputView}>
-                <TextInput
-                    style={styles.TextInput}
-                    placeholder="Username or Email"
-                    placeholderTextColor='#696969'
-                    onChangeText={(email) => setEmail(email)}
-                />
-            </View>
-            <View style={styles.inputView}>
-                {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-                <TextInput
-                    style={styles.TextInput}
-                    placeholder="Password"
-                    placeholderTextColor='#696969'
-                    secureTextEntry={!showPassword}
-                    onChangeText={(password) => setPassword(password)}
-                />
-            </View>
-            <MaterialCommunityIcons
-                name={showPassword ? 'eye-off' : 'eye'}
-                size={24}
-                color="#aaa"
-                style={styles.icon}
-                onPress={toggleShowPassword}
-            />
+        <ImageBackground source={wallpaper} resizeMode="cover" style={styles.Image}>
+            <View style={styles.container}>
+                <View>
+                    <Heading size="3xl" fontWeight="600" color="light.400" style={styles.Header}>
+                        Sign-In
+                    </Heading>
+                </View>
+                <View style={styles.inputView}>
+                    <TextInput
+                        style={styles.TextInput}
+                        placeholder="Email"
+                        placeholderTextColor='#696969'
+                        textColor={"#b7b7b7"}
+                        autoCapitalize={"none"}
+                        onChangeText={(email) => setEmail(email)}
+                    />
+                    {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+                </View>
 
-
-            <TouchableOpacity onPress={onSubmit} style={styles.loginBtn}>
-                <Text style={styles.loginText}>SignIn</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={goToSignUp} style={styles.signup}>
-                <Text style={styles.signupgrey}>
-                    Don't have an account?
-                    <Text style={styles.signupwhite}> Sign up </Text>
+                <View style={styles.inputView}>
+                    <TextInput
+                        style={styles.TextInput}
+                        placeholder="Password"
+                        placeholderTextColor='#696969'
+                        autoCapitalize={"none"}
+                        textColor={"#b7b7b7"}
+                        secureTextEntry={!showPassword}
+                        onChangeText={(password) => setPassword(password)}
+                        right={
+                            <TextInput.Icon
+                                icon={showPassword ? 'eye-off' : 'eye'}
+                                onPress={toggleShowPassword}
+                                color={"#b7b7b7"}
+                            />
+                        }
+                    />
+                </View>
+                <Text style={styles.signupwhite}>
+                    Forgot Your Password?
                 </Text>
-            </TouchableOpacity>
-        </LinearGradient>
+
+                <View
+                    style={styles.buttonContainer}>
+                    <Button
+                        onPress={onSubmit}
+                        style={styles.nativeBaseBtn}
+                        _text={styles.nativeBaseBtnText}>
+                        Sign In
+                    </Button>
+                </View>
+                <TouchableOpacity onPress={goToSignUp} style={styles.signup}>
+                    <Text style={styles.signupgrey}>
+                        Already have an account?
+                        <Text style={styles.signupwhite}> Sign up </Text>
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        </ImageBackground>
     );
 }
 
@@ -99,33 +117,39 @@ export default SignIn;
 
 //
 const styles = StyleSheet.create({
-    linearGradient: {
+    container: {
+        width: "80%",
+    },
+    Header: {
+        paddingLeft: 15,
+        marginBottom: 60,
+    },
+    Image: {
         flex: 1,
-        alignItems: "center",
         justifyContent: "center",
+        alignItems: "center"
     },
-    inputView: {
-        width: 300,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-
-    TextInput: {
-        color: "white",
-        width: '100%',
-        margin: 10,
-        padding: 15,
-        fontSize: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#fff',
-
+    buttonContainer: {
+        alignItems: "center"
     },
     errorText: {
         color: 'red',
         alignSelf: 'flex-start', // Aligns text to the start of the inputView
-        paddingLeft: 10, // Adjust as needed
+        paddingLeft: 5, // Adjust as needed
+    },
+
+    TextInput: {
+        color: "white", // This sets the text color to white
+        width: '100%',
+        marginBottom: 8,
+        backgroundColor: "transparent",
+        fontSize: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#fff',
+        textAlign: 'left',
     },
     signup: {
+        alignItems: "center",
         paddingTop: 50
     },
     signupgrey: {
@@ -134,23 +158,24 @@ const styles = StyleSheet.create({
     signupwhite: {
         color: "white"
     },
-    image: {
-        width: 120,
-        resizeMode: 'contain',
-    },
-
     forgot_button: {
         height: 30,
         marginBottom: 30,
         color: "white",
     },
-    loginBtn: {
-        width: "80%",
-        borderRadius: 25,
-        height: 50,
-        alignItems: "center",
-        justifyContent: "center",
+    nativeBaseBtn: {
+        width: 290,
+        borderRadius: 12,
         marginTop: 40,
-        backgroundColor: "#e71bdd",
+        backgroundColor: "transparent",
+        borderStyle: "solid",
+        borderColor: "white",
+        borderWidth: 1,
+        justifyContent: "center",
+    },
+
+    nativeBaseBtnText: {
+        fontSize: 20, // Adjust text size as needed
+        color: "white", // Adjust text color as needed
     },
 });

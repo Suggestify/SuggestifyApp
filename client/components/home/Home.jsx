@@ -61,14 +61,14 @@ const styles = StyleSheet.create({
             alignItems: "center",
             justifyContent: "center",
         },
-    loginBtn: {
-        width: "80%",
-        borderRadius: 25,
-        height: 50,
-        alignItems: "center",
-        justifyContent: "center",
-        marginTop: 40,
-        backgroundColor: "#FF1493",
-    }
+        loginBtn: {
+            width: "80%",
+            borderRadius: 25,
+            height: 50,
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: 40,
+            backgroundColor: "#FF1493",
+        }
     }
 )

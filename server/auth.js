@@ -66,9 +66,9 @@ router.post("/SignIn", async (req,res)=>{
         const userId = req.body.UserId;
         let user;
         if(userId.includes("@")){
-            user = await User.findOne({email: userId});
+             user = await User.findOne({email: userId});
         }else{
-            user = await User.findOne({userName: UserId});
+             user = await User.findOne({userName: userId});
         }
 
         const pwdDB = user.password;  // password from database

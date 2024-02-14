@@ -8,19 +8,20 @@ import Settings from "./components/settings/Settings";
 import React from 'react'
 import ChatScreen from "./components/chat/ChatScreen";
 import ChatPreview from "./components/home/ChatPreview";
+import { NativeBaseProvider } from 'native-base';
 import LoadingHome from "./components/Reusables/LoadingHome";
 import LoadingLaunch from "./components/Reusables/LoadingLaunch";
 import navigationContainer from "@react-navigation/native/src/NavigationContainer";
-
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
     return (
 
+        <NativeBaseProvider>
             <NavigationContainer>
                 <Stack.Navigator screenOptions={{headerShown: false}}>
-                    <Stack.Screen name="LoadingLaunch" component={LoadingLaunch} />
+                    <Stack.Screen name="loadingLaunch" component={loadingLaunch}/>
                     <Stack.Screen name="SignIn" component={SignIn} />
                     <Stack.Screen name="Home" component={Home} />
                     <Stack.Screen name="SignUp" component={SignUp}/>
@@ -31,7 +32,7 @@ export default function App() {
                     <Stack.Screen name="Settings" component={Settings}></Stack.Screen>
                 </Stack.Navigator>
             </NavigationContainer>
-
+        </NativeBaseProvider>
 
     );
 }
