@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import axios from 'axios'
-import Settings from "../Settings";
+import Global from "../Global";
 
 
 // Array of arrays containing different options
@@ -39,7 +39,7 @@ function Preference({ route ,navigation}) {
     };
 
     async function handleNextOrSkip() {
-        const response = await axios.post(`${Settings.ip}/ai/create`, {
+        const response = await axios.post(`${Global.ip}/ai/create`, {
             userName: userName,
             medium: allOptions[currentArrayIndex].title,
             options: selectedOptions

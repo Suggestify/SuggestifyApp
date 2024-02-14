@@ -4,7 +4,7 @@ import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
-import Settings from "../Settings";
+import Global from "../Global";
 
 function Home({navigation}) {
     const [myArray, setMyArray] = useState(["Music", "Books", "Podcasts", "Shows", "Movies", "Hobbies", "Games"]);
@@ -18,7 +18,7 @@ function Home({navigation}) {
     }
     async function onSubmit(){
         try{
-            const response = await axios.delete(`${Settings.ip}/auth/SignOut`)
+            const response = await axios.delete(`${Global.ip}/auth/SignOut`)
             await AsyncStorage.removeItem('accessToken');
             await AsyncStorage.removeItem('refreshToken');
             if(response.status === 204){

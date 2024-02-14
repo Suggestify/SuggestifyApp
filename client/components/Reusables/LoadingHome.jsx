@@ -1,7 +1,7 @@
 import React, { useEffect,useState } from 'react';
 import { Text, View } from "react-native";
 import axios from 'axios'
-import Settings from "../Settings";
+import Global from "../Global";
 
 function Loading({route, navigation }) {
     const [chatHistory, setChatHistory] = useState("");
@@ -10,7 +10,7 @@ function Loading({route, navigation }) {
     useEffect(() => {
         async function pullChat(){
             try {
-                const response = await axios.get(`${Settings.ip}/ai/fetchMessages`, {
+                const response = await axios.get(`${Global.ip}/ai/fetchMessages`, {
                     params: {
                         userName: userName,
                         chatType: medium
