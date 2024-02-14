@@ -18,7 +18,7 @@ function SignIn({navigation }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-
+    const [emailError, setEmailError] = useState("");
     function toggleShowPassword() {
         setShowPassword(!showPassword);
     }
@@ -29,19 +29,20 @@ function SignIn({navigation }) {
                 password: password
             })
             if (response.status !== 200) {
-                console.log(response.status)
-
+                setEmailError(response.data.message)
             } else {
                 const accessToken = response.data.access;
                 const refreshToken = response.data.refresh;
+                const userName = response.data.userName;
 
                 await AsyncStorage.setItem('accessToken', accessToken);
                 await AsyncStorage.setItem('refreshToken', refreshToken);
+                await AsyncStorage.setItem('userName', userName);
                 navigation.navigate('Home')
 
             }
         } catch (err) {
-            console.log(err)
+            setEmailError(err.response.data.message)
         }
     }
 
@@ -63,6 +64,7 @@ function SignIn({navigation }) {
                 />
             </View>
             <View style={styles.inputView}>
+                {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
                 <TextInput
                     style={styles.TextInput}
                     placeholder="Password"
@@ -117,6 +119,11 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#fff',
 
+    },
+    errorText: {
+        color: 'red',
+        alignSelf: 'flex-start', // Aligns text to the start of the inputView
+        paddingLeft: 10, // Adjust as needed
     },
     signup: {
         paddingTop: 50

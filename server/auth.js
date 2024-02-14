@@ -25,7 +25,6 @@ router.post('/token', (req, res) => {
 
 
 router.post("/SignUp", async (req,res)=>{
-
     try{
         const secret = process.env.B_SECRET;
         const pwdDB = secret + req.body.password;
@@ -46,14 +45,17 @@ router.post("/SignUp", async (req,res)=>{
         const refreshToken = jwt.sign({ username: curUserName }, process.env.REFRESH_TOKEN_SECRET);
         const token = {
             access: accessToken,
-            refresh: refreshToken
+            refresh: refreshToken,
+            userName: curUserName
         }
         res.json(token).status(200);
     }
 
     catch(err){
-        res.status(400)
-        res.json(err);
+        if(err.code === 11000){
+            const field = Object.keys(err.keyValue)[0];
+            res.status(400).send({ field: field,  message: `An account with that ${field} already exists.` });
+        }
     }
 
 });
@@ -62,10 +64,9 @@ router.post("/SignUp", async (req,res)=>{
 router.post("/SignIn", async (req,res)=>{
     try{
         const userId = req.body.UserId;
-        var user;
+        let user;
         if(userId.includes("@")){
             user = await User.findOne({email: userId});
-
         }else{
             user = await User.findOne({userName: UserId});
         }
@@ -85,17 +86,19 @@ router.post("/SignIn", async (req,res)=>{
                 const refreshToken = jwt.sign({ username: user.userName }, process.env.REFRESH_TOKEN_SECRET);
                 const token = {
                     access: accessToken,
-                    refresh: refreshToken
+                    refresh: refreshToken,
+                    userName: user.userName
+
                 }
                 res.json(token).status(200);
             }
             else{
                 console.log("no match");
-                res.sendStatus(401);
+                res.status(401).send({message: "login or password is incorrect"});
             }
         });
     } catch(err){
-        res.status(400);
+        res.status(400).send({message: "login or password is incorrect"});
     }
 });
 
@@ -103,6 +106,36 @@ router.delete('/SignOut', (req, res) => {
     refreshTokens = refreshTokens.filter(token => token !== req.body.token);
     res.sendStatus(204);
 });
+
+router.put('/changeUsername', authenticateToken, async (req, res) => {
+    try {
+        const newUsername = req.body.newUsername;
+        const currUsername =  req.body.username;
+
+        if(newUsername.includes("@") || newUsername == ""){
+            return res.status(400).send({ message: 'bad username' });
+        }
+
+        const usernameExists = await User.findOne({ userName: newUsername });
+        if (usernameExists) {
+            return res.status(400).send({ message: 'Username already taken' });
+        }
+
+        const user = await User.findOne({ userName: currUsername });
+        if (!user) {
+            return res.status(404).send({ message: 'User not found' });
+        }
+
+        user.userName = newUsername; // Update the username
+        await user.save(); // Save the updated user to the database
+
+        res.status(200).send({ message: 'Username successfully updated' });
+    } catch (err) {
+        // Handle any errors
+        res.status(500).send({ message: 'Error updating username' });
+    }
+});
+
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];

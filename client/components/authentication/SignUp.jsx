@@ -8,7 +8,6 @@ import {
     View,
     Image,
     TextInput,
-    Alert,
     TouchableOpacity,
 } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,6 +18,9 @@ function SignUp({navigation}) {
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [emailError, setEmailError] = useState("");
+    const [userNameError, setUserNameError] = useState("");
+
 
     function toggleShowPassword() {
         setShowPassword(!showPassword);
@@ -28,18 +30,18 @@ function SignUp({navigation}) {
         const usernameRegex = /^[a-zA-Z0-9]+$/
 
         if (!emailRegex.test(email)) {
-            Alert.alert("Invalid Email", "Please enter a valid email address.");
+            setEmailError("*Please enter a valid email address.");
             return;
+        } else {
+            setEmailError("");
         }
 
         if (!usernameRegex.test(userName)) {
-            Alert.alert(
-                "Invalid Username",
-                "Username can only contain letters and numbers."
-            );
+            setUserNameError("*Username can only contain letters and numbers.");
             return;
+        } else {
+            setUserNameError("");
         }
-
         try {
             const response = await axios.post(`${Global.ip}/auth/SignUp`, {
                 email: email,
@@ -52,15 +54,22 @@ function SignUp({navigation}) {
             }else{
                 const accessToken = response.data.access;
                 const refreshToken = response.data.refresh;
+                const userName = response.data.userName;
 
                 await AsyncStorage.setItem('accessToken', accessToken);
                 await AsyncStorage.setItem('refreshToken', refreshToken);
-                navigation.navigate('Preference', {
-                    userName: userName
-                });
+                await AsyncStorage.setItem('userName', userName);
+                navigation.navigate('Preference');
             }
         } catch(err){
-            console.log(err)
+            if (err.response && err.response.status === 400) {
+                if(err.response.data.field === "email"){
+                    setEmailError("*An account with that email is already taken");
+                }
+                if(err.response.data.field === "userName"){
+                    setUserNameError("*An account with that username is already taken");
+                }
+            }
         }
     }
 
@@ -78,6 +87,7 @@ function SignUp({navigation}) {
                     placeholderTextColor = '#696969'
                     onChangeText={(email) => setEmail(email)}
                 />
+                {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
             </View>
             <View  style={styles.inputView}>
                 <TextInput
@@ -86,6 +96,7 @@ function SignUp({navigation}) {
                     placeholderTextColor = '#696969'
                     onChangeText={(userName) => setUserName(userName)}
                 />
+                {userNameError ? <Text style={styles.errorText}>{userNameError}</Text> : null}
             </View>
             <View style={styles.inputView}>
                 <TextInput
@@ -131,6 +142,11 @@ const styles = StyleSheet.create({
         width: 300,
         alignItems: "center",
         justifyContent: "center",
+    },
+    errorText: {
+        color: 'red',
+        alignSelf: 'flex-start', // Aligns text to the start of the inputView
+        paddingLeft: 10, // Adjust as needed
     },
 
     TextInput: {

@@ -1,8 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 
-
-
 function ChatPreview({medium}) {
     return (
         <View style={styles.container}>
@@ -29,8 +27,8 @@ const styles = StyleSheet.create({
         borderColor: "Black",
     },
     image: {
-        width: 100, // Set image width
-        height: 100, // Set image height
+        width: 100,
+        height: 100,
         marginRight: 10,
     },
     textContainer: {
