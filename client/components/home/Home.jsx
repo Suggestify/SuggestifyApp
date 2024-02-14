@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import {Text, TouchableOpacity, StyleSheet} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
+import Global from "../Global";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 
 function Home({navigation}) {
-    const [myArray, setMyArray] = useState(["Movies", "Hobbies", "Games"]);
+    const [myArray, setMyArray] = useState(["Music", "Books", "Podcasts", "Shows", "Movies", "Hobbies", "Games"]);
 
     function moveToFrontAndShift(arr, index) {
         if (index < 0 || index >= arr.length) {
@@ -15,7 +16,20 @@ function Home({navigation}) {
         arr.unshift(item); // Add it to the front of the array
     }
     async function onSubmit(){
+
+        try{
+            const response = await axios.delete(`${Global.ip}/auth/SignOut`)
+            await AsyncStorage.removeItem('accessToken');
+            await AsyncStorage.removeItem('refreshToken');
+            if(response.status === 204){
+                navigation.navigate('SignIn')
+            }
+        }catch(err){
+            console.log(err)
+        }
+
         navigation.navigate('Settings')
+
     }
     function handleClick(index) {
         return () => {
@@ -26,16 +40,15 @@ function Home({navigation}) {
 
     return (
         <LinearGradient style={styles.linearGradient} colors={['#150c25', '#222222', 'black']}>
-
+            <TouchableOpacity onPress={onSubmit}  style={styles.loginBtn} >
+                <Text>Settings</Text>
+            </TouchableOpacity>
             {myArray.map((item, index) => (
                 <TouchableOpacity key={item} onPress={handleClick(index)} >
                     <ChatPreview medium={item}/>
                 </TouchableOpacity>
 
             ))}
-            <TouchableOpacity onPress={onSubmit}  style={styles.loginBtn} >
-                <Text>Settings</Text>
-            </TouchableOpacity>
         </LinearGradient>
     );
 }
@@ -48,14 +61,14 @@ const styles = StyleSheet.create({
             alignItems: "center",
             justifyContent: "center",
         },
-    loginBtn: {
-        width: "80%",
-        borderRadius: 25,
-        height: 50,
-        alignItems: "center",
-        justifyContent: "center",
-        marginTop: 40,
-        backgroundColor: "#FF1493",
-    }
+        loginBtn: {
+            width: "80%",
+            borderRadius: 25,
+            height: 50,
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: 40,
+            backgroundColor: "#FF1493",
+        }
     }
 )

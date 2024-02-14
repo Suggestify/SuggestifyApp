@@ -77,7 +77,7 @@ function SignUp({navigation}) {
             <View style={styles.container}>
                 <View>
                     <Heading size="3xl" fontWeight="600" color="light.400" style={styles.Header}>
-                        Sign-In
+                        Sign-Up
                     </Heading>
                 </View>
                 <View style={styles.inputView}>
@@ -135,8 +135,8 @@ function SignUp({navigation}) {
                 </View>
                 <TouchableOpacity onPress={goToLogIn} style={styles.signup}>
                     <Text style={styles.signupgrey}>
-                        Already have an account?
-                        <Text style={styles.signupwhite}> Sign up </Text>
+                       Dont Have an Account?
+                        <Text style={styles.signupwhite}> Sign In </Text>
                     </Text>
                 </TouchableOpacity>
             </View>
