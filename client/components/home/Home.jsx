@@ -5,7 +5,7 @@ import ChatPreview from "./ChatPreview";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 
 function Home({navigation}) {
-    const [myArray, setMyArray] = useState(["Music", "Books", "Podcasts", "Shows", "Movies", "Hobbies", "Games"]);
+    const [myArray, setMyArray] = useState(["Movies", "Hobbies", "Games"]);
 
     function moveToFrontAndShift(arr, index) {
         if (index < 0 || index >= arr.length) {
@@ -26,15 +26,16 @@ function Home({navigation}) {
 
     return (
         <LinearGradient style={styles.linearGradient} colors={['#150c25', '#222222', 'black']}>
-            <TouchableOpacity onPress={onSubmit}  style={styles.loginBtn} >
-                <Text>Settings</Text>
-            </TouchableOpacity>
+
             {myArray.map((item, index) => (
                 <TouchableOpacity key={item} onPress={handleClick(index)} >
                     <ChatPreview medium={item}/>
                 </TouchableOpacity>
 
             ))}
+            <TouchableOpacity onPress={onSubmit}  style={styles.loginBtn} >
+                <Text>Settings</Text>
+            </TouchableOpacity>
         </LinearGradient>
     );
 }
