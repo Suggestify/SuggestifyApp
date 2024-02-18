@@ -17,17 +17,29 @@ const allOptions = [
 ];
 
 function Preference({navigation}) {
-    const userName = asyncStorage.getItem("userName")
+
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [currentArrayIndex, setCurrentArrayIndex] = useState(0); // Index to track the current array of options
     const [currentOptions, setCurrentOptions] = useState(allOptions[currentArrayIndex].options);
+    const [userName, setUserName] = useState(null);
 
     useEffect(() => {
+        async function getUserName(){
+            const res = await asyncStorage.getItem("userName");
+            setUserName(res);
+        }
+        getUserName();
         // Update the options when the current array index changes
         setCurrentOptions(allOptions[currentArrayIndex].options);
         // Reset selected options when moving to the next set
         setSelectedOptions([]);
     }, [currentArrayIndex]);
+
+    useEffect(() => {
+        if (userName){
+            console.log(userName);
+        }
+    }, [userName]);
 
     const handleSelect = (item) => {
         setSelectedOptions(prevSelected => {
@@ -40,6 +52,7 @@ function Preference({navigation}) {
     };
 
     async function handleNextOrSkip() {
+        console.log(userName);
         const response = await axios.post(`${Global.ip}/ai/create`, {
             userName: userName,
             medium: allOptions[currentArrayIndex].title,
