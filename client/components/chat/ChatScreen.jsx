@@ -6,6 +6,7 @@ import ChatBubble from "./ChatBubble";
 
 function ChatScreen({route, navigation}) {
 // take in navigation props to use as array
+    console.log(route.params);
     const currHistory = route.params.chatHistory;
 
     let chatHistory = [];

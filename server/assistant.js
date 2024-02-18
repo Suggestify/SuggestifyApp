@@ -35,8 +35,8 @@ async function createThread(userName, chatType, messageContent){  // should chec
 
   try{
    const myAIMap = await getMapFromUser(userName);
-
-    if(myAIMap[chatType] == 'NULL'){ // if thread does not exist then create new thread
+   console.log(myAIMap);
+    if(myAIMap[chatType] === 'NULL'){ // if thread does not exist then create new thread
       try{
         const thread = await openai.beta.threads.create();
         let threadToSend = String(thread.id);
@@ -63,7 +63,7 @@ async function createThread(userName, chatType, messageContent){  // should chec
 
 // incorporate into loading call
 async function fetchMessages(userName, chatType){
-
+    console.log(userName, chatType);
     const currAIMap = await getMapFromUser(userName);
     const threadMessages = await openai.beta.threads.messages.list(
         currAIMap[chatType]
@@ -114,7 +114,7 @@ async function sendMessage(userName, chatType, messageContent, init){
 }
 
 router.post("/create", async (req,res)=>{ // creates thread per assistant
-
+    console.log(req.body);
   const chatType = req.body.medium;
   const userName = req.body.userName;
   const options = req.body.options;

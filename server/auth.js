@@ -33,7 +33,7 @@ router.post("/SignUp", async (req,res)=>{
         const curEmail = req.body.email;
         const curUserName = req.body.userName;
 
-        const initData = {Book:"NULL", Music:"NULL", Shows:"NULL", Game:"NULL", Hobbie:"NULL", Podcast:"NULL", Movie:"NULL"}
+        const initData = {Music:"NULL", Books:"NULL", Shows:"NULL", Podcasts:"NULL", Movies:"NULL", Hobbies:"NULL", Games:"NULL"}
         const newAIMap = new AIMap(initData);
         await newAIMap.save();
         

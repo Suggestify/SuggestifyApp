@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {Text, TouchableOpacity, StyleSheet} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
+import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 
 function Home({navigation}) {
     const [myArray, setMyArray] = useState(["Music", "Books", "Podcasts", "Shows", "Movies", "Hobbies", "Games"]);
@@ -16,11 +17,13 @@ function Home({navigation}) {
     async function onSubmit(){
         navigation.navigate('Settings')
     }
-    function handleClick(index) {
-        return () => {
-            moveToFrontAndShift(myArray, index);
-            setMyArray([...myArray]);
-        };
+      async function handleClick(index) {
+        const userName = await asyncStorage.getItem('userName');
+        navigation.navigate('LoadingHome', {userName: userName, medium: myArray[index]});
+
+        moveToFrontAndShift(myArray, index);
+        setMyArray([...myArray]);
+
     }
 
     return (
@@ -29,7 +32,7 @@ function Home({navigation}) {
                 <Text>Settings</Text>
             </TouchableOpacity>
             {myArray.map((item, index) => (
-                <TouchableOpacity key={item} onPress={handleClick(index)} >
+                <TouchableOpacity key={item} onPress={()=>handleClick(index)} >
                     <ChatPreview medium={item}/>
                 </TouchableOpacity>
 
@@ -47,6 +50,7 @@ const styles = StyleSheet.create({
             justifyContent: "center",
         },
         loginBtn: {
+
             width: "80%",
             borderRadius: 25,
             height: 50,
@@ -54,6 +58,7 @@ const styles = StyleSheet.create({
             justifyContent: "center",
             marginTop: 40,
             backgroundColor: "#FF1493",
+            paddingTop:100,
         }
     }
 )
