@@ -1,45 +1,29 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 
-function ChatPreview({medium}) {
+function ChatPreview({medium, color, image}) {
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: color }]}>
             <Image
-                source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEnpd5ycoub6rrq7MivNaU33SBONAHLxnLVw&usqp=CAU' }} // Replace with your image URL
+                source={image} // Replace with your image URL
                 style={styles.image}
             />
-            <View style={styles.textContainer}>
-                <Text style={styles.title}>{medium}</Text>
-                <Text style={styles.text}>Some description text goes here...</Text>
-            </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        width: "100%",
-        flexDirection: 'row',
-        alignItems: 'center',
         padding: 10,
-        backgroundColor: "white",
-        borderStyle: "solid",
-        borderColor: "Black",
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%', // Ensure the container takes up the full width of the parent
     },
     image: {
-        width: 100,
-        height: 100,
-        marginRight: 10,
-    },
-    textContainer: {
-        flexDirection: 'column',
-    },
-    title: {
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
-    text: {
-        fontSize: 14,
+        width: 50,
+        height: 50,
+        marginBottom: 10, // Space between the image and text
     },
 });
 
