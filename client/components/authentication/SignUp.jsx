@@ -10,8 +10,6 @@ const wallpaper = require('../../assets/backgrounds/bk2.png');
 
 import Global from "../Global";
 
-
-
 function SignUp({navigation}) {
     const [email, setEmail] = useState("");
     const [userName, setUserName] = useState("");
@@ -47,7 +45,7 @@ function SignUp({navigation}) {
                 password: password
             })
             if (response.status !== 200) {
-                console.log(response.status)
+                setEmailError(`*${response.data.message}`)
 
             } else {
                 const accessToken = response.data.access;

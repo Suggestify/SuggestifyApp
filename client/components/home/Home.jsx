@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
-import {Text, TouchableOpacity, StyleSheet} from "react-native";
+import {Text, TouchableOpacity, StyleSheet,View} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 
 function Home({navigation}) {
-    const [myArray, setMyArray] = useState(["Music", "Books", "Podcasts", "Shows", "Movies", "Hobbies", "Games"]);
+    const [myArray, setMyArray] = useState([
+        { medium: "Music", color: "#e6194b" , image: require('../../assets/icons/music.png')},
+        { medium: "Books", color: "#3cb44b", image: require('../../assets/icons/music.png') },
+        { medium: "Podcasts", color: "#ffe119", image: require('../../assets/icons/music.png')  },
+        { medium: "Shows", color: "#4363d8", image: require('../../assets/icons/music.png')  },
+        { medium: "Movies", color: "#f58231", image: require('../../assets/icons/music.png')  },
+        { medium: "Hobbies", color: "#911eb4", image: require('../../assets/icons/music.png')  },
+        { medium: "Games", color: "#46f0f0", image: require('../../assets/icons/music.png')  }
+    ]);
+
 
     function moveToFrontAndShift(arr, index) {
         if (index < 0 || index >= arr.length) {
@@ -28,15 +37,20 @@ function Home({navigation}) {
 
     return (
         <LinearGradient style={styles.linearGradient} colors={['#150c25', '#222222', 'black']}>
+            <View style={styles.header}>
+            <Text style={styles.headerText}>Suggestify</Text>
+            </View>
             <TouchableOpacity onPress={onSubmit}  style={styles.loginBtn} >
                 <Text>Settings</Text>
             </TouchableOpacity>
-            {myArray.map((item, index) => (
-                <TouchableOpacity key={item} onPress={()=>handleClick(index)} >
-                    <ChatPreview medium={item}/>
-                </TouchableOpacity>
 
-            ))}
+            <View style={styles.grid}>
+                {myArray.map((item, index) => (
+                    <TouchableOpacity  key={item.medium}onPress={()=>handleClick(index)} style={styles.chatPreview}>
+                        <ChatPreview medium={item.medium} color={item.color} image={item.image}/>
+                    </TouchableOpacity>
+                ))}
+            </View>
         </LinearGradient>
     );
 }
@@ -44,6 +58,13 @@ function Home({navigation}) {
 export default Home;
 
 const styles = StyleSheet.create({
+        header: {
+            width: '100%',
+        },
+        headerText: {
+            color: 'white',
+            fontSize: 30,
+        },
         linearGradient: {
             flex: 1,
             alignItems: "center",
@@ -56,9 +77,20 @@ const styles = StyleSheet.create({
             height: 50,
             alignItems: "center",
             justifyContent: "center",
-            marginTop: 40,
             backgroundColor: "#FF1493",
-            paddingTop:100,
-        }
+
+        },
+        grid: {
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-around',
+            width: '100%',
+            marginTop: 25,
+        },
+        chatPreview: {
+            width: '45%', // Adjust width for two columns
+            margin: 10,
+
+        },
     }
 )
