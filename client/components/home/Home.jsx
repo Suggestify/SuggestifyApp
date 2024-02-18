@@ -28,7 +28,7 @@ function Home({navigation}) {
     }
       async function handleClick(index) {
         const userName = await asyncStorage.getItem('userName');
-        navigation.navigate('LoadingHome', {userName: userName, medium: myArray[index]});
+        navigation.navigate('LoadingHome', {userName: userName, medium: myArray[index].medium});
 
         moveToFrontAndShift(myArray, index);
         setMyArray([...myArray]);
