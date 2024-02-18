@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {Text, TouchableOpacity, StyleSheet,View} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
+import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 
 function Home({navigation}) {
     const [myArray, setMyArray] = useState([
@@ -25,11 +26,13 @@ function Home({navigation}) {
     async function onSubmit(){
         navigation.navigate('Settings')
     }
-    function handleClick(index) {
-        return () => {
-            moveToFrontAndShift(myArray, index);
-            setMyArray([...myArray]);
-        };
+      async function handleClick(index) {
+        const userName = await asyncStorage.getItem('userName');
+        navigation.navigate('LoadingHome', {userName: userName, medium: myArray[index]});
+
+        moveToFrontAndShift(myArray, index);
+        setMyArray([...myArray]);
+
     }
 
     return (
@@ -43,7 +46,7 @@ function Home({navigation}) {
 
             <View style={styles.grid}>
                 {myArray.map((item, index) => (
-                    <TouchableOpacity  key={item.medium} onPress={handleClick(index)} style={styles.chatPreview}>
+                    <TouchableOpacity  key={item.medium}onPress={()=>handleClick(index)} style={styles.chatPreview}>
                         <ChatPreview medium={item.medium} color={item.color} image={item.image}/>
                     </TouchableOpacity>
                 ))}
@@ -68,12 +71,14 @@ const styles = StyleSheet.create({
             justifyContent: "center",
         },
         loginBtn: {
+
             width: "80%",
             borderRadius: 25,
             height: 50,
             alignItems: "center",
             justifyContent: "center",
             backgroundColor: "#FF1493",
+
         },
         grid: {
             flexDirection: 'row',

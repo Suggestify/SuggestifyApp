@@ -2,13 +2,14 @@ import mongoose from "mongoose";
 
 
 const aiSchema = new mongoose.Schema({
-    Book: String,
     Music: String,
+    Books: String,
     Shows: String,
-    Game: String,
-    Hobbie: String,
-    Podcast: String,
-    Movie: String,
+    Podcasts: String,
+    Movies: String,
+    Hobbies: String,
+    Games: String,
+
 }, {strict: true});
 
 let AIMap = mongoose.model('AIMap', aiSchema);
