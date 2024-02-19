@@ -37,7 +37,7 @@ function Preference({navigation}) {
 
     useEffect(() => {
         if (userName){
-            console.log(userName);
+            console.log(userName);//
         }
     }, [userName]);
 

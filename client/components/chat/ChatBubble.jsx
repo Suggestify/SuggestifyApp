@@ -4,7 +4,6 @@ import {Card} from "react-native-elements";
 import ChatIcon from "./ChatIcon";
 
 function ChatBubble(props) {
-
     if (props.type === "AI") {
         return (//conditional render icon left or right, style property through props
 

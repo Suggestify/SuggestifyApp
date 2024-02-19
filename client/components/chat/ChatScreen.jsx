@@ -1,13 +1,14 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {SafeAreaView, StyleSheet, Text, View} from "react-native";
 import {Button, Header, Icon} from "react-native-elements";
-import ChatIcon from "./ChatIcon";
 import ChatBubble from "./ChatBubble";
+import ChatInput from "./ChatInput";
+import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 
 function ChatScreen({route, navigation}) {
 // take in navigation props to use as array
-    console.log(route.params);
     const currHistory = route.params.chatHistory;
+    const type = route.params.medium;
 
     let chatHistory = [];
     for(let i =0; i < currHistory.length; i++) {
@@ -19,13 +20,10 @@ function ChatScreen({route, navigation}) {
     }
     // change test
 
+
+
     return ( // pass in props for menu
-        <SafeAreaView>
-        <View style={styles.inputView}>
-            <Header leftComponent={{ icon: 'menu', color: '#fff' }}
-                    centerComponent={{ text: 'MY TITLE', style: { color: '#fff' } }}
-                    rightComponent={{ icon: 'home', color: '#fff' }}/>
-        </View>
+        <SafeAreaView style = {styles.back}>
 
             <View>
                 {chatHistory.map((item) => (
@@ -35,6 +33,11 @@ function ChatScreen({route, navigation}) {
                 ))}
             </View>
 
+            <View style = {styles.input}>
+                <ChatInput chatType = {type}> </ChatInput>
+            </View>
+
+
         </SafeAreaView>
     );
 }
@@ -42,8 +45,14 @@ function ChatScreen({route, navigation}) {
 export default ChatScreen;
 
 const styles = StyleSheet.create({
-    inputView: {
-        width: "100%",
-        justifyContent: "top",
+    back: {
+        backgroundColor: "#525252",
+        height: "100%"
+    },
+    input:{
+        flex: 1,
+        justifyContent: "flex-end",
+        width: "100%"
     }
+
 });
