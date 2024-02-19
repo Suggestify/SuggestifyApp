@@ -71,7 +71,6 @@ const styles = StyleSheet.create({
             justifyContent: "center",
         },
         loginBtn: {
-
             width: "80%",
             borderRadius: 25,
             height: 50,
