@@ -9,10 +9,12 @@ const router = express.Router();
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const assistants = {Book: process.env.A_B_ID, Music: process.env.A_M_ID};
+const fetchLimit = 20;
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API,
   });  
+
 
 
 async function getMapFromUser(userName) {
@@ -66,13 +68,13 @@ async function fetchMessages(userName, chatType){
     console.log(userName, chatType);
     const currAIMap = await getMapFromUser(userName);
     const threadMessages = await openai.beta.threads.messages.list(
-        currAIMap[chatType]
+        currAIMap[chatType], {limit: fetchLimit}
     );
     const returnMessages = [];
     threadMessages.body.data.forEach(message => {
         returnMessages.push(message.content[0].text.value);
      });
-    console.log(returnMessages);
+    console.log(returnMessages + "NOT");
     return returnMessages.reverse();
 
 }
@@ -106,7 +108,7 @@ async function sendMessage(userName, chatType, messageContent, init){
 
             const messages = await openai.beta.threads.messages.list(curThread);// make single fetch
             const toRet = messages.body.data[0].content[0].text.value
-            console.log(toRet);
+            console.log(toRet + "THIS ONE");
             return toRet;
         }
 
@@ -139,19 +141,19 @@ router.post("/sendMessage", async (req,res)=>{  // for indi message
         const chatType = req.body.type;
         console.log("passed");
         const response = await sendMessage(userName, chatType, message, false);
-        console.log(response);
-        res.sendStatus(200);
+        //console.log(response);
+        res.send(response);
+        //res.sendStatus(200);
     }catch(err){
         console.log(err);
     }
-
 });
 
 // fetch previous messages up till var
 router.get("/fetchMessages",async (req,res)=>{ // make get
    // console.log(req);
     const response = await fetchMessages(req.query.userName, req.query.chatType);
-    console.log(response);
+    //console.log(response);
     res.send(response);
 });
 

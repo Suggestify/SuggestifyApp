@@ -15,18 +15,20 @@ function ChatInput(props) {
             messageContent: message,
             type: type
         });
-        if(response.status === 200){
+        if(response.status === 200){  // could split into 2 functions
+            console.log(response);
+            await props.onUpdate(message, "AI");
+            await props.onUpdate(response.data, "User");
             console.log("success");
         }
     }
-
     useEffect(() => {
         async function getUserName() {
             const res = await asyncStorage.getItem("userName");
             setUserName(res);
         }
         getUserName();
-    }, [userName]);
+    }, []);
 
 
     return (
