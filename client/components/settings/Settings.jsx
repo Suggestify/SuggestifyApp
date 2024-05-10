@@ -58,38 +58,37 @@ function Settings({navigation}) {
                 <TouchableOpacity onPress={changeUserName} style={styles.settingsOption}>
                     <Text style={styles.settingsOptionText}>Change Username</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={changeUserName} style={styles.settingsOption}>
+                <TouchableOpacity style={styles.settingsOption}>
                     <Text style={styles.settingsOptionText}>Forgot your password</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={changeUserName} style={styles.settingsOption}>
+                <TouchableOpacity  style={styles.settingsOption}>
                     <Text style={styles.settingsOptionText}>Buy Premium</Text>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.SettingsSection}>
-
-                <TouchableOpacity onPress={changeUserName} style={styles.settingsOption}>
+                <TouchableOpacity style={styles.settingsOption}>
                     <Text style={styles.settingsOptionText}>Notification Settings</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={changeUserName} style={styles.settingsOption}>
+                <TouchableOpacity  style={styles.settingsOption}>
                     <Text style={styles.settingsOptionText}>Edit Recommendation History</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={changeUserName} style={styles.settingsOption}>
+                <TouchableOpacity  style={styles.settingsOption}>
                     <Text style={styles.settingsOptionText}>Rating & Feedback</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={changeUserName} style={styles.settingsOption}>
+                <TouchableOpacity  style={styles.settingsOption}>
                     <Text style={styles.settingsOptionText}>Contact</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={changeUserName} style={styles.settingsOption}>
+                <View style={styles.settingsOptionToggle}>
                     <Switch
-                        // trackColor={{false: '#767577', true: '#81b0ff'}}
-                        // thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+                        trackColor={{false: '#767577', true: '#81b0ff'}}
+                        thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
                         ios_backgroundColor="#3e3e3e"
                         onValueChange={toggleSwitch}
                         value={isEnabled}
                     />
                     <Text style={styles.settingsOptionText}>Toggle Theme</Text>
-                </TouchableOpacity>
+                </View>
             </View>
 
             <View style={styles.SettingsSection}>
@@ -157,6 +156,15 @@ const styles = StyleSheet.create({
             fontWeight: 'bold',
             textDecorationLine: 'underline',
             textAlign: "center",
-        }
+        },
+    settingsOptionToggle: {
+        marginTop: 20,
+        paddingBottom: 20,
+        paddingLeft: 20,
+        borderStyle: "solid",
+        borderColor:'#797979',
+        borderBottomWidth: 1,
+        flexDirection: 'row',
+    },
     }
 )
