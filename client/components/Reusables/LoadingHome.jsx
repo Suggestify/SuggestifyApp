@@ -6,7 +6,6 @@ import Global from "../Global";
 
 
 function Loading({route, navigation }) {
-    const [chatHistory, setChatHistory] = useState("");
     const { userName, medium } = route.params;
 
     async function pullChat(){
@@ -19,26 +18,22 @@ function Loading({route, navigation }) {
                 }
             })
 
-            setChatHistory(response.data)
             if (response.status === 200) {
                 navigation.navigate("ChatScreen", {
                     userName: userName,
                     medium: medium,
-                    chatHistory: chatHistory
+                    chatHistory: response.data
                 })
             } else {
                 console.log("error" + response.status)
-            }
-            ;
+            };
         }catch (err){
             console.log(err)
         }
     };
 
     useEffect(() => {
-
         pullChat();
-
     }, [navigation]);
 
     return (
