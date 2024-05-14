@@ -8,8 +8,11 @@ import Global from "../Global";
 
 function Settings({navigation}) {
     const userName = AsyncStorage.getItem("userName")
-    const [isEnabled, setIsEnabled] = useState(false);
-    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    const [themeEnabled, setThemeEnabled] = useState(false);
+
+    const toggleNotifications = () => setNotificationsEnabled(!notificationsEnabled);
+    const toggleTheme = () => setThemeEnabled(!themeEnabled);
 
     async function logout() {
         try {
@@ -55,24 +58,16 @@ function Settings({navigation}) {
                 </Heading>
             </View>
             <View style={styles.SettingsSection}>
-                <TouchableOpacity onPress={changeUserName} style={styles.settingsOption}>
-                    <Text style={styles.settingsOptionText}>Change Username</Text>
-                </TouchableOpacity>
                 <TouchableOpacity style={styles.settingsOption}>
-                    <Text style={styles.settingsOptionText}>Forgot your password</Text>
+                    <Text style={styles.settingsOptionText}>Edit Recommendation History</Text>
                 </TouchableOpacity>
-                <TouchableOpacity  style={styles.settingsOption}>
+
+                <TouchableOpacity style={styles.settingsOption}>
                     <Text style={styles.settingsOptionText}>Buy Premium</Text>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.SettingsSection}>
-                <TouchableOpacity style={styles.settingsOption}>
-                    <Text style={styles.settingsOptionText}>Notification Settings</Text>
-                </TouchableOpacity>
-                <TouchableOpacity  style={styles.settingsOption}>
-                    <Text style={styles.settingsOptionText}>Edit Recommendation History</Text>
-                </TouchableOpacity>
                 <TouchableOpacity  style={styles.settingsOption}>
                     <Text style={styles.settingsOptionText}>Rating & Feedback</Text>
                 </TouchableOpacity>
@@ -80,19 +75,36 @@ function Settings({navigation}) {
                     <Text style={styles.settingsOptionText}>Contact</Text>
                 </TouchableOpacity>
                 <View style={styles.settingsOptionToggle}>
+                    <Text style={styles.settingsOptionText}>Allow Notifications</Text>
                     <Switch
-                        trackColor={{false: '#767577', true: '#81b0ff'}}
-                        thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+                        trackColor={{ false: '#767577', true: '#81b0ff' }}
+                        thumbColor={notificationsEnabled ? '#f5dd4b' : '#f4f3f4'}
                         ios_backgroundColor="#3e3e3e"
-                        onValueChange={toggleSwitch}
-                        value={isEnabled}
+                        onValueChange={toggleNotifications}
+                        value={notificationsEnabled}
                     />
+                </View>
+                <View style={styles.settingsOptionToggle}>
                     <Text style={styles.settingsOptionText}>Toggle Theme</Text>
+                    <Switch
+                        trackColor={{ false: '#767577', true: '#81b0ff' }}
+                        thumbColor={themeEnabled ? '#f5dd4b' : '#f4f3f4'}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={toggleTheme}
+                        value={themeEnabled}
+                    />
                 </View>
             </View>
+
+            <View style={styles.SettingsSection}>
+                <TouchableOpacity style={styles.settingsOption}>
+                    <Text style={styles.settingsOptionText}>Forgot your password</Text>
+                </TouchableOpacity>
+            </View>
+
             <View style={styles.logOutContainer}>
                 <View style={styles.SettingsSection}>
-                    <TouchableOpacity onPress={logout} style={styles.settingsOption}>
+                    <TouchableOpacity onPress={logout} style={styles.settingsOptionLogOut}>
                         <Text style={styles.settingsOptionLogout}>Logout</Text>
                     </TouchableOpacity>
                 </View>
@@ -114,6 +126,8 @@ const styles = StyleSheet.create({
             justifyContent: 'center', // Centers content horizontally
             alignItems: 'center', // Centers content vertically
             paddingTop: 60,
+            paddingBottom: 20,
+            marginBottom: 20,
             backgroundColor: '#1f1f1f',
         },
         backBtn: {
@@ -140,6 +154,15 @@ const styles = StyleSheet.create({
             borderColor:'#797979',
             borderBottomWidth: 1,
         },
+
+    settingsOptionLogOut: {
+        marginTop: 20,
+        paddingBottom: 20,
+        borderStyle: "solid",
+        borderColor:'#797979',
+        borderBottomWidth: 1,
+    },
+
         settingsOptionText: {
             color: '#afafaf',
             fontSize: 20,
@@ -151,15 +174,17 @@ const styles = StyleSheet.create({
             textDecorationLine: 'underline',
             textAlign: "center",
         },
-        settingsOptionToggle: {
-            marginTop: 20,
-            paddingBottom: 20,
-            paddingLeft: 20,
-            borderStyle: "solid",
-            borderColor:'#797979',
-            borderBottomWidth: 1,
-            flexDirection: 'row',
-        },
+    settingsOptionToggle: {
+        marginTop: 20,
+        paddingBottom: 20,
+        paddingHorizontal: 20,
+        borderStyle: "solid",
+        borderColor:'#797979',
+        borderBottomWidth: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between', // Aligns items on opposite ends
+        alignItems: 'center' // Aligns items vertically
+    },
         logOutContainer: {
             flex: 1,
             justifyContent: 'flex-end',
