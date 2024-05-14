@@ -2,18 +2,16 @@ import React, {useState} from 'react';
 import {Text, TouchableOpacity, Image, StyleSheet, View} from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
-import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function Home({navigation}) {
-    const [myArray, setMyArray] = useState([
-        {medium: "Music", color: "#e6194b", image: require('../../assets/icons/music.png')},
-        {medium: "Books", color: "#3cb44b", image: require('../../assets/icons/music.png')},
-        {medium: "Podcasts", color: "#ffe119", image: require('../../assets/icons/music.png')},
-        {medium: "Shows", color: "#4363d8", image: require('../../assets/icons/music.png')},
-        {medium: "Movies", color: "#f58231", image: require('../../assets/icons/music.png')},
-        {medium: "Hobbies", color: "#911eb4", image: require('../../assets/icons/music.png')},
-        {medium: "Games", color: "#46f0f0", image: require('../../assets/icons/music.png')}
-    ]);
+    const [myArray, setMyArray] = useState([        { medium: "Music", color: "#e6194b", image: require('../../assets/icons/Music.png') },
+    { medium: "Books", color: "#3cb44b", image: require('../../assets/icons/Books.png') },
+    { medium: "Podcasts", color: "#ffe119", image: require('../../assets/icons/Podcasts.png') },
+    { medium: "Shows", color: "#4363d8", image: require('../../assets/icons/Shows.png') },
+    { medium: "Movies", color: "#f58231", image: require('../../assets/icons/Movies.png') },
+    { medium: "Hobbies", color: "#911eb4", image: require('../../assets/icons/Hobbies.png') },
+    { medium: "Games", color: "#46f0f0", image: require('../../assets/icons/Games.png') }]);
 
 
     function moveToFrontAndShift(arr, index) {
@@ -23,13 +21,12 @@ function Home({navigation}) {
         const [item] = arr.splice(index, 1); // Remove the item from the array
         arr.unshift(item); // Add it to the front of the array
     }
-
     async function onSubmit() {
         navigation.navigate('Settings')
     }
 
     async function handleClick(index) {
-        const userName = await asyncStorage.getItem('userName');
+        const userName = await AsyncStorage.getItem('userName');
         navigation.navigate('LoadingHome', {userName: userName, medium: myArray[index].medium});
 
         moveToFrontAndShift(myArray, index);
