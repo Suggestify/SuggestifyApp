@@ -90,11 +90,12 @@ function Settings({navigation}) {
                     <Text style={styles.settingsOptionText}>Toggle Theme</Text>
                 </View>
             </View>
-
-            <View style={styles.SettingsSection}>
-                <TouchableOpacity onPress={logout} style={styles.settingsOption}>
-                    <Text style={styles.settingsOptionLogout}>Logout</Text>
-                </TouchableOpacity>
+            <View style={styles.logOutContainer}>
+                <View style={styles.SettingsSection}>
+                    <TouchableOpacity onPress={logout} style={styles.settingsOption}>
+                        <Text style={styles.settingsOptionLogout}>Logout</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
 
         </View>
@@ -104,21 +105,14 @@ function Settings({navigation}) {
 export default Settings;
 
 const styles = StyleSheet.create({
-        linearGradient: {
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-        },
         container: {
             flex: 1,
             backgroundColor: '#000000',
         },
-        header: {
-            paddingLeft: 15,
-            textAlign: "center",
-        },
         containerHeader: {
-            flexDirection: 'row',
+            flexDirection: 'row',  // Ensures horizontal layout
+            justifyContent: 'center', // Centers content horizontally
+            alignItems: 'center', // Centers content vertically
             paddingTop: 60,
             backgroundColor: '#1f1f1f',
         },
@@ -157,14 +151,20 @@ const styles = StyleSheet.create({
             textDecorationLine: 'underline',
             textAlign: "center",
         },
-    settingsOptionToggle: {
-        marginTop: 20,
-        paddingBottom: 20,
-        paddingLeft: 20,
-        borderStyle: "solid",
-        borderColor:'#797979',
-        borderBottomWidth: 1,
-        flexDirection: 'row',
-    },
+        settingsOptionToggle: {
+            marginTop: 20,
+            paddingBottom: 20,
+            paddingLeft: 20,
+            borderStyle: "solid",
+            borderColor:'#797979',
+            borderBottomWidth: 1,
+            flexDirection: 'row',
+        },
+        logOutContainer: {
+            flex: 1,
+            justifyContent: 'flex-end',
+            marginBottom: 36,
+        }
+
     }
 )
