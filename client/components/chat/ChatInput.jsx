@@ -6,7 +6,7 @@ import Global from "../Global";
 
 function ChatInput(props) {
     const [userName, setUserName] = useState(null);
-    const [message, setMessage] = useState('');
+    const [message, setMessage] = useState();
     const type = props.chatType;
 
     async function handleSend() {
@@ -20,6 +20,7 @@ function ChatInput(props) {
             await props.onUpdate(message, "AI");
             await props.onUpdate(response.data, "User");
             console.log("success");
+            setMessage(); // delayed, can set up a temp variable to store message ^
         }
     }
     useEffect(() => {
