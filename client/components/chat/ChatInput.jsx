@@ -1,73 +1,89 @@
-import React, {useEffect, useState} from 'react';
-import {Text, View, StyleSheet, TextInput, Button} from "react-native";
-import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
-import axios from "axios";
-import Global from "../Global";
+import React, { useEffect, useState } from 'react';
+import { Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import asyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import Global from '../Global';
 
 function ChatInput(props) {
     const [userName, setUserName] = useState(null);
-    const [message, setMessage] = useState();
+    const [message, setMessage] = useState('');
     const type = props.chatType;
 
-    async function handleSend() {
-        const response = await axios.post(`${Global.ip}/ai/sendMessage`, {
-            userName: userName,
-            messageContent: message,
-            type: type
-        });
-        if(response.status === 200){  // could split into 2 functions
-            console.log(response);
-            await props.onUpdate(message, "AI");
-            await props.onUpdate(response.data, "User");
-            console.log("success");
-            setMessage(); // delayed, can set up a temp variable to store message ^
-        }
-    }
     useEffect(() => {
         async function getUserName() {
-            const res = await asyncStorage.getItem("userName");
+            const res = await asyncStorage.getItem('userName');
             setUserName(res);
         }
         getUserName();
     }, []);
 
+    async function handleSend() {
+        const response = await axios.post(`${Global.ip}/ai/sendMessage`, {
+            userName: userName,
+            messageContent: message,
+            type: type,
+        });
+        if (response.status === 200) {
+            await props.onUpdate(message, 'AI');
+            await props.onUpdate(response.data, 'User');
+            setMessage('');
+        }
+    }
 
     return (
         <View style={styles.container}>
-            <TextInput
-                style={styles.input}
-                value={message}
-                onChangeText={setMessage}
-                placeholder="Type your message here..."
-                onSubmitEditing={handleSend}
-            />
-            <View style={styles.button}>
-                <Button title="->" onPress={handleSend} />
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.input}
+                    value={message}
+                    onChangeText={setMessage}
+                    placeholder="Type your message here..."
+                    onSubmitEditing={handleSend}
+                />
+                <TouchableOpacity style={styles.button} onPress={handleSend}>
+                    <Text style={styles.buttonText}>→</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
+        justifyContent: 'flex-end',
+        width: '100%',
+        paddingBottom: 10,
+        backgroundColor: '#525252',
+    },
+    inputContainer: {
         flexDirection: 'row',
-        padding: 10,
+        alignItems: 'center',
+        alignSelf: 'center',
+        width: '95%',
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 25,
+        backgroundColor: 'white',
+        height: 40,
     },
     input: {
         flex: 1,
-        backgroundColor: '#6a656a',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 20,
-        marginRight: '2%',
+        height: '100%',
         paddingHorizontal: 10,
-        paddingVertical: 5, // Adjust based on your design
     },
     button: {
-        backgroundColor: 'darkorange',
-        borderRadius: '25%',
-        width: '13%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 5,
+        height: 30,
+        width: 35,
+        borderRadius: 25,
+        backgroundColor: 'black',
 
+    },
+    buttonText: {
+        fontSize: 25,
+        color: 'blue',
     },
 });
 
