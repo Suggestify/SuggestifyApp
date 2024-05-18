@@ -5,8 +5,8 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from 'cors';
 import authRoutes from './auth.js'
-import AIMap from "./models/AIMap.js";
 import aiRoutes from "./assistant.js";
+import settingRoutes from "./settings.js";
 
 
 const pwd = process.env.MONGO_Y;
@@ -34,7 +34,7 @@ app.use((req,res,next) =>{
 
 app.use("/ai", aiRoutes);
 app.use('/auth', authRoutes)
-
+app.use('/settings', settingRoutes)
 
 app.listen(port, ()=>{
     console.log(`Server Running On Port: ${port}`);

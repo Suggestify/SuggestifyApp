@@ -17,11 +17,17 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    notificationToken: {
+        type: String,
+        required: false,
+        unique: true
+    },
     createdAt:{
         type: Date,
         immutable: true,
         default: ()=> new Date()
     },
+
     AIMap: {type: 
         Schema.Types.ObjectID,
          ref: "AIMap"

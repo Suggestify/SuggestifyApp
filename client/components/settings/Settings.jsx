@@ -1,17 +1,59 @@
-import React, {useState} from 'react';
+import React, { useState} from 'react';
+import * as Notifications from 'expo-notifications';
 import {StyleSheet, Text, TouchableOpacity, View, Switch, Alert,} from "react-native";
 import {Heading} from 'native-base';
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import Global from "../Global";
 
-function Settings({navigation}) {
-    const userName = AsyncStorage.getItem("userName")
+function Settings({route, navigation}) {
+    const {userName} = route.params;
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
     const [themeEnabled, setThemeEnabled] = useState(false);
 
-    const toggleNotifications = () => setNotificationsEnabled(!notificationsEnabled);
+    async function toggleNotifications() {
+        let currentEnabledState = !notificationsEnabled;
+        setNotificationsEnabled(currentEnabledState);
+
+        if (currentEnabledState) {
+            console.log("test");
+            const { status } = await Notifications.requestPermissionsAsync({
+                ios: {
+                    allowAlert: true,
+                    allowSound: true,
+                    allowBadge: true,
+                    allowAnnouncements: true,
+                },
+            });
+            if (status !== 'granted') {
+                alert('Failed to get push token for push notification!');
+                return;
+            }
+            const token = (await Notifications.getExpoPushTokenAsync({
+                projectId: '1e87624a-57f3-4080-9cf6-b8b7471ab184' // Replace 'your-username' with your actual Expo username
+            })).data;
+            console.log(userName);
+            const response = await axios.post(`${Global.ip}/settings/setNotifications`, {
+                userName: userName,
+                token: token
+            })
+            console.log("response");
+            console.log(response);
+            if(response.status === 200){
+                console.log("Token saved");
+                console.log("Token:", token);
+            }
+            else{
+                console.log("Token not saved");
+            }
+
+        } else {
+            // Optionally handle the case where notifications are turned off
+            // e.g., update the database to disable notifications for this user
+        }
+    }
+
+
     const toggleTheme = () => setThemeEnabled(!themeEnabled);
 
     async function logout() {
@@ -118,6 +160,7 @@ export default Settings;
 
 const styles = StyleSheet.create({
         container: {
+
             flex: 1,
             backgroundColor: '#000000',
         },

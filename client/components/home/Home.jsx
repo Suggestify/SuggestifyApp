@@ -22,7 +22,8 @@ function Home({navigation}) {
         arr.unshift(item); // Add it to the front of the array
     }
     async function onSubmit() {
-        navigation.navigate('Settings')
+        const userName = await AsyncStorage.getItem('userName');
+        navigation.navigate('Settings', {userName: userName});
     }
 
     async function handleClick(index) {
@@ -73,6 +74,7 @@ const styles = StyleSheet.create({
             fontSize: 40,
         },
         linearGradient: {
+            paddingTop: 50,
             flex: 1,
             alignItems: "center",
             justifyContent: "center",
