@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import {ImageBackground, StyleSheet, Text, View, TouchableOpacity} from "react-native";
 
 import {TextInput} from 'react-native-paper';
@@ -11,7 +11,7 @@ const wallpaper = require('../../assets/backgrounds/bk1.png');
 import Global from "../Global";
 
 function SignIn({navigation }) {
-
+    const { contact, updateContact } = useContext(ContactContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -36,7 +36,16 @@ function SignIn({navigation }) {
                 await AsyncStorage.setItem('accessToken', accessToken);
                 await AsyncStorage.setItem('refreshToken', refreshToken);
                 await AsyncStorage.setItem('userName', userName);
-                navigation.navigate('Home')
+                updateContact({userName: userName});
+                const response2 = await axios.get(`${Global.ip}/settings/fetchSettings`, {
+                    userName: userName
+                })
+                if (response2.status === 200) {
+                    updateContact({theme: response2.data.theme});
+                    updateContact({notificationsOn: response2.data.notificationsOn});
+                    updateContact({mediumOrder: response2.data.mediumOrder});
+                    navigation.navigate('Home')
+                }
 
             }
         } catch (err) {

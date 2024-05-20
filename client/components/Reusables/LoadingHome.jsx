@@ -7,17 +7,14 @@ import Global from "../Global";
 
 function Loading({route, navigation }) {
     const { userName, medium } = route.params;
-
     async function pullChat(){
         try {
-
             const response = await axios.get(`${Global.ip}/ai/fetchMessages`, {
                 params: {
                     userName: userName,
                     chatType: medium
                 }
             })
-
             if (response.status === 200) {
                 navigation.navigate("ChatScreen", {
                     userName: userName,

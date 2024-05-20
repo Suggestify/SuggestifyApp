@@ -1,11 +1,14 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {Text, TouchableOpacity, Image, StyleSheet, View} from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function Home({navigation}) {
-    const [myArray, setMyArray] = useState([        { medium: "Music", color: "#e6194b", image: require('../../assets/icons/music.png') },
+    const { contact, updateContact } = useContext(ContactContext);
+    const userName = contact.userName;
+    const [myArray, setMyArray] = useState([
+        { medium: "Music", color: "#e6194b", image: require('../../assets/icons/music.png') },
     { medium: "Books", color: "#3cb44b", image: require('../../assets/icons/Books.png') },
     { medium: "Podcasts", color: "#ffe119", image: require('../../assets/icons/Podcasts.png') },
     { medium: "Shows", color: "#4363d8", image: require('../../assets/icons/Shows.png') },
@@ -22,12 +25,10 @@ function Home({navigation}) {
         arr.unshift(item); // Add it to the front of the array
     }
     async function onSubmit() {
-        const userName = await AsyncStorage.getItem('userName');
         navigation.navigate('Settings', {userName: userName});
     }
 
     async function handleClick(index) {
-        const userName = await AsyncStorage.getItem('userName');
         navigation.navigate('LoadingHome', {userName: userName, medium: myArray[index].medium});
 
         moveToFrontAndShift(myArray, index);

@@ -1,5 +1,6 @@
 import express from 'express'
 import User from "./models/User.js";
+import UserSettings from "./models/UserSettings.js";
 import dotenv from 'dotenv';
 dotenv.config();
 const router = express.Router()
@@ -35,5 +36,25 @@ router.post("/setNotifications", async (req, res) => {
     }
 });
 
+router.get("/fetchSettings", async (req, res) => {
+    const userName = req.query.userName;
+    try {
+        let user = await User.findOne({userName: userName});
+        try{
+            let userSettings = await UserSettings.findById(user.UserSettingsID);
+            if (!userSettings) {
+                return res.status(404).send({message: "User settings not found"});
+            }
+            res.status(200).json(userSettings);
+        } catch (err) {
+            console.log(err);
+            res.status(500).send({message: "Failed to fetch user settings"});
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({message: "Failed to fetch user settings"});
+    }
+
+})
 
 export default router
