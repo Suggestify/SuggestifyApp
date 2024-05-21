@@ -22,3 +22,5 @@ export const ContactProvider = ({ children }) => {
         </ContactContext.Provider>
     );
 };
+
+export { ContactContext };

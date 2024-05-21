@@ -37,6 +37,7 @@ router.post("/setNotifications", async (req, res) => {
 });
 
 router.get("/fetchSettings", async (req, res) => {
+    console.log("called");
     const userName = req.query.userName;
     try {
         let user = await User.findOne({userName: userName});

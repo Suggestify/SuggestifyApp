@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Text, View } from "react-native";
 import axios from "axios";
 import Global from "../Global";
+import { ContactContext } from "../../ContactContext";
 
 function Loading({ navigation }) {
     const { contact, updateContact } = useContext(ContactContext);
@@ -11,12 +12,15 @@ function Loading({ navigation }) {
         const checkToken = async () => {
             const accessToken = await AsyncStorage.getItem('accessToken');
             if (accessToken) {
+                console.log("accessToken: " + accessToken);
                 const userName = await AsyncStorage.getItem('userName');
                 updateContact({userName: userName});
+                console.log(Global.ip)
                 const response = await axios.get(`${Global.ip}/settings/fetchSettings`, {
                     userName: userName
                 })
-                if (response2.status === 200) {
+                console.log("test2");
+                if (response.status === 200) {
                     updateContact({theme: response.data.theme});
                     updateContact({notificationsOn: response.data.notificationsOn});
                     updateContact({mediumOrder: response.data.mediumOrder});
