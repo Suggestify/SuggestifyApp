@@ -10,7 +10,6 @@ function Loading({route, navigation }) {
 
     async function pullChat(){
         try {
-
             const response = await axios.get(`${Global.ip}/ai/fetchMessages`, {
                 params: {
                     userName: userName,
@@ -19,6 +18,7 @@ function Loading({route, navigation }) {
             })
 
             if (response.status === 200) {
+                console.log(response.data);
                 navigation.navigate("ChatScreen", {
                     userName: userName,
                     medium: medium,
@@ -30,7 +30,7 @@ function Loading({route, navigation }) {
         }catch (err){
             console.log(err)
         }
-    };
+    }
 
     useEffect(() => {
         pullChat();
