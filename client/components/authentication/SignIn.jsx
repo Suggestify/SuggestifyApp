@@ -5,6 +5,7 @@ import {TextInput} from 'react-native-paper';
 import {Heading, Button} from "native-base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
+import {ContactContext} from "../../ContactContext";
 
 const wallpaper = require('../../assets/backgrounds/bk1.png');
 
@@ -38,8 +39,11 @@ function SignIn({navigation }) {
                 await AsyncStorage.setItem('userName', userName);
                 updateContact({userName: userName});
                 const response2 = await axios.get(`${Global.ip}/settings/fetchSettings`, {
-                    userName: userName
-                })
+                    params: {
+                        userName: userName
+                    }
+                });
+
                 if (response2.status === 200) {
                     updateContact({theme: response2.data.theme});
                     updateContact({notificationsOn: response2.data.notificationsOn});

@@ -3,8 +3,7 @@ import mongoose from "mongoose";
 const UserSettingsSchema = new mongoose.Schema({
     notificationToken: {
         type: String,
-        required: false,
-        unique: true
+        sparse: true
     },
     notificationOn: {
         type: Boolean,
@@ -12,9 +11,9 @@ const UserSettingsSchema = new mongoose.Schema({
         default: false
     },
     theme: {
-        type: String,
+        type: Boolean,
         required: true,
-        default: 'dark'
+        default: false
     },
     mediumOrder: {
         type: Array,

@@ -15,14 +15,14 @@ function Loading({ navigation }) {
                 console.log("accessToken: " + accessToken);
                 const userName = await AsyncStorage.getItem('userName');
                 updateContact({userName: userName});
-                console.log(Global.ip)
                 const response = await axios.get(`${Global.ip}/settings/fetchSettings`, {
-                    userName: userName
+                    params: {
+                        userName: userName
+                    }
                 })
-                console.log("test2");
                 if (response.status === 200) {
                     updateContact({theme: response.data.theme});
-                    updateContact({notificationsOn: response.data.notificationsOn});
+                    updateContact({notificationOn: response.data.notificationOn});
                     updateContact({mediumOrder: response.data.mediumOrder});
                     navigation.navigate('Home')
                 }

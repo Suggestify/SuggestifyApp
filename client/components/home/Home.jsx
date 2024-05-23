@@ -3,16 +3,19 @@ import {Text, TouchableOpacity, Image, StyleSheet, View} from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
 import { ContactContext } from "../../ContactContext";
+import axios from "axios";
+import Global from "../Global";
 
 function Home({navigation}) {
 
     const { contact, updateContact } = useContext(ContactContext);
     const userName = contact.userName
+    console.log(userName);
     const order = contact.mediumOrder;
     const initialArray = [
         { medium: "Music", color: "#e6194b", image: require('../../assets/icons/Music.png') },
         { medium: "Books", color: "#3cb44b", image: require('../../assets/icons/Books.png') },
-        { medium: "Podcasts", color: "#ffe119", image: require('../../assets/icons/Podcasts.png') },
+        { medium: "Podcast", color: "#ffe119", image: require('../../assets/icons/Podcasts.png') },
         { medium: "Shows", color: "#4363d8", image: require('../../assets/icons/Shows.png') },
         { medium: "Movies", color: "#f58231", image: require('../../assets/icons/Movies.png') },
         { medium: "Hobbies", color: "#911eb4", image: require('../../assets/icons/Hobbies.png') },
@@ -33,6 +36,7 @@ function Home({navigation}) {
         return newArr;
     }
     function moveToFrontAndShift(arr, index) {
+
         if (index < 0 || index >= arr.length) {
             return; // Invalid index
         }
@@ -44,11 +48,14 @@ function Home({navigation}) {
     }
 
     async function handleClick(index) {
-        navigation.navigate('LoadingHome', {userName: userName, medium: myArray[index].medium});
-
-        moveToFrontAndShift(order, index);
-        reorderArray(myArray, order);
+        console.log(myArray[index].medium);
+        moveToFrontAndShift(myArray, index);
+        await axios.put(`${Global.ip}/settings/updateOrder`, {
+            userName: userName,
+            order: myArray.map(item => item.medium)
+        })
         setMyArray([...myArray]);
+        navigation.navigate('LoadingHome', {medium: myArray[index].medium});
     }
 
     return (

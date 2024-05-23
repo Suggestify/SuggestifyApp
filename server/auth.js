@@ -40,7 +40,7 @@ router.post("/SignUp", async (req,res)=>{
 
         const NewUserSettings = new UserSettings();
         await NewUserSettings.save();
-        
+
         const data = {email: curEmail, userName: curUserName, password: hashedPWD, AIMap: newAIMap.id, UserSettingsID: NewUserSettings.id };  // email, username, password for database
         const currentUser = new User(data);
         await currentUser.save();
@@ -56,6 +56,7 @@ router.post("/SignUp", async (req,res)=>{
     }
 
     catch(err){
+        console.log(err)
         if(err.code === 11000){
             const field = Object.keys(err.keyValue)[0];
             res.status(400).send({ field: field,  message: `An account with that ${field} already exists.` });

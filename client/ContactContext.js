@@ -8,7 +8,7 @@ export const ContactProvider = ({ children }) => {
         username: '',
         mediumOrder: ['Music', 'Books', 'Podcast', 'Shows', 'Movies', 'Hobbies', 'Games'],
         notificationsOn: false,
-        theme: 'dark'
+        theme: false
     });
 
     // Function to update the contact details
