@@ -63,41 +63,25 @@ async function createThread(userName, chatType, messageContent){  // should chec
 }
 
 // incorporate into loading call
-async function fetchMessages(userName, chatType){
+async function fetchMessages(userName, chatType, earliestMessageId = null) {
     const currAIMap = await getMapFromUser(userName);
-    const threadMessages = await openai.beta.threads.messages.list(
-        currAIMap[chatType], {limit: fetchLimit}
-    );
-    const returnMessages = [];
-    threadMessages.body.data.forEach(message => {
-        const temp = {message: message.content[0].text.value, msgID: message.id};
-        returnMessages.push(temp);
-        //returnMessages.push(message.content[0].text.value);
-     });
-    console.log(threadMessages.body.data[0]);
-    return returnMessages.reverse();
-}
-// CONCAT^
-async function loadMessages(userName, chatType, earliestMessageId){
+    const options = { limit: fetchLimit };
 
-    const currAIMap = await getMapFromUser(userName);
-    const options = {
-        limit: 10  // Set the number of messages to fetch
-    };
     if (earliestMessageId) {
         options.before = earliestMessageId;
+        options.limit = 10;
     }
+
     const threadMessages = await openai.beta.threads.messages.list(
         currAIMap[chatType], options
     );
 
     const returnMessages = [];
     threadMessages.body.data.forEach(message => {
-        const temp = {message: message.content[0].text.value, msgID: message.id};
+        const temp = { message: message.content[0].text.value, msgID: message.id };
         returnMessages.push(temp);
-        //returnMessages.push(message.content[0].text.value);
     });
-    console.log("SUCCESS123");
+
     return returnMessages.reverse();
 }
 
@@ -165,6 +149,7 @@ router.post("/sendMessage", async (req,res)=>{  // for indi message
 });
 
 // fetch previous messages up till var
+// refactor to one endpoint?
 router.get("/fetchMessages",async (req,res)=>{ // make get
     const response = await fetchMessages(req.query.userName, req.query.chatType);
     res.send(response);
@@ -172,8 +157,7 @@ router.get("/fetchMessages",async (req,res)=>{ // make get
 
 
 router.get("/loadMessages",async (req,res)=>{ // make get
-    console.log("hello");
-    const response = await loadMessages(req.query.userName, req.query.chatType, req.query.earliestMessageId);
+    const response = await fetchMessages(req.query.userName, req.query.chatType, req.query.earliestMessageId);
     res.send(response);
 });
 

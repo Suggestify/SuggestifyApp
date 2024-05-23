@@ -18,7 +18,6 @@ function Loading({route, navigation }) {
             })
 
             if (response.status === 200) {
-                console.log(response.data);
                 navigation.navigate("ChatScreen", {
                     userName: userName,
                     medium: medium,

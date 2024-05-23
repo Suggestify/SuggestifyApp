@@ -9,13 +9,14 @@ import Global from "../Global";
 function ChatScreen({ route, navigation }) {
     const [currHistory, setCurrHistory] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
-    const [isAddingNewMessage, setIsAddingNewMessage] = useState(false);
+    const [isAddingNewMessage, setIsAddingNewMessage] = useState(true);
     const type = route.params.medium;
     const flatListRef = useRef(null);
 
     function formatMessages(messages) {
+        const uniqueSuffix = Date.now();
         return messages.map((message, index) => ({
-            id: index,
+            id: `${message.msgID}-${uniqueSuffix}-${index}`,
             message: message.message,
             type: index % 2 === 0 ? 'AI' : 'User',
             msgID: message.msgID
@@ -28,20 +29,18 @@ function ChatScreen({ route, navigation }) {
     }, [route.params.chatHistory]);
 
     useEffect(() => {
-        if (isAddingNewMessage) {
+        if (isAddingNewMessage && currHistory.length > 0) {
             const scrollTimeout = setTimeout(() => {
-                if (flatListRef.current) {
-                    console.log('Scrolling to end');
-                    flatListRef.current.scrollToEnd({ animated: true });
-                }
+                flatListRef.current?.scrollToEnd({ animated: true });
             }, 200);
 
             return () => clearTimeout(scrollTimeout);
         }
-    }, [currHistory, isAddingNewMessage]);
+    }, [isAddingNewMessage, currHistory.length]);
+
 
     function updateHistory(newMessage, type) {
-        setIsAddingNewMessage(true); // Set to true when adding a new message
+        setIsAddingNewMessage(true);
         setCurrHistory((currentHistory) => [
             ...currentHistory,
             { id: currentHistory.length, message: newMessage, type: type },
@@ -50,26 +49,32 @@ function ChatScreen({ route, navigation }) {
 
     async function onRefresh() {
         setRefreshing(true);
-        setIsAddingNewMessage(false); // Set to false when refreshing
-        // Simulate loading more messages
-        setTimeout(async () => {
+        setIsAddingNewMessage(false);
+        try {
             let moreMessages = await loadMessages();
             moreMessages = formatMessages(moreMessages);
-            console.log(moreMessages);
-            setCurrHistory((prevState) => [...moreMessages, ...prevState]);
-            setRefreshing(false);
-        }, 1500);
+            setCurrHistory(prevState => [...moreMessages, ...prevState]);
+        } catch (error) {
+            console.error('Failed to refresh messages:', error);
+        }
+        setRefreshing(false);
     }
 
     async function loadMessages() {
-        const response = await axios.get(`${Global.ip}/ai/loadMessages`, {
-            params: {
-                userName: route.params.userName,
-                chatType: type,
-                earliestMessageId: currHistory[0].msgID,
-            }
-        })
-        return response.data;
+        try {
+            const response = await axios.get(`${Global.ip}/ai/loadMessages`, {
+                params: {
+                    userName: route.params.userName,
+                    chatType: type,
+                    earliestMessageId: currHistory[0]?.msgID,
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Failed to load messages:', error);
+            // error state
+            return [];
+        }
     }
 
     return (
