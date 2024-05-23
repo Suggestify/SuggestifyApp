@@ -37,7 +37,6 @@ async function createThread(userName, chatType, messageContent){  // should chec
 
   try{
    const myAIMap = await getMapFromUser(userName);
-   console.log(myAIMap);
     if(myAIMap[chatType] === 'NULL'){ // if thread does not exist then create new thread
       try{
         const thread = await openai.beta.threads.create();
@@ -64,19 +63,26 @@ async function createThread(userName, chatType, messageContent){  // should chec
 }
 
 // incorporate into loading call
-async function fetchMessages(userName, chatType){
-    console.log(userName, chatType);
+async function fetchMessages(userName, chatType, earliestMessageId = null) {
     const currAIMap = await getMapFromUser(userName);
+    const options = { limit: fetchLimit };
+
+    if (earliestMessageId) {
+        options.before = earliestMessageId;
+        options.limit = 10;
+    }
+
     const threadMessages = await openai.beta.threads.messages.list(
-        currAIMap[chatType], {limit: fetchLimit}
+        currAIMap[chatType], options
     );
+
     const returnMessages = [];
     threadMessages.body.data.forEach(message => {
-        returnMessages.push(message.content[0].text.value);
-     });
-    console.log(returnMessages + "NOT");
-    return returnMessages.reverse();
+        const temp = { message: message.content[0].text.value, msgID: message.id };
+        returnMessages.push(temp);
+    });
 
+    return returnMessages.reverse();
 }
 
 
@@ -102,13 +108,11 @@ async function sendMessage(userName, chatType, messageContent, init){
             let currMsgStatus = "pending";
             while (currMsgStatus !== "completed") {
                 currMsgStatus = await checkStatus(curThread, run.id); // check syntax
-                console.log(currMsgStatus);
                 await delay(1000);
             }
 
             const messages = await openai.beta.threads.messages.list(curThread);// make single fetch
             const toRet = messages.body.data[0].content[0].text.value
-            console.log(toRet + "THIS ONE");
             return toRet;
         }
 
@@ -119,7 +123,7 @@ async function sendMessage(userName, chatType, messageContent, init){
 }
 
 router.post("/create", async (req,res)=>{ // creates thread per assistant
-   console.log(req.body);
+
   const chatType = req.body.medium;
   const userName = req.body.userName;
   const options = req.body.options;
@@ -134,26 +138,27 @@ router.post("/create", async (req,res)=>{ // creates thread per assistant
 
 router.post("/sendMessage", async (req,res)=>{  // for indi message
 
-    console.log(req.body);
     try {
         const userName = req.body.userName;
         const message = req.body.messageContent;
         const chatType = req.body.type;
-        console.log("passed");
         const response = await sendMessage(userName, chatType, message, false);
-        //console.log(response);
         res.send(response);
-        //res.sendStatus(200);
     }catch(err){
         console.log(err);
     }
 });
 
 // fetch previous messages up till var
+// refactor to one endpoint?
 router.get("/fetchMessages",async (req,res)=>{ // make get
-   // console.log(req);
     const response = await fetchMessages(req.query.userName, req.query.chatType);
-    //console.log(response);
+    res.send(response);
+});
+
+
+router.get("/loadMessages",async (req,res)=>{ // make get
+    const response = await fetchMessages(req.query.userName, req.query.chatType, req.query.earliestMessageId);
     res.send(response);
 });
 

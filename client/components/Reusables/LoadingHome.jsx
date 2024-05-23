@@ -29,7 +29,7 @@ function Loading({route, navigation }) {
         }catch (err){
             console.log(err)
         }
-    };
+    }
 
     useEffect(() => {
         pullChat();
