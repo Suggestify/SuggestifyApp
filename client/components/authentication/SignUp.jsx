@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import {ImageBackground, StyleSheet, Text, View, TouchableOpacity} from "react-native";
 
 import {TextInput} from 'react-native-paper';
@@ -9,6 +9,7 @@ import axios from 'axios';
 const wallpaper = require('../../assets/backgrounds/bk2.png');
 
 import Global from "../Global";
+import {ContactContext} from "../../ContactContext";
 
 function SignUp({navigation}) {
     const [email, setEmail] = useState("");
@@ -17,6 +18,8 @@ function SignUp({navigation}) {
     const [showPassword, setShowPassword] = useState(false);
     const [emailError, setEmailError] = useState("");
     const [userNameError, setUserNameError] = useState("");
+
+    const { contact, updateContact } = useContext(ContactContext);
 
     function toggleShowPassword() {
         setShowPassword(!showPassword);
@@ -55,7 +58,20 @@ function SignUp({navigation}) {
                 await AsyncStorage.setItem('accessToken', accessToken);
                 await AsyncStorage.setItem('refreshToken', refreshToken);
                 await AsyncStorage.setItem('userName', userName);
-                navigation.navigate('Preference');
+                updateContact({userName: userName});
+                const response2 = await axios.get(`${Global.ip}/settings/fetchSettings`, {
+                    params: {
+                        userName: userName
+                    }
+                });
+
+                if (response2.status === 200) {
+                    updateContact({theme: response2.data.theme});
+                    updateContact({notificationsOn: response2.data.notificationsOn});
+                    updateContact({mediumOrder: response2.data.mediumOrder});
+                    navigation.navigate('Preference');
+                }
+
             }
         } catch (err) {
             if (err.response && err.response.status === 400) {

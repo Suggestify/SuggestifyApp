@@ -1,45 +1,77 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
+import * as Notifications from 'expo-notifications';
 import {StyleSheet, Text, TouchableOpacity, View, Switch, Alert,} from "react-native";
 import {Heading} from 'native-base';
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import Global from "../Global";
+import {ContactContext} from "../../ContactContext";
 
-function Settings({navigation}) {
-    const userName = AsyncStorage.getItem("userName")
-    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-    const [themeEnabled, setThemeEnabled] = useState(false);
+function Settings({route, navigation}) {
+    const { contact, updateContact } = useContext(ContactContext);
+    const {userName} = route.params;
+    const [notificationsEnabled, setNotificationsEnabled] = useState(contact.notificationOn);
+    const [themeEnabled, setThemeEnabled] = useState(contact.theme);
 
-    const toggleNotifications = () => setNotificationsEnabled(!notificationsEnabled);
-    const toggleTheme = () => setThemeEnabled(!themeEnabled);
+    async function toggleSwitch(switchType, value ){
+        const response = await axios.post(`${Global.ip}/settings/toggleSwitch`, {
+            userName: userName,
+            switchType: switchType,
+            value: value
+        })
+        return response;
+    }
+
+    async function toggleNotifications() {
+        contact.notificationsOn = !notificationsEnabled;
+        setNotificationsEnabled(contact.notificationsOn);
+        let response = await toggleSwitch("notificationOn", contact.notificationsOn);
+
+        if (response.data.firstTime) {
+            const { status } = await Notifications.requestPermissionsAsync({
+                ios: {
+                    allowAlert: true,
+                    allowSound: true,
+                    allowBadge: true,
+                    allowAnnouncements: true,
+                },
+            });
+            if (status !== 'granted') {
+                alert('Failed to get push token for push notification!');
+                return;
+            }
+            const token = (await Notifications.getExpoPushTokenAsync({
+                projectId: '1e87624a-57f3-4080-9cf6-b8b7471ab184' // Replace 'your-username' with your actual Expo username
+            })).data;
+            const response = await axios.post(`${Global.ip}/settings/setNotifications`, {
+                userName: userName,
+                token: token
+            })
+            if(response.status === 200){
+
+            }
+            else{
+
+            }
+        }
+    }
+
+
+    async function toggleTheme (){
+        contact.theme = !themeEnabled;
+        setThemeEnabled(contact.theme);
+        let response = await toggleSwitch("theme",  contact.theme);
+    }
 
     async function logout() {
         try {
             const response = await axios.delete(`${Global.ip}/auth/SignOut`)
-            await AsyncStorage.removeItem('accessToken');
-            await AsyncStorage.removeItem('refreshToken');
             if (response.status === 204) {
+                await AsyncStorage.clear();
                 navigation.navigate('SignIn')
             }
         } catch (err) {
             console.log(err)
-        }
-    }
-
-    async function changeUserName() {
-        try {
-            const response = await axios.put(`${Global.ip}/auth/changeUsername`, {
-                newUsername: newUsername,
-                currUsername: userName
-            })
-            if (response.status === 200) {
-                Alert.alert("Username changed successfully");
-            } else {
-                Alert.alert(response.data.message);
-            }
-        } catch (err) {
-            Alert.alert("Error", "Failed to change username");
         }
     }
 
@@ -118,6 +150,7 @@ export default Settings;
 
 const styles = StyleSheet.create({
         container: {
+
             flex: 1,
             backgroundColor: '#000000',
         },

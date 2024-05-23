@@ -123,6 +123,7 @@ async function sendMessage(userName, chatType, messageContent, init){
 }
 
 router.post("/create", async (req,res)=>{ // creates thread per assistant
+
   const chatType = req.body.medium;
   const userName = req.body.userName;
   const options = req.body.options;
