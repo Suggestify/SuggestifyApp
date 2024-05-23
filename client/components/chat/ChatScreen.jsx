@@ -66,7 +66,7 @@ function ChatScreen({ route, navigation }) {
                 params: {
                     userName: route.params.userName,
                     chatType: type,
-                    earliestMessageId: currHistory[0]?.msgID,
+                    earliestMessageId: currHistory[0].msgID,
                 }
             });
             return response.data;

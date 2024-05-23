@@ -68,7 +68,7 @@ async function fetchMessages(userName, chatType, earliestMessageId = null) {
     const options = { limit: fetchLimit };
 
     if (earliestMessageId) {
-        options.before = earliestMessageId;
+        options.after = earliestMessageId;
         options.limit = 10;
     }
 
@@ -78,7 +78,7 @@ async function fetchMessages(userName, chatType, earliestMessageId = null) {
 
     const returnMessages = [];
     threadMessages.body.data.forEach(message => {
-        const temp = { message: message.content[0].text.value, msgID: message.id };
+        const temp = {message: message.content[0].text.value, msgID: message.id };
         returnMessages.push(temp);
     });
 
