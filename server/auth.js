@@ -4,6 +4,7 @@ import User from "./models/User.js";
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv';
 import AIMap from './models/AIMap.js';
+import UserSettings from './models/UserSettings.js';
 dotenv.config();
 const router = express.Router()
 
@@ -36,8 +37,11 @@ router.post("/SignUp", async (req,res)=>{
         const initData = {Music:"NULL", Books:"NULL", Shows:"NULL", Podcasts:"NULL", Movies:"NULL", Hobbies:"NULL", Games:"NULL"}
         const newAIMap = new AIMap(initData);
         await newAIMap.save();
-        
-        const data = {email: curEmail, userName: curUserName, password: hashedPWD, AIMap: newAIMap.id };  // email, username, password for database
+
+        const NewUserSettings = new UserSettings();
+        await NewUserSettings.save();
+
+        const data = {email: curEmail, userName: curUserName, password: hashedPWD, AIMap: newAIMap.id, UserSettingsID: NewUserSettings.id };  // email, username, password for database
         const currentUser = new User(data);
         await currentUser.save();
 
@@ -52,6 +56,7 @@ router.post("/SignUp", async (req,res)=>{
     }
 
     catch(err){
+        console.log(err)
         if(err.code === 11000){
             const field = Object.keys(err.keyValue)[0];
             res.status(400).send({ field: field,  message: `An account with that ${field} already exists.` });

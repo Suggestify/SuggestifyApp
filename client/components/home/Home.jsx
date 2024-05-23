@@ -1,20 +1,42 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {Text, TouchableOpacity, Image, StyleSheet, View} from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ContactContext } from "../../ContactContext";
+import axios from "axios";
+import Global from "../Global";
 
 function Home({navigation}) {
-    const [myArray, setMyArray] = useState([        { medium: "Music", color: "#e6194b", image: require('../../assets/icons/music.png') },
-    { medium: "Books", color: "#3cb44b", image: require('../../assets/icons/Books.png') },
-    { medium: "Podcasts", color: "#ffe119", image: require('../../assets/icons/Podcasts.png') },
-    { medium: "Shows", color: "#4363d8", image: require('../../assets/icons/Shows.png') },
-    { medium: "Movies", color: "#f58231", image: require('../../assets/icons/Movies.png') },
-    { medium: "Hobbies", color: "#911eb4", image: require('../../assets/icons/Hobbies.png') },
-    { medium: "Games", color: "#46f0f0", image: require('../../assets/icons/Games.png') }]);
+
+    const { contact, updateContact } = useContext(ContactContext);
+    const userName = contact.userName
+    console.log(userName);
+    const order = contact.mediumOrder;
+    const initialArray = [
+        { medium: "Music", color: "#e6194b", image: require('../../assets/icons/Music.png') },
+        { medium: "Books", color: "#3cb44b", image: require('../../assets/icons/Books.png') },
+        { medium: "Podcast", color: "#ffe119", image: require('../../assets/icons/Podcasts.png') },
+        { medium: "Shows", color: "#4363d8", image: require('../../assets/icons/Shows.png') },
+        { medium: "Movies", color: "#f58231", image: require('../../assets/icons/Movies.png') },
+        { medium: "Hobbies", color: "#911eb4", image: require('../../assets/icons/Hobbies.png') },
+        { medium: "Games", color: "#46f0f0", image: require('../../assets/icons/Games.png') }
+    ];
+
+    const [myArray, setMyArray] = useState(reorderArray(initialArray, order));
 
 
+    function reorderArray(arr, order) {
+        const newArr = [];
+        order.forEach(o => {
+            const found = arr.find(item => item.medium === o);
+            if (found) {
+                newArr.push(found);
+            }
+        });
+        return newArr;
+    }
     function moveToFrontAndShift(arr, index) {
+
         if (index < 0 || index >= arr.length) {
             return; // Invalid index
         }
@@ -22,17 +44,18 @@ function Home({navigation}) {
         arr.unshift(item); // Add it to the front of the array
     }
     async function onSubmit() {
-        const userName = await AsyncStorage.getItem('userName');
         navigation.navigate('Settings', {userName: userName});
     }
 
     async function handleClick(index) {
-        const userName = await AsyncStorage.getItem('userName');
-        navigation.navigate('LoadingHome', {userName: userName, medium: myArray[index].medium});
-
+        console.log(myArray[index].medium);
         moveToFrontAndShift(myArray, index);
+        await axios.put(`${Global.ip}/settings/updateOrder`, {
+            userName: userName,
+            order: myArray.map(item => item.medium)
+        })
         setMyArray([...myArray]);
-
+        navigation.navigate('LoadingHome', {medium: myArray[index].medium});
     }
 
     return (

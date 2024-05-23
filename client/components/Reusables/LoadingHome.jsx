@@ -1,23 +1,22 @@
-import React, { useEffect,useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import { Text, View } from "react-native";
-//import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 import axios from 'axios'
 import Global from "../Global";
+import { ContactContext } from "../../ContactContext";
 
 
 function Loading({route, navigation }) {
-    const { userName, medium } = route.params;
-
+    const { contact, updateContact } = useContext(ContactContext);
+    const userName = contact.userName;
+    const { medium } = route.params;
     async function pullChat(){
         try {
-
             const response = await axios.get(`${Global.ip}/ai/fetchMessages`, {
                 params: {
                     userName: userName,
                     chatType: medium
                 }
             })
-
             if (response.status === 200) {
                 navigation.navigate("ChatScreen", {
                     userName: userName,
