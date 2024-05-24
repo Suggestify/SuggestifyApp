@@ -13,9 +13,7 @@ const fetchLimit = 20;
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API,
-  });  
-
-
+  });
 
 async function getMapFromUser(userName) {
     try {
