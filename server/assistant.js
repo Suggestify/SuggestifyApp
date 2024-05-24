@@ -13,8 +13,17 @@ const fetchLimit = 20;
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API,
-  });  
+  });
 
+
+function errorHandler(err, req, res, next) {
+    console.error(err.stack);
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).send({
+        error: true,
+        message: err.message || 'Internal Server Error',
+    });
+}
 
 
 async function getMapFromUser(userName) {
@@ -162,4 +171,7 @@ router.get("/loadMessages",async (req,res)=>{ // make get
     res.send(response);
 });
 
+
+
+app.use(errorHandler);
 export default router;
