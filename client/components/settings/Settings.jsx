@@ -24,16 +24,11 @@ function Settings({route, navigation}) {
     }
 
     async function toggleNotifications() {
-        console.log("test")
-        Toast.show({
-            type: 'success',
-            text1: 'Hello',
-            text2: 'This is some something 👋'
-        });
         contact.notificationsOn = !notificationsEnabled;
         setNotificationsEnabled(contact.notificationsOn);
         let response = await toggleSwitch("notificationOn", contact.notificationsOn);
         if(response.status === 200){
+            console.log("Notifications updated 1");
             if (response.data.firstTime) {
                 const {status} = await Notifications.requestPermissionsAsync({
                     ios: {
@@ -50,20 +45,48 @@ function Settings({route, navigation}) {
                 const token = (await Notifications.getExpoPushTokenAsync({
                     projectId: '1e87624a-57f3-4080-9cf6-b8b7471ab184' // Replace 'your-username' with your actual Expo username
                 })).data;
-            } else{
+                await axios.post(`${Global.ip}/settings/setNotifications`, {
+                    userName: userName,
+                    token: token
+                })
 
             }
-            const response = await axios.post(`${Global.ip}/settings/setNotifications`, {
-                userName: userName,
-                token: token
-            })
+            Toast.show({
+                type: 'success', // There are 'success', 'error', 'info' types available by default
+                text1: 'Settings Updated',
+                text2: 'Your changes have been saved successfully.'
+            });
+        }
+        else{
+            contact.notificationsOn = !notificationsEnabled;
+            setNotificationsEnabled(contact.notificationsOn);
+            Toast.show({
+                type: 'error', // There are 'success', 'error', 'info' types available by default
+                text1: 'Settings Not Updated',
+                text2: 'Your changes have not been saved successfully.'
+            });
+
         }
     }
 
     async function toggleTheme (){
         contact.theme = !themeEnabled;
         setThemeEnabled(contact.theme);
-        let response = await toggleSwitch("theme",  contact.theme);
+        let response = await toggleSwitch("theme",  !contact.theme);
+        if (response.status === 200) {
+            Toast.show({
+                type: 'success', // There are 'success', 'error', 'info' types available by default
+                text2: 'Your changes have been saved successfully.'
+            });
+        }
+        else{
+            contact.theme = !themeEnabled;
+            setThemeEnabled(contact.theme);
+            Toast.show({
+                type: 'error', // There are 'success', 'error', 'info' types available by default
+                text2: 'Your changes have not been saved successfully.'
+            });
+        }
     }
 
     async function logout() {

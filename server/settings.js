@@ -101,14 +101,16 @@ router.put("/updateOrder", async (req, res) => {
 });
 
 router.post("/toggleSwitch", async (req, res) => {
-    const { userName, switchType, switchState } = req.body;
-
+    const { userName, switchType, value } = req.body;
+    console.log("called")
     // Validate inputs
-    if (!userName || switchType === undefined || switchState === undefined) {
+    if (!userName || switchType === undefined || value === undefined) {
+        console.log(userName, switchType, value)
         return res.status(400).send({ message: "Missing required fields (userName, switchType, or switchState)" });
     }
     // Validate switchType to ensure it's a known property
-    const validSwitchTypes = ['notificationOn', 'darkMode', 'emailAlerts']; // example switch types
+    console.log(switchType)
+    const validSwitchTypes = ['notificationOn', 'theme']; // example switch types
     if (!validSwitchTypes.includes(switchType)) {
         return res.status(400).send({ message: "Invalid switchType provided" });
     }
@@ -122,10 +124,10 @@ router.post("/toggleSwitch", async (req, res) => {
         if (!userSettings) {
             return res.status(404).send({ message: "User settings not found" });
         }
-        userSettings[switchType] = switchState;
+        userSettings[switchType] = value;
         await userSettings.save();
 
-        if (switchType === "notificationOn" && switchState && userSettings.notificationToken === undefined) {
+        if (switchType === "notificationOn" && value && userSettings.notificationToken === undefined) {
             return res.status(200).send({ message: "Notification enabled", firstTime: true });
         }
         res.status(200).send({ message: "Switch toggled successfully" });
