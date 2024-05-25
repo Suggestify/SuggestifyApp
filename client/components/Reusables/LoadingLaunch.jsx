@@ -12,7 +12,6 @@ function Loading({ navigation }) {
         const checkToken = async () => {
             const accessToken = await AsyncStorage.getItem('accessToken');
             if (accessToken) {
-                console.log("accessToken: " + accessToken);
                 const userName = await AsyncStorage.getItem('userName');
                 updateContact({userName: userName});
                 const response = await axios.get(`${Global.ip}/settings/fetchSettings`, {
