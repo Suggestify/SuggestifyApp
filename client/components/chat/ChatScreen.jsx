@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SafeAreaView, StyleSheet, View, FlatList, RefreshControl } from 'react-native';
+import { SafeAreaView, StyleSheet, View, FlatList, RefreshControl, TouchableOpacity, Text } from 'react-native';
 import ChatBubble from './ChatBubble';
 import ChatInput from './ChatInput';
 import axios from "axios";
 import Global from "../Global";
+import {Ionicons} from "@expo/vector-icons";
 
 
 function ChatScreen({ route, navigation }) {
@@ -77,46 +78,73 @@ function ChatScreen({ route, navigation }) {
         }
     }
 
-    return (
-        <SafeAreaView style={styles.container}>
-            <FlatList
-                ref={flatListRef}
-                data={currHistory}
-                renderItem={({ item }) => <ChatBubble message={item.message} type={item.type} />}
-                keyExtractor={(item) => item.id.toString()}
-                contentContainerStyle={styles.flatListContent}
-                ListFooterComponent={<View style={styles.footer} />}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                    />
-                }
-            />
-            <View style={styles.inputContainer}>
-                <ChatInput chatType={type} onUpdate={updateHistory} />
-            </View>
-        </SafeAreaView>
+    const ChatHeader = ({ onBackPress, title }) => (
+        <View style={styles.headerContainer}>
+            <TouchableOpacity onPress={onBackPress}>
+                <Ionicons name="arrow-back" size={24} color="white" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>{title}</Text>
+        </View>
     );
-}
 
-export default ChatScreen;
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#525252',
-    },
-    flatListContent: {
-        flexGrow: 1,
-        justifyContent: 'flex-end',
-    },
-    inputContainer: {
-        justifyContent: 'flex-end',
-        width: '100%',
-        backgroundColor: '#525252', // Ensure the input container is visible
-    },
-    footer: {
-        height: 10,
-    }
-});
+        return (
+            <SafeAreaView style={styles.container}>
+                <ChatHeader
+                    onBackPress={() =>   navigation.navigate("Home")}
+                    title= {type}
+                />
+                <FlatList
+                    ref={flatListRef}
+                    data={currHistory}
+                    renderItem={({ item }) => <ChatBubble message={item.message} type={item.type} />}
+                    keyExtractor={(item) => item.id.toString()}
+                    contentContainerStyle={styles.flatListContent}
+                    ListFooterComponent={<View style={styles.footer} />}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                        />
+                    }
+                />
+                <View style={styles.inputContainer}>
+                    <ChatInput chatType={type} onUpdate={updateHistory} />
+                </View>
+            </SafeAreaView>
+        );
+    };
+
+    export default ChatScreen;
+
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: '#525252',
+        },
+        flatListContent: {
+            flexGrow: 1,
+            justifyContent: 'flex-end',
+        },
+        inputContainer: {
+            justifyContent: 'flex-end',
+            width: '100%',
+            backgroundColor: '#525252',
+        },
+        footer: {
+            height: 10,
+        },
+        headerContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: 10,
+            backgroundColor: '#333',
+            height: 50
+        },
+        headerTitle: {
+            color: 'white',
+            fontSize: 18,
+            marginLeft: 10,
+        }
+    });
+

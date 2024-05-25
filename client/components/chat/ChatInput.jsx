@@ -27,6 +27,7 @@ function ChatInput(props) {
                 messageContent: message,
                 type: type,
             });
+
             if (response.status === 200) {
                 await props.onUpdate(message, 'AI');
                 await props.onUpdate(response.data, 'User');

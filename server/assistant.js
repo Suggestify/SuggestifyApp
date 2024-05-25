@@ -184,7 +184,7 @@ router.post("/sendMessage", async (req, res, next) => {
 
     try {
         const response = await sendMessage(userName, chatType, messageContent, false);
-        res.send(response);  // Send the response obtained from the sendMessage function
+        res.status(200).send(response);  // Send the response obtained from the sendMessage function
     } catch (err) {
         next(err);
     }
