@@ -37,7 +37,7 @@ function Preference({navigation}) {
 
     useEffect(() => {
         if (userName){
-            console.log(userName);//
+            //console.log(userName);//
         }
     }, [userName]);
 
@@ -52,7 +52,6 @@ function Preference({navigation}) {
     };
 
     async function handleNextOrSkip() {
-        console.log(userName);
         const response = await axios.post(`${Global.ip}/ai/create`, {
             userName: userName,
             medium: allOptions[currentArrayIndex].title,

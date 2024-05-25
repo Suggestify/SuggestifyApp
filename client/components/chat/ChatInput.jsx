@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import asyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Global from '../Global';
@@ -7,6 +7,7 @@ import Global from '../Global';
 function ChatInput(props) {
     const [userName, setUserName] = useState(null);
     const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);  // Added loading state
     const type = props.chatType;
 
     useEffect(() => {
@@ -18,16 +19,23 @@ function ChatInput(props) {
     }, []);
 
     async function handleSend() {
-        const response = await axios.post(`${Global.ip}/ai/sendMessage`, {
-            userName: userName,
-            messageContent: message,
-            type: type,
-        });
-        if (response.status === 200) {
-            await props.onUpdate(message, 'AI');
-            await props.onUpdate(response.data, 'User');
-            setMessage('');
+        if (loading) return;  // Prevent multiple sends if already loading
+        setLoading(true);  // Set loading to true when send starts
+        try {
+            const response = await axios.post(`${Global.ip}/ai/sendMessage`, {
+                userName: userName,
+                messageContent: message,
+                type: type,
+            });
+            if (response.status === 200) {
+                await props.onUpdate(message, 'AI');
+                await props.onUpdate(response.data, 'User');
+                setMessage('');
+            }
+        } catch (error) {
+            console.error('Failed to send message:', error);
         }
+        setLoading(false);  // Reset loading state whether success or fail
     }
 
     return (
@@ -40,8 +48,12 @@ function ChatInput(props) {
                     placeholder="Type your message here..."
                     onSubmitEditing={handleSend}
                 />
-                <TouchableOpacity style={styles.button} onPress={handleSend}>
-                    <Text style={styles.buttonText}>→</Text>
+                <TouchableOpacity style={styles.button} onPress={handleSend} disabled={loading}>
+                    {loading ? (
+                        <ActivityIndicator size="small" color="#00ff00" />
+                    ) : (
+                        <Text style={styles.buttonText}>→</Text>
+                    )}
                 </TouchableOpacity>
             </View>
         </View>
@@ -79,7 +91,6 @@ const styles = StyleSheet.create({
         width: 35,
         borderRadius: 25,
         backgroundColor: 'black',
-
     },
     buttonText: {
         fontSize: 25,
