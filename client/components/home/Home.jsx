@@ -10,7 +10,7 @@ function Home({navigation}) {
 
     const { contact, updateContact } = useContext(ContactContext);
     const userName = contact.userName
-    console.log(userName);
+    console.log(contact.mediumOrder);
     const order = contact.mediumOrder;
     const initialArray = [
         { medium: "Music", color: "#e6194b", image: require('../../assets/icons/Music.png') },
@@ -36,7 +36,6 @@ function Home({navigation}) {
         return newArr;
     }
     function moveToFrontAndShift(arr, index) {
-
         if (index < 0 || index >= arr.length) {
             return; // Invalid index
         }
@@ -48,14 +47,14 @@ function Home({navigation}) {
     }
 
     async function handleClick(index) {
-        console.log(myArray[index].medium);
+        const medium = myArray[index].medium;
         moveToFrontAndShift(myArray, index);
         await axios.put(`${Global.ip}/settings/updateOrder`, {
             userName: userName,
-            order: myArray.map(item => item.medium)
+            newOrder: myArray.map(item => item.medium)
         })
         setMyArray([...myArray]);
-        navigation.navigate('LoadingHome', {medium: myArray[index].medium});
+        navigation.navigate('LoadingHome', {medium: medium});
     }
 
     return (

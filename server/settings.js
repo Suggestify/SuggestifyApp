@@ -71,29 +71,34 @@ router.get("/fetchSettings", async (req, res) => {
 
 router.put("/updateOrder", async (req, res) => {
     const { userName, newOrder } = req.body;
-
+    console.log("test1")
     // Validate inputs
+
     if (!userName || !newOrder) {
         return res.status(400).send({ message: "Missing userName or order in request" });
     }
-
+    console.log("test2")
     try {
         // Fetch user and their settings
         let user = await User.findOne({ userName: userName });
         if (!user) {
             return res.status(404).send({ message: "User not found" });
         }
+        console.log("test3")
 
         let userSettings = await UserSettings.findById(user.UserSettingsID);
         if (!userSettings) {
             return res.status(404).send({ message: "User settings not found" });
         }
+        console.log("test4")
 
         // Update and save user settings
         userSettings.mediumOrder = newOrder;
         await userSettings.save();
+        console.log("test5")
 
         res.status(200).send({ message: "User settings updated successfully" });
+        console.log("test6")
     } catch (err) {
         console.error(err); // Consider more secure logging strategies
         res.status(500).send({ message: "Failed to update user settings due to a server error" });

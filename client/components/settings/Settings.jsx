@@ -98,6 +98,7 @@ function Settings({route, navigation}) {
             })
             if (response.status === 204) {
                 await AsyncStorage.clear();
+
                 navigation.navigate('SignIn')
             }
         } catch (err) {
