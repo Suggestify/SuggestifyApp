@@ -28,7 +28,6 @@ function Settings({route, navigation}) {
         setNotificationsEnabled(contact.notificationsOn);
         let response = await toggleSwitch("notificationOn", contact.notificationsOn);
         if(response.status === 200){
-            console.log("Notifications updated 1");
             if (response.data.firstTime) {
                 const {status} = await Notifications.requestPermissionsAsync({
                     ios: {

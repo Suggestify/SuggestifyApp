@@ -10,7 +10,6 @@ function Home({navigation}) {
 
     const { contact, updateContact } = useContext(ContactContext);
     const userName = contact.userName
-    console.log(contact.mediumOrder);
     const order = contact.mediumOrder;
     const initialArray = [
         { medium: "Music", color: "#e6194b", image: require('../../assets/icons/Music.png') },
