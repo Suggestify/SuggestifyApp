@@ -14,7 +14,7 @@ if (!process.env.A_B_ID || !process.env.A_M_ID) {
     process.exit(1);
 }
 
-const assistants = {Books: process.env.A_B_ID, Music: process.env.A_M_ID};
+const assistants = {Music: process.env.A_M_ID, Books: process.env.A_B_ID, Podcasts: process.env.A_P_ID, Shows: process.env.A_S_ID, Movies: process.env.A_MV_ID, Hobbies: process.env.A_H_ID, Games: process.env.A_G_ID};
 const fetchLimit = 20;
 
 const openai = new OpenAI({
@@ -107,7 +107,6 @@ async function fetchMessages(userName, chatType, earliestMessageId = null) {
             console.log("Reached the earliest message.");
             begin  = 2;
         }
-
         // Exclude the extra message by slicing the array if more than the fetchLimit was actually fetched
         let returnMessages = threadMessages.body.data.map(message => ({
             message: message.content[0].text.value,
@@ -184,7 +183,7 @@ router.post("/sendMessage", async (req, res, next) => {
 
     try {
         const response = await sendMessage(userName, chatType, messageContent, false);
-        res.send(response);  // Send the response obtained from the sendMessage function
+        res.status(200).send(response);  // Send the response obtained from the sendMessage function
     } catch (err) {
         next(err);
     }
