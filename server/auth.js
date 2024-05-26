@@ -11,7 +11,6 @@ const router = express.Router()
 let refreshTokens = [];
 const saltRounds = 10;
 
-
 router.post('/token', (req, res) => {
     const refreshToken = req.body.token;
     if (!refreshToken || !refreshTokens.includes(refreshToken)) return res.sendStatus(403);
@@ -22,8 +21,6 @@ router.post('/token', (req, res) => {
         res.json({ accessToken });
     });
 });
-
-
 
 router.post("/SignUp", async (req,res)=>{
     try{
@@ -54,17 +51,17 @@ router.post("/SignUp", async (req,res)=>{
         }
         res.json(token).status(200);
     }
-
     catch(err){
         console.log(err)
         if(err.code === 11000){
             const field = Object.keys(err.keyValue)[0];
             res.status(400).send({ field: field,  message: `An account with that ${field} already exists.` });
         }
+        else{
+            res.status(400).send({ message: "Error creating account, please try again later" });
+        }
     }
-
 });
-
 
 router.post("/SignIn", async (req,res)=>{
     try{
@@ -76,71 +73,60 @@ router.post("/SignIn", async (req,res)=>{
              user = await User.findOne({userName: userId});
         }
 
+        if (!user) {
+            return res.status(401).send({ message: "Invalid login credentials" });
+        }
+
         const pwdDB = user.password;  // password from database
-
-        const secret = process.env.B_SECRET;
-        const pwdUser = secret + req.body.password;  // password on current input
-
-        bcryptjs.compare(pwdUser, pwdDB, function(err, match){
-            if(err){
-                console.log(err)
-            }
-            if(match){
-                console.log(process.env.ACCESS_TOKEN_SECRET)
+        const pwdUser = process.env.B_SECRET + req.body.password;  // password on current input
+        try {
+            const match = await bcryptjs.compare(pwdUser, pwdDB);
+            if (match) {
                 const accessToken = jwt.sign({ username: user.userName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
                 const refreshToken = jwt.sign({ username: user.userName }, process.env.REFRESH_TOKEN_SECRET);
-                const token = {
+                res.status(200).json({
                     access: accessToken,
                     refresh: refreshToken,
                     userName: user.userName
-
-                }
-                res.json(token).status(200);
+                });
+            } else {
+                res.status(401).send({ message: "Invalid login credentials" });
             }
-            else{
-                console.log("no match");
-                res.status(401).send({message: "login or password is incorrect"});
-            }
-        });
+        } catch (bcryptError) {
+            console.error(bcryptError);
+            res.status(500).send({ message: "An error occurred during the login process." });
+        }
     } catch(err){
-        res.status(400).send({message: "login or password is incorrect"});
+        res.status(400).send({message: "Invalid login credentials"});
     }
 });
 
-router.delete('/SignOut', (req, res) => {
+router.delete('/SignOut', async (req, res) => {
+    const userName = req.body.userName;
+    let user;
+    try{
+        user = await User.findOne({userName: userName});
+        if (!user) {
+            return res.status(404).send({ message: "User not found" });
+        }
+        let userSettings;
+        try{
+            userSettings = await UserSettings.findById(user.UserSettingsID);
+            if (!userSettings) {
+                return res.status(404).send({ message: "User settings not found" });
+            }
+            userSettings.notificationToken = undefined;
+            userSettings.notificationsOn = false;
+            await userSettings.save();
+        }catch (err){
+            console.log(err);
+        }
+    }catch (err){
+        console.log(err);
+    }
     refreshTokens = refreshTokens.filter(token => token !== req.body.token);
     res.sendStatus(204);
 });
-
-router.put('/changeUsername', authenticateToken, async (req, res) => {
-    try {
-        const newUsername = req.body.newUsername;
-        const currUsername =  req.body.username;
-
-        if(newUsername.includes("@") || newUsername == ""){
-            return res.status(400).send({ message: 'bad username' });
-        }
-
-        const usernameExists = await User.findOne({ userName: newUsername });
-        if (usernameExists) {
-            return res.status(400).send({ message: 'Username already taken' });
-        }
-
-        const user = await User.findOne({ userName: currUsername });
-        if (!user) {
-            return res.status(404).send({ message: 'User not found' });
-        }
-
-        user.userName = newUsername; // Update the username
-        await user.save(); // Save the updated user to the database
-
-        res.status(200).send({ message: 'Username successfully updated' });
-    } catch (err) {
-        // Handle any errors
-        res.status(500).send({ message: 'Error updating username' });
-    }
-});
-
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
@@ -153,7 +139,5 @@ function authenticateToken(req, res, next) {
         next(); // Proceed to the protected route
     });
 }
-
-
 
 export default router

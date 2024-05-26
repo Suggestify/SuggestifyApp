@@ -1,4 +1,5 @@
 import React from 'react'
+import Toast from 'react-native-toast-message';
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -33,8 +34,10 @@ export default function App() {
                         <Stack.Screen name="LoadingHome" component={LoadingHome}/>
                         <Stack.Screen name="ChatScreen" component={ChatScreen}/>
                         <Stack.Screen name="Settings" component={Settings}></Stack.Screen>
+
                     </Stack.Navigator>
                 </NavigationContainer>
+                <Toast ref={(ref) => Toast.setRef(ref)} />
             </ContactProvider>
         </NativeBaseProvider>
     );

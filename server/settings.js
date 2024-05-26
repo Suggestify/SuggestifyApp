@@ -15,9 +15,8 @@ cron.schedule('0 21 * * 0', () => {
     sendPushNotifications();
 });
 router.post("/setNotifications", async (req, res) => {
-    const userName = req.body.userName;
-    const token = req.body.token;
-    console.log(userName);
+    const { userName, token } = req.body;
+
     if (!userName || !token) {
         return res.status(400).send({ message: "Missing userID or token" });
     }
@@ -28,85 +27,108 @@ router.post("/setNotifications", async (req, res) => {
         }
 
         let userSettings = await UserSettings.findById(user.UserSettingsID);
+        if (!userSettings) {
+            return res.status(404).send({ message: "User settings not found" });
+        }
+
         userSettings.notificationToken = token; // Directly assign the token to the user model
-
-        await userSettings.save(); // Save the updated user to the database
-
-        res.status(200).json({ message: "Notification token updated successfully" });
+        try {
+            await userSettings.save();
+            res.status(200).json({ message: "Notification token updated successfully" });
+        } catch (saveError) {
+            res.status(500).send({ message: "Failed to save notification token" });
+        }
     } catch (err) {
-        console.log(err);
         res.status(500).send({ message: "Failed to update notification token" });
     }
 });
 
 router.get("/fetchSettings", async (req, res) => {
     const userName = req.query.userName;
-    try {
-        let user = await User.findOne({userName: userName});
-        const userSettingsID = user.UserSettingsID;
-        try{
-            let userSettings = await UserSettings.findById(userSettingsID);
-            if (!userSettings) {
-                return res.status(404).send({message: "User settings not found"});
-            }
-            console.log(userSettings)
-            res.status(200).json(userSettings);
-        } catch (err) {
-            console.log(err);
-            res.status(500).send({message: "Failed to fetch user settings"});
-        }
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({message: "Failed to fetch user settings"});
+    if (!userName) {
+        return res.status(400).send({ message: "Missing or invalid userName parameter" });
     }
-})
 
-router.put("/updateOrder", async (req, res) => {
-    const userName = req.body.userName;
-    const newOrder = req.body.order;
     try {
         let user = await User.findOne({ userName: userName });
         if (!user) {
             return res.status(404).send({ message: "User not found" });
         }
+
         let userSettings = await UserSettings.findById(user.UserSettingsID);
         if (!userSettings) {
             return res.status(404).send({ message: "User settings not found" });
         }
-        userSettings.mediumOrder = newOrder;
-        await userSettings.save();
-        res.status(200).send({ message: "User settings updated successfully" });
+
+        res.status(200).json(userSettings);
     } catch (err) {
-        console.log(err);
-        res.status(500).send({ message: "Failed to update user settings" });
+        console.error(err);
+        res.status(500).send({ message: "Failed to fetch user settings due to a server error" });
     }
-})
+});
 
-router.post("/toggleSwitch", async (req, res) => {
-const userName = req.body.userName;
-    const switchType = req.body.switchType;
-    const switchState = req.body.value;
 
+router.put("/updateOrder", async (req, res) => {
+    const { userName, newOrder } = req.body;
+    // Validate inputs
+    if (!userName || !newOrder) {
+        return res.status(400).send({ message: "Missing userName or order in request" });
+    }
     try {
-        let user = await User.findOne({userName: userName});
+        // Fetch user and their settings
+        let user = await User.findOne({ userName: userName });
         if (!user) {
-            return res.status(404).send({message: "User not found"});
+            return res.status(404).send({ message: "User not found" });
         }
+
         let userSettings = await UserSettings.findById(user.UserSettingsID);
         if (!userSettings) {
-            return res.status(404).send({message: "User settings not found"});
+            return res.status(404).send({ message: "User settings not found" });
         }
-        userSettings[switchType] = switchState;
+
+        // Update and save user settings
+        userSettings.mediumOrder = newOrder;
         await userSettings.save();
-        if(switchType === "notificationOn" ){
-            if(userSettings.notificationToken == undefined && switchState){
-                res.status(200).send({message: "Notification enabled", firstTime: true})
-            }
-        }
-        res.status(200)
-    } catch(err){
-        console.log(err);
-        res.status(500).send({message: "Failed to toggle switch"});
+
+        res.status(200).send({ message: "User settings updated successfully" });
+    } catch (err) {
+        console.error(err); // Consider more secure logging strategies
+        res.status(500).send({ message: "Failed to update user settings due to a server error" });
     }
-})
+});
+
+router.post("/toggleSwitch", async (req, res) => {
+    const { userName, switchType, value } = req.body;
+    // Validate inputs
+    if (!userName || switchType === undefined || value === undefined) {
+        return res.status(400).send({ message: "Missing required fields (userName, switchType, or switchState)" });
+    }
+    // Validate switchType to ensure it's a known property
+    const validSwitchTypes = ['notificationOn', 'theme']; // example switch types
+    if (!validSwitchTypes.includes(switchType)) {
+        return res.status(400).send({ message: "Invalid switchType provided" });
+    }
+    try {
+        let user = await User.findOne({ userName: userName });
+        if (!user) {
+            return res.status(404).send({ message: "User not found" });
+        }
+
+        let userSettings = await UserSettings.findById(user.UserSettingsID);
+        if (!userSettings) {
+            return res.status(404).send({ message: "User settings not found" });
+        }
+        userSettings[switchType] = value;
+        await userSettings.save();
+
+        if (switchType === "notificationOn" && value && userSettings.notificationToken === undefined) {
+            return res.status(200).send({ message: "Notification enabled", firstTime: true });
+        }
+        res.status(200).send({ message: "Switch toggled successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ message: "Failed to toggle switch due to a server error" });
+    }
+});
+
 export default router

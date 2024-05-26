@@ -5,12 +5,13 @@ import {Heading} from 'native-base';
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Global from "../Global";
+import Toast from "react-native-toast-message";
 import {ContactContext} from "../../ContactContext";
 
 function Settings({route, navigation}) {
     const { contact, updateContact } = useContext(ContactContext);
     const {userName} = route.params;
-    const [notificationsEnabled, setNotificationsEnabled] = useState(contact.notificationOn);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(contact.notificationsOn);
     const [themeEnabled, setThemeEnabled] = useState(contact.theme);
 
     async function toggleSwitch(switchType, value ){
@@ -26,48 +27,77 @@ function Settings({route, navigation}) {
         contact.notificationsOn = !notificationsEnabled;
         setNotificationsEnabled(contact.notificationsOn);
         let response = await toggleSwitch("notificationOn", contact.notificationsOn);
+        if(response.status === 200){
+            if (response.data.firstTime) {
+                const {status} = await Notifications.requestPermissionsAsync({
+                    ios: {
+                        allowAlert: true,
+                        allowSound: true,
+                        allowBadge: true,
+                        allowAnnouncements: true,
+                    },
+                });
+                if (status !== 'granted') {
+                    alert('Failed to get push token for push notification!');
+                    return;
+                }
+                const token = (await Notifications.getExpoPushTokenAsync({
+                    projectId: '1e87624a-57f3-4080-9cf6-b8b7471ab184' // Replace 'your-username' with your actual Expo username
+                })).data;
+                await axios.post(`${Global.ip}/settings/setNotifications`, {
+                    userName: userName,
+                    token: token
+                })
 
-        if (response.data.firstTime) {
-            const { status } = await Notifications.requestPermissionsAsync({
-                ios: {
-                    allowAlert: true,
-                    allowSound: true,
-                    allowBadge: true,
-                    allowAnnouncements: true,
-                },
+            }
+            Toast.show({
+                type: 'success', // There are 'success', 'error', 'info' types available by default
+                text1: 'Settings Updated',
+                text2: 'Your changes have been saved successfully.'
             });
-            if (status !== 'granted') {
-                alert('Failed to get push token for push notification!');
-                return;
-            }
-            const token = (await Notifications.getExpoPushTokenAsync({
-                projectId: '1e87624a-57f3-4080-9cf6-b8b7471ab184' // Replace 'your-username' with your actual Expo username
-            })).data;
-            const response = await axios.post(`${Global.ip}/settings/setNotifications`, {
-                userName: userName,
-                token: token
-            })
-            if(response.status === 200){
+        }
+        else{
+            contact.notificationsOn = !notificationsEnabled;
+            setNotificationsEnabled(contact.notificationsOn);
+            Toast.show({
+                type: 'error', // There are 'success', 'error', 'info' types available by default
+                text1: 'Settings Not Updated',
+                text2: 'Your changes have not been saved successfully.'
+            });
 
-            }
-            else{
-
-            }
         }
     }
-
 
     async function toggleTheme (){
         contact.theme = !themeEnabled;
         setThemeEnabled(contact.theme);
-        let response = await toggleSwitch("theme",  contact.theme);
+        let response = await toggleSwitch("theme",  !contact.theme);
+        if (response.status === 200) {
+            Toast.show({
+                type: 'success', // There are 'success', 'error', 'info' types available by default
+                text2: 'Your changes have been saved successfully.'
+            });
+        }
+        else{
+            contact.theme = !themeEnabled;
+            setThemeEnabled(contact.theme);
+            Toast.show({
+                type: 'error', // There are 'success', 'error', 'info' types available by default
+                text2: 'Your changes have not been saved successfully.'
+            });
+        }
     }
 
     async function logout() {
         try {
-            const response = await axios.delete(`${Global.ip}/auth/SignOut`)
+            const response = await axios.delete(`${Global.ip}/auth/SignOut`, {
+                data: {
+                    userName: userName
+                }
+            })
             if (response.status === 204) {
                 await AsyncStorage.clear();
+
                 navigation.navigate('SignIn')
             }
         } catch (err) {

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import axios from 'axios'
 import Global from "../Global";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
+import {ContactContext} from "../../ContactContext";
 
 
 // Array of arrays containing different options
@@ -17,11 +18,11 @@ const allOptions = [
 ];
 
 function Preference({navigation}) {
-
+    const { contact, updateContact } = useContext(ContactContext);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [currentArrayIndex, setCurrentArrayIndex] = useState(0); // Index to track the current array of options
     const [currentOptions, setCurrentOptions] = useState(allOptions[currentArrayIndex].options);
-    const [userName, setUserName] = useState(null);
+    const [userName, setUserName] = useState(contact.userName);
 
     useEffect(() => {
         async function getUserName(){
@@ -35,11 +36,6 @@ function Preference({navigation}) {
         setSelectedOptions([]);
     }, [currentArrayIndex]);
 
-    useEffect(() => {
-        if (userName){
-            //console.log(userName);//
-        }
-    }, [userName]);
 
     const handleSelect = (item) => {
         setSelectedOptions(prevSelected => {
