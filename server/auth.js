@@ -5,11 +5,15 @@ import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv';
 import AIMap from './models/AIMap.js';
 import UserSettings from './models/UserSettings.js';
+import axios from "axios";
 dotenv.config();
 const router = express.Router()
 
 let refreshTokens = [];
 const saltRounds = 10;
+
+
+
 
 router.post('/token', (req, res) => {
     const refreshToken = req.body.token;
@@ -49,6 +53,7 @@ router.post("/SignUp", async (req,res)=>{
             refresh: refreshToken,
             userName: curUserName
         }
+        const response = await
         res.json(token).status(200);
     }
     catch(err){

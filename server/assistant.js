@@ -56,8 +56,7 @@ async function getMapFromUser(userName) {
     }
 }
 
-
-
+// figure out?
 function convertToMessage(options){
     let message = "";
     for(let i = 0; i < options.length; i++){
@@ -76,6 +75,7 @@ async function createThread(userName, chatType, messageContent) {
             const data = { [chatType]: threadToSend };
             await AIMap.findByIdAndUpdate(myAIMap.id, data);
             await sendMessage(userName, chatType, messageContent, true);
+            console.log("created");
         } else {
             console.log("Thread already exists");  // handling this case differently if necessary
         }
@@ -87,7 +87,13 @@ async function createThread(userName, chatType, messageContent) {
 // incorporate into loading call
 async function fetchMessages(userName, chatType, earliestMessageId = null) {
     try {
-        const currAIMap = await getMapFromUser(userName);
+        let currAIMap = await getMapFromUser(userName);
+
+        if(currAIMap[chatType] === "NULL"){
+            await createThread(userName, chatType, " ");
+            currAIMap = await getMapFromUser(userName);
+        }
+
         const options = { limit: fetchLimit + 1 }; // Always attempt to fetch one more than needed
         let begin = 0;
 
@@ -96,6 +102,7 @@ async function fetchMessages(userName, chatType, earliestMessageId = null) {
             options.limit = 11;
         }
 
+        console.log("late");
         let threadMessages = await openai.beta.threads.messages.list(
             currAIMap[chatType], options
         );
@@ -199,6 +206,7 @@ router.post("/sendMessage", async (req, res, next) => {
 // fetch previous messages up till var
 // refactor to one endpoint?
 router.get("/fetchMessages", async (req, res, next) => {
+
     try {
         const userName = req.query.userName;
         const chatType = req.query.chatType;
