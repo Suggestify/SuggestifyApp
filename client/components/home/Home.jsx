@@ -42,7 +42,7 @@ function Home({navigation}) {
         arr.unshift(item); // Add it to the front of the array
     }
     async function onSubmit() {
-        navigation.navigate('Settings', {userName: userName});
+        navigation.navigate('Settings');
     }
 
     async function handleClick(index) {

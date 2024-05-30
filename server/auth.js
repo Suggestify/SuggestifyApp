@@ -64,6 +64,7 @@ router.post("/SignUp", async (req,res)=>{
 });
 
 router.post("/SignIn", async (req,res)=>{
+    console.log("Sign In Request Received")
     try{
         const userId = req.body.UserId;
         let user;

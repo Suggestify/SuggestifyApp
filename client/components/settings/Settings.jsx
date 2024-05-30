@@ -8,9 +8,9 @@ import Global from "../Global";
 import Toast from "react-native-toast-message";
 import {ContactContext} from "../../ContactContext";
 
-function Settings({route, navigation}) {
+function Settings({navigation}) {
     const { contact, updateContact } = useContext(ContactContext);
-    const {userName} = route.params;
+    const userName = contact.userName;
     const [notificationsEnabled, setNotificationsEnabled] = useState(contact.notificationsOn);
     const [themeEnabled, setThemeEnabled] = useState(contact.theme);
 
@@ -109,6 +109,10 @@ function Settings({route, navigation}) {
         navigation.navigate('Home')
     }
 
+    function preferenceReset() {
+        navigation.navigate('PreferenceSettings')
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.containerHeader}>
@@ -120,11 +124,11 @@ function Settings({route, navigation}) {
                 </Heading>
             </View>
             <View style={styles.SettingsSection}>
-                <TouchableOpacity style={styles.settingsOption}>
-                    <Text style={styles.settingsOptionText}>Edit Recommendation History</Text>
+                <TouchableOpacity style={styles.settingsOption} onPress={preferenceReset}>
+                    <Text style={styles.settingsOptionText}>Reset Preference</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.settingsOption}>
+                <TouchableOpacity style={styles.settingsOption} >
                     <Text style={styles.settingsOptionText}>Buy Premium</Text>
                 </TouchableOpacity>
             </View>

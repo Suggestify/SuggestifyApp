@@ -165,7 +165,11 @@ router.post("/create", async (req, res, next) => {
     const chatType = req.body.medium;
     const userName = req.body.userName;
     let messageContent = req.body.options; // to init
-    messageContent = convertToMessage(messageContent)
+    messageContent = convertToMessage(messageContent);
+    const myAIMap = await getMapFromUser(userName);
+    myAIMap[chatType] = "NULL";
+    await AIMap.findByIdAndUpdate(myAIMap.id, myAIMap);
+
 
     try {
         await createThread(userName, chatType, messageContent);
