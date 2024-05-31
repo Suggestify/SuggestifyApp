@@ -6,7 +6,7 @@ const ContactContext = createContext();
 export const ContactProvider = ({ children }) => {
     const [contact, setContact] = useState({
         username: '',
-        mediumOrder: ['Music', 'Books', 'Podcast', 'Shows', 'Movies', 'Hobbies', 'Games'],
+        mediumOrder: ['Music', 'Books', 'Podcasts', 'Shows', 'Movies', 'Hobbies', 'Games'],
         notificationsOn: false,
         theme: false
     });
