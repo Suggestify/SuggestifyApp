@@ -13,7 +13,7 @@ function ChatPreview({ medium, color, image }) {
     useEffect(() => {
         const fetchLastMessage = async () => {
             try {
-                console.log("trying")
+                console.log("userName" + userName + " chatType " + medium);
                 const response = await axios.get(`${Global.ip}/ai/fetchMessages`, {
                     params: {
                         userName: userName,
