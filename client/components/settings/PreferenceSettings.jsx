@@ -53,27 +53,30 @@ function PreferenceSettings({ navigation }) {
                     Settings
                 </Heading>
             </View>
+            <View style = {styles.headingBackground}>
+                <Text style = {styles.headingStyle}>Click on an option to reset chat history</Text>
+            </View>
             <View style={styles.SettingsSection}>
-                <TouchableOpacity style={styles.settingsOption} onPress={() =>handleReset("Music")}>
-                    <Text style={styles.settingsOptionText}>Reset Music History</Text>
+                <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={() =>handleReset("Music")}>
+                    <Text style={styles.settingsOptionText}>Music</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.settingsOption} onPress={() =>handleReset("Book")}>
-                    <Text style={styles.settingsOptionText}>Reset Book History</Text>
+                <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={() =>handleReset("Book")}>
+                    <Text style={styles.settingsOptionText}>Book</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.settingsOption} onPress={() =>handleReset("Podcast")}>
-                    <Text style={styles.settingsOptionText}>Reset Podcast History</Text>
+                <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={() =>handleReset("Podcast")}>
+                    <Text style={styles.settingsOptionText}>Podcast</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.settingsOption} onPress={() =>handleReset("Show")}>
-                    <Text style={styles.settingsOptionText}>Reset Show History</Text>
+                <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={() =>handleReset("Show")}>
+                    <Text style={styles.settingsOptionText}>Show</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.settingsOption} onPress={() =>handleReset("Movie")}>
-                    <Text style={styles.settingsOptionText}>Reset Movie History</Text>
+                <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={() =>handleReset("Movie")}>
+                    <Text style={styles.settingsOptionText}>Movie</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.settingsOption} onPress={() =>handleReset("Hobby")}>
-                    <Text style={styles.settingsOptionText}>Reset Hobby History</Text>
+                <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={() =>handleReset("Hobby")}>
+                    <Text style={styles.settingsOptionText}>Hobby</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.settingsOption} onPress={() =>handleReset("Game")}>
-                    <Text style={styles.settingsOptionText}>Reset Game History</Text>
+                    <Text style={styles.settingsOptionText}>Game</Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.SettingsSection}>
@@ -89,7 +92,6 @@ function PreferenceSettings({ navigation }) {
 
 
 export default PreferenceSettings;
-
 const styles = StyleSheet.create({
         container: {
             flex: 1,
@@ -104,6 +106,19 @@ const styles = StyleSheet.create({
             marginBottom: 20,
             backgroundColor: '#1f1f1f',
         },
+        headingBackground: {
+            alignSelf: 'center',
+            backgroundColor: '#1f1f1f',
+            width: "95%",
+            padding: 10,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: "20%",
+        },
+        headingStyle: {
+            color: "white",
+            fontSize: 15,
+        },
         backBtn: {
             display: "flex",
             color: "white",
@@ -117,8 +132,11 @@ const styles = StyleSheet.create({
             paddingRight: 10,
         },
         SettingsSection: {
+            alignSelf: 'center',
             marginTop: 20,
             backgroundColor: '#1f1f1f',
+            borderRadius: "20%",
+            width: "95%",
         },
         settingsOption: {
             marginTop: 20,
@@ -126,7 +144,11 @@ const styles = StyleSheet.create({
             paddingLeft: 20,
             borderStyle: "solid",
             borderColor:'#797979',
+        },
+
+        settingsBorder:{
             borderBottomWidth: 1,
+            borderColor:'#797979',
         },
 
         settingsOptionLogOut: {
@@ -134,7 +156,6 @@ const styles = StyleSheet.create({
             paddingBottom: 20,
             borderStyle: "solid",
             borderColor:'#797979',
-            borderBottomWidth: 1,
         },
 
         settingsOptionText: {
@@ -163,6 +184,7 @@ const styles = StyleSheet.create({
             flex: 1,
             justifyContent: 'flex-end',
             marginBottom: 36,
+            width: "100%",
         }
 
     }
