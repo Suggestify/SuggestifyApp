@@ -85,7 +85,8 @@ async function createThread(userName, chatType, messageContent) {
 }
 
 // incorporate into loading call
-async function fetchMessages(userName, chatType, earliestMessageId = null) {
+async function fetchMessages(userName, chatType, fetchAmt, earliestMessageId = null) {
+    console.log(userName, chatType, fetchAmt )
     try {
         let currAIMap = await getMapFromUser(userName);
 
@@ -94,15 +95,18 @@ async function fetchMessages(userName, chatType, earliestMessageId = null) {
             currAIMap = await getMapFromUser(userName);
         }
 
-        const options = { limit: fetchLimit + 1 }; // Always attempt to fetch one more than needed
+        let options = { limit: fetchLimit + 1 }; // Always attempt to fetch one more than needed
         let begin = 0;
+
+        if(fetchAmt === 1){
+            options.limit = 3;
+        }
 
         if (earliestMessageId) {
             options.after = earliestMessageId; // Fetch messages after the earliest known message ID
             options.limit = 11;
         }
 
-        console.log("late");
         let threadMessages = await openai.beta.threads.messages.list(
             currAIMap[chatType], options
         );
@@ -206,11 +210,12 @@ router.post("/sendMessage", async (req, res, next) => {
 // fetch previous messages up till var
 // refactor to one endpoint?
 router.get("/fetchMessages", async (req, res, next) => {
-
+    console.log("test")
     try {
         const userName = req.query.userName;
         const chatType = req.query.chatType;
-        const response = await fetchMessages(userName, chatType);
+        const fetchAmt = req.query.fetchAmt ?? "3";
+        const response = await fetchMessages(userName, chatType, fetchAmt);
         res.send(response);
     } catch (err) {
         next(err);

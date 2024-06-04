@@ -12,13 +12,13 @@ function Home({navigation}) {
     const userName = contact.userName
     const order = contact.mediumOrder;
     const initialArray = [
-        { medium: "Music", color: "#e6194b", image: require('../../assets/icons/Music.png') },
-        { medium: "Books", color: "#3cb44b", image: require('../../assets/icons/Books.png') },
-        { medium: "Podcast", color: "#ffe119", image: require('../../assets/icons/Podcasts.png') },
-        { medium: "Shows", color: "#4363d8", image: require('../../assets/icons/Shows.png') },
-        { medium: "Movies", color: "#f58231", image: require('../../assets/icons/Movies.png') },
-        { medium: "Hobbies", color: "#911eb4", image: require('../../assets/icons/Hobbies.png') },
-        { medium: "Games", color: "#46f0f0", image: require('../../assets/icons/Games.png') }
+        { medium: "Music", color: "#593232", image: require('../../assets/icons/Music.png') },
+        { medium: "Books", color: "#204823", image: require('../../assets/icons/Books.png') },
+        { medium: "Podcasts", color: "#6b6831", image: require('../../assets/icons/Podcasts.png') },
+        { medium: "Shows", color: "#273052", image: require('../../assets/icons/Shows.png') },
+        { medium: "Movies", color: "#6b412a", image: require('../../assets/icons/Movies.png') },
+        { medium: "Hobbies", color: "#4c2756", image: require('../../assets/icons/Hobbies.png') },
+        { medium: "Games", color: "#204949", image: require('../../assets/icons/Games.png') }
     ];
 
     const [myArray, setMyArray] = useState(reorderArray(initialArray, order));
@@ -57,7 +57,7 @@ function Home({navigation}) {
     }
 
     return (
-        <LinearGradient style={styles.linearGradient} colors={['#150c25', '#222222', 'black']}>
+        <View style={styles.linearGradient} >
             <View style={styles.header}>
                 <Text style={styles.headerText}>Suggestify</Text>
                 <TouchableOpacity onPress={onSubmit}>
@@ -68,64 +68,47 @@ function Home({navigation}) {
                 </TouchableOpacity>
             </View>
 
-
-            <View style={styles.grid}>
+            <View style={styles.container2}>
                 {myArray.map((item, index) => (
                     <TouchableOpacity key={item.medium} onPress={() => handleClick(index)} style={styles.chatPreview}>
                         <ChatPreview medium={item.medium} color={item.color} image={item.image}/>
                     </TouchableOpacity>
                 ))}
             </View>
-        </LinearGradient>
+        </View>
     );
 }
 
 export default Home;
 
 const styles = StyleSheet.create({
-        header: {
-            width: '100%',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingHorizontal: 10,
-        },
-        headerText: {
-            color: '#adadad',
-            fontSize: 40,
-        },
-        linearGradient: {
-            paddingTop: 50,
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-            paddingHorizontal: 10,
-        },
-        loginBtn: {
-            width: "80%",
-            borderRadius: 25,
-            height: 50,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "#FF1493",
-
-        },
-        grid: {
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-around',
-            width: '100%',
-            marginTop: 25,
-        },
-        chatPreview: {
-            width: '45%', // Adjust width for two columns
-            marginHorizontal: 10,
-            marginVertical: 15,
-
-        },
-        imageStyle: {
-            width: 50,
-            height: 50,
-        }
+    header: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+    },
+    headerText: {
+        color: '#adadad',
+        fontSize: 40,
+    },
+    linearGradient: {
+        backgroundColor: '#000000',
+        paddingTop: 50,
+        flex: 1, // This ensures the gradient fills the screen vertically
+        alignItems: "center",
+        justifyContent: "center",
+        width: '100%', // Ensure this fills the screen horizontally
+    },
+    chatPreview: {
+        width: '100%', // This will make each chat preview take the full width
+    },
+    imageStyle: {
+        width: 50,
+        height: 50,
+    },
+    container2:{
+        width: '100%'
     }
-)
+});
