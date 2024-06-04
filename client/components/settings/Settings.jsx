@@ -124,7 +124,7 @@ function Settings({navigation}) {
                 </Heading>
             </View>
             <View style={styles.SettingsSection}>
-                <TouchableOpacity style={styles.settingsOption} onPress={preferenceReset}>
+                <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={preferenceReset}>
                     <Text style={styles.settingsOptionText}>Reset Preference</Text>
                 </TouchableOpacity>
 
@@ -134,13 +134,13 @@ function Settings({navigation}) {
             </View>
 
             <View style={styles.SettingsSection}>
-                <TouchableOpacity  style={styles.settingsOption}>
+                <TouchableOpacity  style={[styles.settingsOption, styles.settingsBorder]}>
                     <Text style={styles.settingsOptionText}>Rating & Feedback</Text>
                 </TouchableOpacity>
-                <TouchableOpacity  style={styles.settingsOption}>
+                <TouchableOpacity  style={[styles.settingsOption, styles.settingsBorder]}>
                     <Text style={styles.settingsOptionText}>Contact</Text>
                 </TouchableOpacity>
-                <View style={styles.settingsOptionToggle}>
+                <View style={[styles.settingsOptionToggle, styles.settingsBorder]}>
                     <Text style={styles.settingsOptionText}>Allow Notifications</Text>
                     <Switch
                         trackColor={{ false: '#767577', true: '#81b0ff' }}
@@ -184,14 +184,13 @@ export default Settings;
 
 const styles = StyleSheet.create({
         container: {
-
             flex: 1,
             backgroundColor: '#000000',
         },
         containerHeader: {
-            flexDirection: 'row',  // Ensures horizontal layout
-            justifyContent: 'center', // Centers content horizontally
-            alignItems: 'center', // Centers content vertically
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
             paddingTop: 60,
             paddingBottom: 20,
             marginBottom: 20,
@@ -202,6 +201,7 @@ const styles = StyleSheet.create({
             color: "white",
             borderRadius: 50,
         },
+
         backBtnText: {
             color: "white",
             fontSize: 20,
@@ -210,7 +210,10 @@ const styles = StyleSheet.create({
             paddingRight: 10,
         },
         SettingsSection: {
+            alignSelf: 'center',
+            borderRadius: "20%",
             marginTop: 20,
+            width: "95%",
             backgroundColor: '#1f1f1f',
         },
         settingsOption: {
@@ -219,16 +222,19 @@ const styles = StyleSheet.create({
             paddingLeft: 20,
             borderStyle: "solid",
             borderColor:'#797979',
-            borderBottomWidth: 1,
         },
 
-    settingsOptionLogOut: {
-        marginTop: 20,
-        paddingBottom: 20,
-        borderStyle: "solid",
-        borderColor:'#797979',
-        borderBottomWidth: 1,
-    },
+        settingsBorder:{
+            borderBottomWidth: 1,
+            borderColor:'#797979',
+        },
+
+        settingsOptionLogOut: {
+            marginTop: 20,
+            paddingBottom: 20,
+            borderStyle: "solid",
+            borderColor:'#797979',
+        },
 
         settingsOptionText: {
             color: '#afafaf',
@@ -241,17 +247,16 @@ const styles = StyleSheet.create({
             textDecorationLine: 'underline',
             textAlign: "center",
         },
-    settingsOptionToggle: {
-        marginTop: 20,
-        paddingBottom: 20,
-        paddingHorizontal: 20,
-        borderStyle: "solid",
-        borderColor:'#797979',
-        borderBottomWidth: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between', // Aligns items on opposite ends
-        alignItems: 'center' // Aligns items vertically
-    },
+        settingsOptionToggle: {
+            marginTop: 20,
+            paddingBottom: 20,
+            paddingHorizontal: 20,
+            borderStyle: "solid",
+            borderColor:'#797979',
+            flexDirection: 'row',
+            justifyContent: 'space-between', // Aligns items on opposite ends
+            alignItems: 'center' // Aligns items vertically
+        },
         logOutContainer: {
             flex: 1,
             justifyContent: 'flex-end',
