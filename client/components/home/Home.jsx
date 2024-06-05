@@ -1,5 +1,5 @@
 import React, {useState, useContext} from 'react';
-import {Text, TouchableOpacity, Image, StyleSheet, View} from "react-native";
+import {Text, TouchableOpacity, Image, StyleSheet, View, ScrollView} from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
 import { ContactContext } from "../../ContactContext";
@@ -57,25 +57,27 @@ function Home({navigation}) {
     }
 
     return (
-        <View style={styles.linearGradient} >
-            <View style={styles.header}>
-                <Text style={styles.headerText}>Suggestify</Text>
-                <TouchableOpacity onPress={onSubmit}>
-                    <Image
-                        source={require('../../assets/icons/profile.png')}
-                        style={styles.imageStyle} // You can define styles for your image in your stylesheet
-                    />
-                </TouchableOpacity>
-            </View>
-
-            <View style={styles.container2}>
-                {myArray.map((item, index) => (
-                    <TouchableOpacity key={item.medium} onPress={() => handleClick(index)} style={styles.chatPreview}>
-                        <ChatPreview medium={item.medium} color={item.color} image={item.image}/>
+        <LinearGradient colors={['#000000', '#3f3f3f']} style={styles.linearGradient}>
+            <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+                <View style={styles.header}>
+                    <Text style={styles.headerText}>Suggestify</Text>
+                    <TouchableOpacity onPress={onSubmit}>
+                        <Image
+                            source={require('../../assets/icons/profile.png')}
+                            style={styles.imageStyle} // You can define styles for your image in your stylesheet
+                        />
                     </TouchableOpacity>
-                ))}
-            </View>
-        </View>
+                </View>
+
+                <View style={styles.container2}>
+                    {myArray.map((item, index) => (
+                        <TouchableOpacity key={item.medium} onPress={() => handleClick(index)} style={styles.chatPreview}>
+                            <ChatPreview medium={item.medium} color={item.color} image={item.image}/>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            </ScrollView>
+        </LinearGradient>
     );
 }
 
@@ -83,32 +85,38 @@ export default Home;
 
 const styles = StyleSheet.create({
     header: {
-        width: '100%',
+        width: '85%',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 10,
+        paddingBottom: 30
     },
     headerText: {
         color: '#adadad',
         fontSize: 40,
     },
     linearGradient: {
-        backgroundColor: '#000000',
-        paddingTop: 50,
-        flex: 1, // This ensures the gradient fills the screen vertically
-        alignItems: "center",
-        justifyContent: "center",
-        width: '100%', // Ensure this fills the screen horizontally
+        flex: 1, // This ensures the gradient fills the screen
     },
-    chatPreview: {
-        width: '100%', // This will make each chat preview take the full width
+    scrollViewContainer: {
+        paddingTop: 100,
+        flexGrow: 1,
+        alignItems: 'center',
+
+        backgroundColor: '#151515',
     },
+
     imageStyle: {
         width: 50,
         height: 50,
     },
     container2:{
-        width: '100%'
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: "center"
+
+    },
+    chatPreview:{
+        paddingBottom: 8
     }
 });
