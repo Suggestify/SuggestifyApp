@@ -21,7 +21,9 @@ function ChatPreview({ medium, color, image }) {
                         fetchAmt: 1
                     }
                 });
-                setLastMessage(response.data?.[0]?.message ?? "Start a conversation!");
+                let message = response.data?.[0]?.message ?? "Start a conversation!";
+                message = message.slice(0, 30); // Limit the message to 30 characters
+                setLastMessage(message);
             } catch (error) {
                 console.error('Failed to fetch last message:', error);
                 setLastMessage('Failed to load message.'); // Error text
