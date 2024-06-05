@@ -13,7 +13,6 @@ function ChatPreview({ medium, color, image }) {
     useEffect(() => {
         const fetchLastMessage = async () => {
             try {
-                console.log("userName" + userName + " chatType " + medium);
                 const response = await axios.get(`${Global.ip}/ai/fetchMessages`, {
                     params: {
                         userName: userName,
@@ -35,7 +34,7 @@ function ChatPreview({ medium, color, image }) {
 
 
     return (
-        <LinearGradient style={styles.container} colors={[color, '#000000']} start={{ x: 0, y: 1 }} end={{ x: 1, y: 1 }}>
+        <LinearGradient style={[styles.container, {borderColor: color}]} colors={[color, '#131313']} start={{ x: 0.2, y: 1 }} end={{ x: 1.1, y: 1 }}>
             <Image source={image} style={styles.image} />
             <View style={styles.textContainer}>
                 <Text style={styles.mediumText}>
@@ -56,12 +55,14 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center', // Center items vertically in the container
         justifyContent: 'flex-start', // Align items to the start of the container
-        width: '100%', // Ensure the container takes up the full width
-        height: 95
+        width: '85%', // Ensure the container takes up the full width
+        height: 70,
+        borderWidth: 2,
+        borderStyle: "solid",
     },
     image: {
-        width: 50,
-        height: 50,
+        width: 40,
+        height: 40,
         marginHorizontal: 10, // Add some margin right for spacing between image and text
     },
     textContainer: {
@@ -70,10 +71,10 @@ const styles = StyleSheet.create({
     mediumText: {
         fontSize: 22,
         fontWeight: 'bold', // Optional: to highlight the medium text
-        color: '#ccc',
+        color: '#ffffff',
     },
     lastMessageText: {
-        color: '#8f8f8f', // Optional: different color for less emphasis
+        color: '#d7d7d7',
     },
 });
 
