@@ -9,8 +9,8 @@ const router = express.Router();
 
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-if (!process.env.A_B_ID || !process.env.A_M_ID) {
-    console.error("Missing required environment variables: A_B_ID, A_M_ID");
+if (!process.env.A_B_ID || !process.env.A_M_ID || !process.env.A_M_ID || !process.env.A_P_ID || !process.env.A_S_ID || !process.env.A_MV_ID || !process.env.A_H_ID || !process.env.A_G_ID || !process.env.OPENAI_API) {
+    console.error("Missing required environment variables");
     process.exit(1);
 }
 
@@ -86,7 +86,6 @@ async function createThread(userName, chatType, messageContent) {
 
 // incorporate into loading call
 async function fetchMessages(userName, chatType, fetchAmt, earliestMessageId = null) {
-    console.log(userName, chatType, fetchAmt )
     try {
         let currAIMap = await getMapFromUser(userName);
 
@@ -98,32 +97,35 @@ async function fetchMessages(userName, chatType, fetchAmt, earliestMessageId = n
         let options = { limit: fetchLimit + 1 }; // Always attempt to fetch one more than needed
         let begin = 0;
 
-        if(fetchAmt === 1){
-            options.limit = 3;
-        }
-
         if (earliestMessageId) {
             options.after = earliestMessageId; // Fetch messages after the earliest known message ID
             options.limit = 11;
+        }
+
+        if(fetchAmt == 1){
+            options.limit = 3;
         }
 
         let threadMessages = await openai.beta.threads.messages.list(
             currAIMap[chatType], options
         );
 
-        // Determine if you have reached the earliest message by checking the fetched message count
+        if (!threadMessages.body || !threadMessages.body.data || threadMessages.body.data.length === 0) {
+            console.log("No messages to process.");
+            return [];
+        }
+
         const reachedEarliest = threadMessages.body.data.length <= fetchLimit;
 
         if (reachedEarliest) {
             console.log("Reached the earliest message.");
             begin  = 2;
         }
-        // Exclude the extra message by slicing the array if more than the fetchLimit was actually fetched
+
         let returnMessages = threadMessages.body.data.map(message => ({
-            message: message.content[0].text.value,
+            message: message.content?.[0]?.text?.value || 'Error loading message',
             msgID: message.id
         }));
-
         returnMessages = returnMessages.slice(0, returnMessages.length - begin);
         return returnMessages.reverse();
     } catch (err) {
@@ -210,7 +212,6 @@ router.post("/sendMessage", async (req, res, next) => {
 // fetch previous messages up till var
 // refactor to one endpoint?
 router.get("/fetchMessages", async (req, res, next) => {
-    console.log("test")
     try {
         const userName = req.query.userName;
         const chatType = req.query.chatType;
