@@ -1,10 +1,11 @@
 import React, {useState, useContext} from 'react';
-import {Text, TouchableOpacity, Image, StyleSheet, View, ScrollView} from "react-native";
+import {Text, TouchableOpacity, Image, StyleSheet, View, ScrollView, ImageBackground} from "react-native";
 import {LinearGradient} from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
 import { ContactContext } from "../../ContactContext";
 import axios from "axios";
 import Global from "../Global";
+import wallpaper from "../../assets/backgrounds/wallpaper.png";
 
 function Home({navigation}) {
 
@@ -20,6 +21,7 @@ function Home({navigation}) {
         { medium: "Hobbies", color: "#4c2756", image: require('../../assets/icons/Hobbies.png') },
         { medium: "Games", color: "#204949", image: require('../../assets/icons/Games.png') }
     ];
+    const wallPaper = require('../../assets/backgrounds/wallpaper.png');
 
     const [myArray, setMyArray] = useState(reorderArray(initialArray, order));
 
@@ -57,7 +59,7 @@ function Home({navigation}) {
     }
 
     return (
-        <LinearGradient colors={['#000000', '#3f3f3f']} style={styles.linearGradient}>
+        <ImageBackground  source={wallpaper} resizeMode="cover" style={styles.linearGradient}>
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
                 <View style={styles.header}>
                     <Text style={styles.headerText}>Suggestify</Text>
@@ -77,7 +79,7 @@ function Home({navigation}) {
                     ))}
                 </View>
             </ScrollView>
-        </LinearGradient>
+        </ImageBackground>
     );
 }
 
@@ -102,8 +104,6 @@ const styles = StyleSheet.create({
         paddingTop: 100,
         flexGrow: 1,
         alignItems: 'center',
-
-        backgroundColor: '#151515',
     },
 
     imageStyle: {
