@@ -1,4 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
 import {ContactContext} from "../../ContactContext";
@@ -10,27 +11,28 @@ function ChatPreview({ medium, color, image }) {
     const userName = contact.userName
     const [lastMessage, setLastMessage] = useState('Loading last message...');
 
-    useEffect(() => {
-        const fetchLastMessage = async () => {
-            try {
-                const response = await axios.get(`${Global.ip}/ai/fetchMessages`, {
-                    params: {
-                        userName: userName,
-                        chatType: medium,
-                        fetchAmt: 1
-                    }
-                });
-                let message = response.data?.[0]?.message ?? "Start a conversation!";
-                message = message.slice(0, 30); // Limit the message to 30 characters
-                setLastMessage(message);
-            } catch (error) {
-                console.error('Failed to fetch last message:', error);
-                setLastMessage('Failed to load message.'); // Error text
-            }
-        };
-
-        fetchLastMessage();
-    }, [userName, medium]); // Re-run the effect if userName or medium changes
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchLastMessage = async () => {
+                try {
+                    const response = await axios.get(`${Global.ip}/ai/fetchMessages`, {
+                        params: {
+                            userName: userName,
+                            chatType: medium,
+                            fetchAmt: 1
+                        }
+                    });
+                    let message = response.data?.[0]?.message ?? "Start a conversation!";
+                    message = message.slice(0, 30); // Limit the message to 30 characters
+                    setLastMessage(message);
+                } catch (error) {
+                    console.error('Failed to fetch last message:', error);
+                    setLastMessage('Failed to load message.'); // Error text
+                }
+            };
+            fetchLastMessage();
+        }, [userName, medium])
+    );
 
 
     return (
