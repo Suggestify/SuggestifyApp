@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import { Text, View } from "react-native";
 import { ContactContext } from "../../ContactContext";
 
-import api from "../../helpers/api";
+import api from "../../helperFunctions/Api";
 
 
 function Loading({route, navigation }) {

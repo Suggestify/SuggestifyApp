@@ -4,7 +4,7 @@ import ChatBubble from './ChatBubble';
 import ChatInput from './ChatInput';
 import {Ionicons} from "@expo/vector-icons";
 
-import api from "../../helpers/api";
+import api from "../../helperFunctions/Api";
 
 function ChatScreen({ route, navigation }) {
     const [currHistory, setCurrHistory] = useState([]);

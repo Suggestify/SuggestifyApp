@@ -6,7 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import {ContactContext} from "../../ContactContext";
 
-import api from "../../helpers/api";
+import api from "../../helperFunctions/Api";
 function Settings({navigation}) {
     const { contact, updateContact } = useContext(ContactContext);
     const userName = contact.userName;
@@ -92,6 +92,7 @@ function Settings({navigation}) {
         try {
             const response = await api.delete(`/auth/SignOut`, {
                 data: {
+                    token: await AsyncStorage.getItem('refreshToken'),
                     userName: userName
                 }
             })

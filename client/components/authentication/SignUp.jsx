@@ -8,7 +8,7 @@ import axios from 'axios';
 
 const wallpaper = require('../../assets/backgrounds/bk2.png');
 
-import Global from "../../helpers/Global";
+import Global from "../../helperFunctions/Global";
 import {ContactContext} from "../../ContactContext";
 
 function SignUp({navigation}) {

@@ -1,4 +1,4 @@
-// Inside api.js
+// Inside Api.js
 
 // Import necessary items
 import axios from 'axios';
@@ -28,11 +28,8 @@ api.interceptors.response.use(response => response, async (error) => {
         try {
             const refreshToken = await AsyncStorage.getItem('refreshToken');
             const userName = await AsyncStorage.getItem('userName');
-            console.log("trying to do smth rn")
             const tokenResponse = await axios.post(`${Global.ip}/auth/token`, { token: refreshToken, userName: userName });
-            console.log("here yee")
             const newAccessToken = tokenResponse.data.accessToken;
-            console.log("new access token: " + newAccessToken);
             await AsyncStorage.setItem('accessToken', newAccessToken);
 
             api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
@@ -40,8 +37,6 @@ api.interceptors.response.use(response => response, async (error) => {
 
             return api(originalRequest);
         } catch (refreshError) {
-            console.error('Failed to refresh token', refreshError);
-            // Handle logout or redirection to login as needed
             return Promise.reject(refreshError);
         }
     }

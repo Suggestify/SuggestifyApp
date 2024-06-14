@@ -1,36 +1,40 @@
 import React, { useState, useEffect,useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 import {ContactContext} from "../../ContactContext";
 
-import api from "../../helpers/api";
+import api from "../../helperFunctions/Api";
 
 
 // Array of arrays containing different options
 const allOptions = [
     {title: "Music", options: ["Pop", "Rock", "Hip Hop", "Jazz", "Electronic", "Country", "R&B", "Classical", "Reggae", "Blues", "Folk", "Metal", "Lo-fi", "Punk", "Soul", "Indie", "EDM", "Latin", "K-pop", "Gospel", "Reggaeton", "Funk", "House", "Techno", "Alternative", "Trance"]},
-    {title: "Book", options:["Fantasy", "Mystery", "Thriller", "Science Fiction", "Romance", "Historical Fiction", "Biography", "Self-Help", "Young Adult", "Graphic Novel", "Horror", "Poetry", "Crime", "Adventure", "Classics", "Non-Fiction", "Children's", "Humor", "Satire", "Dystopian", "Memoir", "Literary Fiction", "Political", "Philosophy", "Travel", "Nature & Ecology", "Religion & Spirituality"]},
-    {title: "Show", options:["Drama", "Comedy", "Thriller", "Sci-Fi", "Fantasy", "Mystery", "Documentary", "Horror", "Reality", "Animation", "Crime", "Historical", "Action", "Musical", "Romance", "Adventure", "Western", "Family", "War", "Legal", "Political", "Sports"]},
+    {title: "Books", options:["Fantasy", "Mystery", "Thriller", "Science Fiction", "Romance", "Historical Fiction", "Biography", "Self-Help", "Young Adult", "Graphic Novel", "Horror", "Poetry", "Crime", "Adventure", "Classics", "Non-Fiction", "Children's", "Humor", "Satire", "Dystopian", "Memoir", "Literary Fiction", "Political", "Philosophy", "Travel", "Nature & Ecology", "Religion & Spirituality"]},
+    {title: "Shows", options:["Drama", "Comedy", "Thriller", "Sci-Fi", "Fantasy", "Mystery", "Documentary", "Horror", "Reality", "Animation", "Crime", "Historical", "Action", "Musical", "Romance", "Adventure", "Western", "Family", "War", "Legal", "Political", "Sports"]},
     {title: "Podcasts", options:["True Crime", "News", "Comedy", "Science", "Technology", "Health & Wellness", "History", "Business", "Education", "Sports", "Entertainment", "Lifestyle", "Philosophy", "Art", "Music", "Politics", "Religion", "Travel", "Fiction", "Personal Journal", "Games & Hobbies", "Parenting", "Society & Culture", "Science Fiction"]},
-    {title: "Movie", options:["Action", "Adventure", "Romance", "Comedy", "Drama", "Horror", "Sci-Fi", "Fantasy", "Thriller", "Documentary", "Biopic", "Musical", "Animation", "Crime", "Mystery", "War", "Western", "Family", "Historical", "Superhero", "Noir", "Indie", "Sport", "Teen", "Epic", "Silent"]},
-    {title: "Hobby", options:["Creative Arts", "Outdoor Recreation", "Collecting", "Mind & Body Wellness", "Culinary Arts", "Technology & Gadgets", "Home & Garden", "Literature & Writing", "Performing Arts", "Board Games & Puzzles", "Sports & Fitness", "Travel & Adventure", "Music & Dance", "Photography & Videography", "Crafting", "Animal Care"]},
-    {title: "Game", options:["RPG", "FPS", "Puzzle", "Strategy", "Sports", "Racing", "Adventure", "Simulation", "Platformer", "MOBA", "Sandbox", "Fighting", "Stealth", "Survival", "Card & Board", "Educational", "Interactive Fiction", "MMO", "Rhythm", "Visual Novel", "Text-Based", "Tower Defense"]}
+    {title: "Movies", options:["Action", "Adventure", "Romance", "Comedy", "Drama", "Horror", "Sci-Fi", "Fantasy", "Thriller", "Documentary", "Biopic", "Musical", "Animation", "Crime", "Mystery", "War", "Western", "Family", "Historical", "Superhero", "Noir", "Indie", "Sport", "Teen", "Epic", "Silent"]},
+    {title: "Hobbies", options:["Creative Arts", "Outdoor Recreation", "Collecting", "Mind & Body Wellness", "Culinary Arts", "Technology & Gadgets", "Home & Garden", "Literature & Writing", "Performing Arts", "Board Games & Puzzles", "Sports & Fitness", "Travel & Adventure", "Music & Dance", "Photography & Videography", "Crafting", "Animal Care"]},
+    {title: "Games", options:["RPG", "FPS", "Puzzle", "Strategy", "Sports", "Racing", "Adventure", "Simulation", "Platformer", "MOBA", "Sandbox", "Fighting", "Stealth", "Survival", "Card & Board", "Educational", "Interactive Fiction", "MMO", "Rhythm", "Visual Novel", "Text-Based", "Tower Defense"]}
 ];
 
-function NewPreference({route, navigation}) {
-    const { medium } = route.params;
+function Preference({navigation}) {
     const { contact, updateContact } = useContext(ContactContext);
     const [selectedOptions, setSelectedOptions] = useState([]);
-    const [currentOptions, setCurrentOptions] = useState();
+    const [currentArrayIndex, setCurrentArrayIndex] = useState(0); // Index to track the current array of options
+    const [currentOptions, setCurrentOptions] = useState(allOptions[currentArrayIndex].options);
     const [userName, setUserName] = useState(contact.userName);
 
     useEffect(() => {
-        const findOptionsForMedium = (medium) => {
-            const mediumData = allOptions.find(item => item.title === medium);
-            return mediumData ? mediumData.options : [];
-        };
-
-        setCurrentOptions(findOptionsForMedium(medium));
-    }, [medium]);
+        async function getUserName(){
+            const res = await asyncStorage.getItem("userName");
+            setUserName(res);
+        }
+        getUserName();
+        // Update the options when the current array index changes
+        setCurrentOptions(allOptions[currentArrayIndex].options);
+        // Reset selected options when moving to the next set
+        setSelectedOptions([]);
+    }, [currentArrayIndex]);
 
 
     const handleSelect = (item) => {
@@ -46,11 +50,15 @@ function NewPreference({route, navigation}) {
     async function handleNextOrSkip() {
         const response = await api.post(`/ai/create`, {
             userName: userName,
-            medium: medium,
+            medium: allOptions[currentArrayIndex].title,
             options: selectedOptions
         })
         if(response.status === 200) {
-            navigation.navigate("PreferenceSettings")
+            if (currentArrayIndex < allOptions.length - 1) {
+                setCurrentArrayIndex(currentArrayIndex + 1);
+            } else {
+                navigation.navigate("Home")
+            }
         }
     };
 
@@ -59,7 +67,8 @@ function NewPreference({route, navigation}) {
         return (
             <TouchableOpacity
                 style={[styles.item, isSelected ? styles.itemSelected : null]}
-                onPress={() => handleSelect(item)}>
+                onPress={() => handleSelect(item)}
+            >
                 <Text style={styles.itemText}>{item}</Text>
             </TouchableOpacity>
         );
@@ -67,7 +76,7 @@ function NewPreference({route, navigation}) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{medium}</Text>
+            <Text style={styles.title}>{allOptions[currentArrayIndex].title}</Text>
             <FlatList
                 data={currentOptions}
                 renderItem={renderItem}
@@ -131,4 +140,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default NewPreference;
+export default Preference;

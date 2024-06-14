@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import asyncStorage from '@react-native-async-storage/async-storage';
 
-import api from '../../helpers/api';
+import api from '../../helperFunctions/Api';
 
 function ChatInput(props) {
     const [userName, setUserName] = useState(null);

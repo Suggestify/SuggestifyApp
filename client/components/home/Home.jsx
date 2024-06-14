@@ -4,7 +4,7 @@ import ChatPreview from "./ChatPreview";
 import { ContactContext } from "../../ContactContext";
 import wallpaper from "../../assets/backgrounds/wallpaper.png";
 
-import api from "../../helpers/api";
+import api from "../../helperFunctions/Api";
 
 function Home({navigation}) {
 

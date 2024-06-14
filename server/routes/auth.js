@@ -12,7 +12,7 @@ const router = express.Router()
 let refreshTokens = [];
 const saltRounds = 10;
 
-import {authenticateToken} from "../middleware.js";
+import {authenticateToken} from "../middleWare/secureEndPoint.js";
 
 router.post('/token', async (req, res) => {
     const refreshToken = req.body.token;
@@ -54,16 +54,15 @@ router.post("/SignUp", async (req,res)=>{
         await currentUser.save();
 
         const accessToken =  jwt.sign({ username: curUserName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1m' });
-        //const refreshToken =  await jwt.sign({ username: curUserName }, process.env.REFRESH_TOKEN_SECRET);
-        const refreshToken = 7;
+        const refreshToken =  await jwt.sign({ username: curUserName }, process.env.REFRESH_TOKEN_SECRET);
         if (refreshToken) {
             const newToken = new Token({ token: refreshToken });
-            await newToken.save();
+            if(newToken.token != null) {
+                await newToken.save();
+            }
         } else {
             console.error("Failed to generate a valid token.");
         }
-
-
         const token = {
             access: accessToken,
             refresh: refreshToken,
@@ -128,6 +127,7 @@ router.post("/SignIn", async (req,res)=>{
 
 router.delete('/SignOut', authenticateToken, async (req, res) => {
     const token = req.body.token;
+    console.log(token)
     const userName = req.body.userName;
     let user;
     try{
@@ -144,6 +144,7 @@ router.delete('/SignOut', authenticateToken, async (req, res) => {
             }
             userSettings.notificationToken = undefined;
             userSettings.notificationsOn = false;
+            await Token.deleteOne({token: token});
             await userSettings.save();
         }catch (err){
             console.log(err);
@@ -151,7 +152,7 @@ router.delete('/SignOut', authenticateToken, async (req, res) => {
     }catch (err){
         console.log(err);
     }
-    await Token.deleteOne({token: token});
+
     res.sendStatus(204);
 });
 

@@ -7,7 +7,7 @@ import User from "../models/User.js";
 dotenv.config();
 const router = express.Router();
 
-import {authenticateToken} from "../middleware.js";
+import {authenticateToken} from "../middleWare/secureEndPoint.js";
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 if (!process.env.A_B_ID || !process.env.A_M_ID || !process.env.A_M_ID || !process.env.A_P_ID || !process.env.A_S_ID || !process.env.A_MV_ID || !process.env.A_H_ID || !process.env.A_G_ID || !process.env.OPENAI_API) {
@@ -76,7 +76,6 @@ async function createThread(userName, chatType, messageContent) {
             const data = { [chatType]: threadToSend };
             await AIMap.findByIdAndUpdate(myAIMap.id, data);
             await sendMessage(userName, chatType, messageContent, true);
-            console.log("created");
         } else {
             console.log("Thread already exists");  // handling this case differently if necessary
         }
@@ -119,7 +118,6 @@ async function fetchMessages(userName, chatType, fetchAmt, earliestMessageId = n
         const reachedEarliest = threadMessages.body.data.length <= fetchLimit;
 
         if (reachedEarliest) {
-            console.log("Reached the earliest message.");
             begin  = 2;
         }
 
@@ -175,11 +173,18 @@ async function sendMessage(userName, chatType, messageContent, init) {
     }
 }
 
-router.post("/create", authenticateToken, async (req, res, next) => {
+router.post("/create", async (req, res, next) => {
     const chatType = req.body.medium;
     const userName = req.body.userName;
     let messageContent = req.body.options; // to init
-    messageContent = convertToMessage(messageContent);
+
+    if(messageContent == "" || messageContent == undefined){ // check this later
+        messageContent = "Generic"
+    }
+    else{
+        messageContent = convertToMessage(messageContent);
+    }
+
     const myAIMap = await getMapFromUser(userName);
     myAIMap[chatType] = "NULL";
     await AIMap.findByIdAndUpdate(myAIMap.id, myAIMap);
@@ -192,7 +197,6 @@ router.post("/create", authenticateToken, async (req, res, next) => {
         next(err);
     }
 });
-
 
 router.post("/sendMessage", authenticateToken, async (req, res, next) => {
     const userName = req.body.userName;

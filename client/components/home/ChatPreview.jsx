@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
 import {ContactContext} from "../../ContactContext";
 
-import api from "../../helpers/api";
+import api from "../../helperFunctions/Api";
 
 function ChatPreview({ medium, color, image }) {
     const { contact, updateContact } = useContext(ContactContext);
