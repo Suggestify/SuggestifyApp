@@ -1,8 +1,8 @@
 import React, { useState, useEffect,useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import axios from 'axios'
-import Global from "../Global";
 import {ContactContext} from "../../ContactContext";
+
+import api from "../../helpers/api";
 
 
 // Array of arrays containing different options
@@ -10,7 +10,7 @@ const allOptions = [
     {title: "Music", options: ["Pop", "Rock", "Hip Hop", "Jazz", "Electronic", "Country", "R&B", "Classical", "Reggae", "Blues", "Folk", "Metal", "Lo-fi", "Punk", "Soul", "Indie", "EDM", "Latin", "K-pop", "Gospel", "Reggaeton", "Funk", "House", "Techno", "Alternative", "Trance"]},
     {title: "Book", options:["Fantasy", "Mystery", "Thriller", "Science Fiction", "Romance", "Historical Fiction", "Biography", "Self-Help", "Young Adult", "Graphic Novel", "Horror", "Poetry", "Crime", "Adventure", "Classics", "Non-Fiction", "Children's", "Humor", "Satire", "Dystopian", "Memoir", "Literary Fiction", "Political", "Philosophy", "Travel", "Nature & Ecology", "Religion & Spirituality"]},
     {title: "Show", options:["Drama", "Comedy", "Thriller", "Sci-Fi", "Fantasy", "Mystery", "Documentary", "Horror", "Reality", "Animation", "Crime", "Historical", "Action", "Musical", "Romance", "Adventure", "Western", "Family", "War", "Legal", "Political", "Sports"]},
-    {title: "Podcast", options:["True Crime", "News", "Comedy", "Science", "Technology", "Health & Wellness", "History", "Business", "Education", "Sports", "Entertainment", "Lifestyle", "Philosophy", "Art", "Music", "Politics", "Religion", "Travel", "Fiction", "Personal Journal", "Games & Hobbies", "Parenting", "Society & Culture", "Science Fiction"]},
+    {title: "Podcasts", options:["True Crime", "News", "Comedy", "Science", "Technology", "Health & Wellness", "History", "Business", "Education", "Sports", "Entertainment", "Lifestyle", "Philosophy", "Art", "Music", "Politics", "Religion", "Travel", "Fiction", "Personal Journal", "Games & Hobbies", "Parenting", "Society & Culture", "Science Fiction"]},
     {title: "Movie", options:["Action", "Adventure", "Romance", "Comedy", "Drama", "Horror", "Sci-Fi", "Fantasy", "Thriller", "Documentary", "Biopic", "Musical", "Animation", "Crime", "Mystery", "War", "Western", "Family", "Historical", "Superhero", "Noir", "Indie", "Sport", "Teen", "Epic", "Silent"]},
     {title: "Hobby", options:["Creative Arts", "Outdoor Recreation", "Collecting", "Mind & Body Wellness", "Culinary Arts", "Technology & Gadgets", "Home & Garden", "Literature & Writing", "Performing Arts", "Board Games & Puzzles", "Sports & Fitness", "Travel & Adventure", "Music & Dance", "Photography & Videography", "Crafting", "Animal Care"]},
     {title: "Game", options:["RPG", "FPS", "Puzzle", "Strategy", "Sports", "Racing", "Adventure", "Simulation", "Platformer", "MOBA", "Sandbox", "Fighting", "Stealth", "Survival", "Card & Board", "Educational", "Interactive Fiction", "MMO", "Rhythm", "Visual Novel", "Text-Based", "Tower Defense"]}
@@ -44,7 +44,7 @@ function NewPreference({route, navigation}) {
     };
 
     async function handleNextOrSkip() {
-        const response = await axios.post(`${Global.ip}/ai/create`, {
+        const response = await api.post(`/ai/create`, {
             userName: userName,
             medium: medium,
             options: selectedOptions

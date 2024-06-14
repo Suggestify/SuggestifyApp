@@ -1,25 +1,25 @@
 import React, { useEffect, useContext } from 'react';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Text, View } from "react-native";
-import axios from "axios";
-import Global from "../Global";
 import { ContactContext } from "../../ContactContext";
+
+import api from "../../helpers/api";
 
 function Loading({ navigation }) {
     const { contact, updateContact } = useContext(ContactContext);
-
     useEffect(() => {
         const checkToken = async () => {
             const accessToken = await AsyncStorage.getItem('accessToken');
             if (accessToken) {
                 const userName = await AsyncStorage.getItem('userName');
                 updateContact({userName: userName});
-                const response = await axios.get(`${Global.ip}/settings/fetchSettings`, {
+                const response = await api.get(`/settings/fetchSettings`, {
                     params: {
                         userName: userName
                     }
                 })
                 if (response.status === 200) {
+                    console.log(response.data.notificationOn);
                     updateContact({theme: response.data.theme});
                     updateContact({notificationOn: response.data.notificationOn});
                     updateContact({mediumOrder: response.data.mediumOrder});

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import asyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import Global from '../Global';
+
+import api from '../../helpers/api';
 
 function ChatInput(props) {
     const [userName, setUserName] = useState(null);
@@ -22,7 +22,7 @@ function ChatInput(props) {
         if (loading) return;  // Prevent multiple sends if already loading
         setLoading(true);  // Set loading to true when send starts
         try {
-            const response = await axios.post(`${Global.ip}/ai/sendMessage`, {
+            const response = await api.post(`/ai/sendMessage`, {
                 userName: userName,
                 messageContent: message,
                 type: type,

@@ -1,12 +1,13 @@
 import express from "express";
 import dotenv from 'dotenv';
 import {OpenAI} from 'OpenAI';
-import AIMap from "./models/AIMap.js";
-import User from "./models/User.js";
+import AIMap from "../models/AIMap.js";
+import User from "../models/User.js";
 
 dotenv.config();
 const router = express.Router();
 
+import {authenticateToken} from "../middleware.js";
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 if (!process.env.A_B_ID || !process.env.A_M_ID || !process.env.A_M_ID || !process.env.A_P_ID || !process.env.A_S_ID || !process.env.A_MV_ID || !process.env.A_H_ID || !process.env.A_G_ID || !process.env.OPENAI_API) {
@@ -174,7 +175,7 @@ async function sendMessage(userName, chatType, messageContent, init) {
     }
 }
 
-router.post("/create", async (req, res, next) => {
+router.post("/create", authenticateToken, async (req, res, next) => {
     const chatType = req.body.medium;
     const userName = req.body.userName;
     let messageContent = req.body.options; // to init
@@ -193,7 +194,7 @@ router.post("/create", async (req, res, next) => {
 });
 
 
-router.post("/sendMessage", async (req, res, next) => {
+router.post("/sendMessage", authenticateToken, async (req, res, next) => {
     const userName = req.body.userName;
     const messageContent = req.body.messageContent;
     const chatType = req.body.type;
@@ -211,7 +212,7 @@ router.post("/sendMessage", async (req, res, next) => {
 
 // fetch previous messages up till var
 // refactor to one endpoint?
-router.get("/fetchMessages", async (req, res, next) => {
+router.get("/fetchMessages", authenticateToken,async (req, res, next) => {
     try {
         const userName = req.query.userName;
         const chatType = req.query.chatType;
@@ -224,7 +225,7 @@ router.get("/fetchMessages", async (req, res, next) => {
 });
 
 // can concat??^
-router.get("/loadMessages", async (req, res, next) => {
+router.get("/loadMessages", authenticateToken, async (req, res, next) => {
     try {
         const userName = req.query.userName;
         const chatType = req.query.chatType;

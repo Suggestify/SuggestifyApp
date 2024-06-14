@@ -1,8 +1,8 @@
 import React, {useContext, useEffect, useState} from 'react';
 import { Text, View } from "react-native";
-import axios from 'axios'
-import Global from "../Global";
 import { ContactContext } from "../../ContactContext";
+
+import api from "../../helpers/api";
 
 
 function Loading({route, navigation }) {
@@ -11,7 +11,7 @@ function Loading({route, navigation }) {
     const { medium } = route.params;
     async function pullChat(){
         try {
-            const response = await axios.get(`${Global.ip}/ai/fetchMessages`, {
+            const response = await api.get(`/ai/fetchMessages`, {
                 params: {
                     userName: userName,
                     chatType: medium

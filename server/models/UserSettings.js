@@ -18,7 +18,7 @@ const UserSettingsSchema = new mongoose.Schema({
     mediumOrder: {
         type: Array,
         required: true,
-        default: ['Music', 'Books', 'Podcast', 'Shows', 'Movies', 'Hobbies', 'Games']
+        default: ['Music', 'Books', 'Podcasts', 'Shows', 'Movies', 'Hobbies', 'Games']
     },
 });
 

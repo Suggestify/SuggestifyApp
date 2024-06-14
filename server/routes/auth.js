@@ -1,30 +1,37 @@
 import express from 'express'
 import bcryptjs from "bcryptjs";
-import User from "./models/User.js";
+import User from "../models/User.js";
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv';
-import AIMap from './models/AIMap.js';
-import UserSettings from './models/UserSettings.js';
-import axios from "axios";
+import AIMap from '../models/AIMap.js';
+import UserSettings from '../models/UserSettings.js';
+import Token from '../models/Tokens.js';
 dotenv.config();
 const router = express.Router()
 
 let refreshTokens = [];
 const saltRounds = 10;
 
+import {authenticateToken} from "../middleware.js";
 
-
-
-router.post('/token', (req, res) => {
+router.post('/token', async (req, res) => {
     const refreshToken = req.body.token;
-    if (!refreshToken || !refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+    const tokenExists = await Token.findOne({token: refreshToken});
+    if (!refreshToken || !tokenExists){
+        return res.sendStatus(403);
+    }
 
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403);
-        const accessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-        res.json({ accessToken });
+        if (err) {
+            // Remove the invalid refresh token
+            refreshTokens = refreshTokens.filter(token => token !== refreshToken);
+            return res.sendStatus(403);
+        }
+        const newAccessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1m' });
+        res.json({ accessToken: newAccessToken });
     });
 });
+
 
 router.post("/SignUp", async (req,res)=>{
     try{
@@ -46,14 +53,23 @@ router.post("/SignUp", async (req,res)=>{
         const currentUser = new User(data);
         await currentUser.save();
 
-        const accessToken = jwt.sign({ username: curUserName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-        const refreshToken = jwt.sign({ username: curUserName }, process.env.REFRESH_TOKEN_SECRET);
+        const accessToken =  jwt.sign({ username: curUserName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1m' });
+        //const refreshToken =  await jwt.sign({ username: curUserName }, process.env.REFRESH_TOKEN_SECRET);
+        const refreshToken = 7;
+        if (refreshToken) {
+            const newToken = new Token({ token: refreshToken });
+            await newToken.save();
+        } else {
+            console.error("Failed to generate a valid token.");
+        }
+
+
         const token = {
             access: accessToken,
             refresh: refreshToken,
             userName: curUserName
         }
-        const response = await
+
         res.json(token).status(200);
     }
     catch(err){
@@ -87,8 +103,12 @@ router.post("/SignIn", async (req,res)=>{
         try {
             const match = await bcryptjs.compare(pwdUser, pwdDB);
             if (match) {
-                const accessToken = jwt.sign({ username: user.userName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+                const accessToken = jwt.sign({ username: user.userName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1m' });
                 const refreshToken = jwt.sign({ username: user.userName }, process.env.REFRESH_TOKEN_SECRET);
+
+                const newToken = new Token({token: refreshToken});
+                await newToken.save();
+
                 res.status(200).json({
                     access: accessToken,
                     refresh: refreshToken,
@@ -106,10 +126,12 @@ router.post("/SignIn", async (req,res)=>{
     }
 });
 
-router.delete('/SignOut', async (req, res) => {
+router.delete('/SignOut', authenticateToken, async (req, res) => {
+    const token = req.body.token;
     const userName = req.body.userName;
     let user;
     try{
+
         user = await User.findOne({userName: userName});
         if (!user) {
             return res.status(404).send({ message: "User not found" });
@@ -129,20 +151,8 @@ router.delete('/SignOut', async (req, res) => {
     }catch (err){
         console.log(err);
     }
-    refreshTokens = refreshTokens.filter(token => token !== req.body.token);
+    await Token.deleteOne({token: token});
     res.sendStatus(204);
 });
-
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-    if (!token) return res.sendStatus(401); // No token, unauthorized
-
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403); // Invalid token
-        req.user = user;
-        next(); // Proceed to the protected route
-    });
-}
 
 export default router

@@ -2,8 +2,8 @@ import React, {useState, useEffect, useContext} from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
 import {ContactContext} from "../../ContactContext";
-import axios from "axios";
-import Global from "../Global";
+
+import api from "../../helpers/api";
 
 function ChatPreview({ medium, color, image }) {
     const { contact, updateContact } = useContext(ContactContext);
@@ -13,7 +13,7 @@ function ChatPreview({ medium, color, image }) {
     useEffect(() => {
         const fetchLastMessage = async () => {
             try {
-                const response = await axios.get(`${Global.ip}/ai/fetchMessages`, {
+                const response = await api.get(`/ai/fetchMessages`, {
                     params: {
                         userName: userName,
                         chatType: medium,

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState } from 'react';
 
 // Define the Contact context
 const ContactContext = createContext();
@@ -7,7 +7,7 @@ export const ContactProvider = ({ children }) => {
     const [contact, setContact] = useState({
         username: '',
         mediumOrder: ['Music', 'Books', 'Podcasts', 'Shows', 'Movies', 'Hobbies', 'Games'],
-        notificationsOn: false,
+        notificationOn: false,
         theme: false
     });
 

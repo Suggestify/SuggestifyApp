@@ -1,9 +1,9 @@
 import React, { useState, useEffect,useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import axios from 'axios'
-import Global from "../Global";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 import {ContactContext} from "../../ContactContext";
+
+import api from "../../helpers/api";
 
 
 // Array of arrays containing different options
@@ -48,7 +48,7 @@ function Preference({navigation}) {
     };
 
     async function handleNextOrSkip() {
-        const response = await axios.post(`${Global.ip}/ai/create`, {
+        const response = await api.post(`/ai/create`, {
             userName: userName,
             medium: allOptions[currentArrayIndex].title,
             options: selectedOptions

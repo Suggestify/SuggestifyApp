@@ -1,20 +1,22 @@
 import express from 'express'
-import User from "./models/User.js";
-import UserSettings from "./models/UserSettings.js";
+import User from "../models/User.js";
+import UserSettings from "../models/UserSettings.js";
 import dotenv from 'dotenv';
 
 dotenv.config();
 const router = express.Router()
 import cron from 'node-cron';
-import pkg from '../client/notifications.js';
+import pkg from '../../client/helpers/notifications.js';
 const { sendPushNotifications } = pkg;
+
+import {authenticateToken} from "../middleware.js";
 
 
 cron.schedule('0 21 * * 0', () => {
     console.log('This message logs every Sunday at 9 PM.');
     sendPushNotifications();
 });
-router.post("/setNotifications", async (req, res) => {
+router.post("/setNotifications", authenticateToken, async (req, res) => {
     const { userName, token } = req.body;
 
     if (!userName || !token) {
@@ -48,7 +50,6 @@ router.get("/fetchSettings", async (req, res) => {
     if (!userName) {
         return res.status(400).send({ message: "Missing or invalid userName parameter" });
     }
-
     try {
         let user = await User.findOne({ userName: userName });
         if (!user) {
@@ -59,7 +60,7 @@ router.get("/fetchSettings", async (req, res) => {
         if (!userSettings) {
             return res.status(404).send({ message: "User settings not found" });
         }
-
+        console.log(userSettings)
         res.status(200).json(userSettings);
     } catch (err) {
         console.error(err);
@@ -68,7 +69,7 @@ router.get("/fetchSettings", async (req, res) => {
 });
 
 
-router.put("/updateOrder", async (req, res) => {
+router.put("/updateOrder", authenticateToken, async (req, res) => {
     const { userName, newOrder } = req.body;
     // Validate inputs
     if (!userName || !newOrder) {
@@ -97,7 +98,8 @@ router.put("/updateOrder", async (req, res) => {
     }
 });
 
-router.post("/toggleSwitch", async (req, res) => {
+router.post("/toggleSwitch", authenticateToken, async (req, res) => {
+    console.log("----------------------------------")
     const { userName, switchType, value } = req.body;
     // Validate inputs
     if (!userName || switchType === undefined || value === undefined) {
@@ -109,18 +111,21 @@ router.post("/toggleSwitch", async (req, res) => {
         return res.status(400).send({ message: "Invalid switchType provided" });
     }
     try {
+        console.log("major errors clear")
         let user = await User.findOne({ userName: userName });
         if (!user) {
             return res.status(404).send({ message: "User not found" });
         }
-
+        console.log("secondary issues clear")
         let userSettings = await UserSettings.findById(user.UserSettingsID);
         if (!userSettings) {
             return res.status(404).send({ message: "User settings not found" });
         }
+        console.log("tertiary issues clear")
         userSettings[switchType] = value;
+        console.log("quaternary issues clear + " + switchType, userName, value);
         await userSettings.save();
-
+        console.log("quinary issues clear")
         if (switchType === "notificationOn" && value && userSettings.notificationToken === undefined) {
             return res.status(200).send({ message: "Notification enabled", firstTime: true });
         }

@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
-import UserSettings from "./UserSettings.js";
 
 const userSchema = new mongoose.Schema({
     email:{

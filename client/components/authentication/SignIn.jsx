@@ -9,7 +9,7 @@ import {ContactContext} from "../../ContactContext";
 
 const wallpaper = require('../../assets/backgrounds/bk1.png');
 
-import Global from "../Global";
+import Global from "../../helpers/Global";
 
 function SignIn({navigation }) {
     const { contact, updateContact } = useContext(ContactContext);

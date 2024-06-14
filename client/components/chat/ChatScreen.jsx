@@ -2,10 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { SafeAreaView, StyleSheet, View, FlatList, RefreshControl, TouchableOpacity, Text } from 'react-native';
 import ChatBubble from './ChatBubble';
 import ChatInput from './ChatInput';
-import axios from "axios";
-import Global from "../Global";
 import {Ionicons} from "@expo/vector-icons";
 
+import api from "../../helpers/api";
 
 function ChatScreen({ route, navigation }) {
     const [currHistory, setCurrHistory] = useState([]);
@@ -63,7 +62,7 @@ function ChatScreen({ route, navigation }) {
 
     async function loadMessages() {
         try {
-            const response = await axios.get(`${Global.ip}/ai/loadMessages`, {
+            const response = await api.get(`/ai/loadMessages`, {
                 params: {
                     userName: route.params.userName,
                     chatType: type,
