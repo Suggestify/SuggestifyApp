@@ -8,14 +8,14 @@ import {NativeBaseProvider} from 'native-base';
 import SignIn from "./components/authentication/SignIn";
 import SignUp from "./components/authentication/SignUp";
 import Home from "./components/home/Home";
-import Preference from "./components/prefrence/Preference";
+import Preference from "./components/preference/Preference";
 import Settings from "./components/settings/Settings";
 import PreferenceSettings from "./components/settings/PreferenceSettings";
-import NewPreference from "./components/prefrence/NewPreference";
+import NewPreference from "./components/preference/NewPreference";
 import ChatScreen from "./components/chat/ChatScreen";
 import ChatPreview from "./components/home/ChatPreview";
-import LoadingHome from "./components/Reusables/LoadingHome";
-import LoadingLaunch from "./components/Reusables/LoadingLaunch";
+import LoadingHome from "./components/loading/LoadingHome";
+import LoadingLaunch from "./components/loading/LoadingLaunch";
 
 import {ContactProvider} from './ContactContext';
 

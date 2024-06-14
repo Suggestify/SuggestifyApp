@@ -8,7 +8,7 @@ import axios from 'axios';
 
 const wallpaper = require('../../assets/backgrounds/bk2.png');
 
-import Global from "../Global";
+import Global from "../../helperFunctions/Global";
 import {ContactContext} from "../../ContactContext";
 
 function SignUp({navigation}) {
@@ -42,11 +42,13 @@ function SignUp({navigation}) {
             setUserNameError("");
         }
         try {
+
             const response = await axios.post(`${Global.ip}/auth/SignUp`, {
                 email: email,
                 userName: userName,
                 password: password
             })
+
             if (response.status !== 200) {
                 setEmailError(`*${response.data.message}`)
 
@@ -64,8 +66,10 @@ function SignUp({navigation}) {
                         userName: userName
                     }
                 });
+                console.log("res2 = " + response2.status)
 
                 if (response2.status === 200) {
+                    console.log("bingus")
                     updateContact({theme: response2.data.theme});
                     updateContact({notificationsOn: response2.data.notificationsOn});
                     updateContact({mediumOrder: response2.data.mediumOrder});

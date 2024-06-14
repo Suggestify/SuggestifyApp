@@ -2,20 +2,20 @@ import React, {useContext, useState} from 'react';
 import * as Notifications from 'expo-notifications';
 import {StyleSheet, Text, TouchableOpacity, View, Switch, Alert,} from "react-native";
 import {Heading} from 'native-base';
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Global from "../Global";
 import Toast from "react-native-toast-message";
 import {ContactContext} from "../../ContactContext";
 
+import api from "../../helperFunctions/Api";
 function Settings({navigation}) {
     const { contact, updateContact } = useContext(ContactContext);
     const userName = contact.userName;
-    const [notificationsEnabled, setNotificationsEnabled] = useState(contact.notificationsOn);
+    console.log(contact)
+    const [notificationsEnabled, setNotificationsEnabled] = useState(contact.notificationOn);
     const [themeEnabled, setThemeEnabled] = useState(contact.theme);
 
     async function toggleSwitch(switchType, value ){
-        const response = await axios.post(`${Global.ip}/settings/toggleSwitch`, {
+        const response = await api.post(`/settings/toggleSwitch`, {
             userName: userName,
             switchType: switchType,
             value: value
@@ -44,7 +44,7 @@ function Settings({navigation}) {
                 const token = (await Notifications.getExpoPushTokenAsync({
                     projectId: '1e87624a-57f3-4080-9cf6-b8b7471ab184' // Replace 'your-username' with your actual Expo username
                 })).data;
-                await axios.post(`${Global.ip}/settings/setNotifications`, {
+                await api.post(`/settings/setNotifications`, {
                     userName: userName,
                     token: token
                 })
@@ -71,7 +71,7 @@ function Settings({navigation}) {
     async function toggleTheme (){
         contact.theme = !themeEnabled;
         setThemeEnabled(contact.theme);
-        let response = await toggleSwitch("theme",  !contact.theme);
+        let response = await toggleSwitch("theme",  contact.theme);
         if (response.status === 200) {
             Toast.show({
                 type: 'success', // There are 'success', 'error', 'info' types available by default
@@ -90,14 +90,14 @@ function Settings({navigation}) {
 
     async function logout() {
         try {
-            const response = await axios.delete(`${Global.ip}/auth/SignOut`, {
+            const response = await api.delete(`/auth/SignOut`, {
                 data: {
+                    token: await AsyncStorage.getItem('refreshToken'),
                     userName: userName
                 }
             })
             if (response.status === 204) {
                 await AsyncStorage.clear();
-
                 navigation.navigate('SignIn')
             }
         } catch (err) {

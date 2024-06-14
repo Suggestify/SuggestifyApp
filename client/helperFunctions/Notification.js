@@ -3,7 +3,7 @@ let expo = new Expo();
 
 async function getTokensFromDB() {
     try {
-        const { default: User } = await import('../server/models/User.js'); // Ensure the path is correct
+        const { default: User } = await import('../../server/models/User.js'); // Ensure the path is correct
         const users = await User.find({ notificationToken: { $ne: null } });
         return users.map(user => user.notificationToken);
     } catch (error) {

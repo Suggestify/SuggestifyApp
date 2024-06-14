@@ -4,9 +4,9 @@ dotenv.config();
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from 'cors';
-import authRoutes from './auth.js'
-import aiRoutes from "./assistant.js";
-import settingRoutes from "./settings.js";
+import authRoutes from './routes/auth.js'
+import aiRoutes from "./routes/assistant.js";
+import settingRoutes from "./routes/settings.js";
 
 
 const pwd = process.env.MONGO_Y;

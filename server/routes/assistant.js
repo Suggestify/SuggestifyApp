@@ -1,15 +1,17 @@
 import express from "express";
 import dotenv from 'dotenv';
 import {OpenAI} from 'OpenAI';
-import AIMap from "./models/AIMap.js";
-import User from "./models/User.js";
-import rateLimit from "./rate.js";
-import rate from "./rate.js";
+
+import AIMap from "../models/AIMap.js";
+import User from "../models/User.js";
+import rateLimit from "../middleWare/rate.js";
+
 
 dotenv.config();
 const router = express.Router();
 
-//rateLimit("user:1").then(console.log);
+
+import {authenticateToken} from "../middleWare/secureEndPoint.js";
 
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -79,7 +81,6 @@ async function createThread(userName, chatType, messageContent) {
             const data = { [chatType]: threadToSend };
             await AIMap.findByIdAndUpdate(myAIMap.id, data);
             await sendMessage(userName, chatType, messageContent, true);
-            console.log("created");
         } else {
             console.log("Thread already exists");  // handling this case differently if necessary
         }
@@ -122,7 +123,6 @@ async function fetchMessages(userName, chatType, fetchAmt, earliestMessageId = n
         const reachedEarliest = threadMessages.body.data.length <= fetchLimit;
 
         if (reachedEarliest) {
-            console.log("Reached the earliest message.");
             begin  = 2;
         }
 
@@ -182,7 +182,14 @@ router.post("/create", async (req, res, next) => {
     const chatType = req.body.medium;
     const userName = req.body.userName;
     let messageContent = req.body.options; // to init
-    messageContent = convertToMessage(messageContent);
+
+    if(messageContent == "" || messageContent == undefined){ // check this later
+        messageContent = "Generic"
+    }
+    else{
+        messageContent = convertToMessage(messageContent);
+    }
+
     const myAIMap = await getMapFromUser(userName);
     myAIMap[chatType] = "NULL";
     await AIMap.findByIdAndUpdate(myAIMap.id, myAIMap);
@@ -196,8 +203,8 @@ router.post("/create", async (req, res, next) => {
     }
 });
 
+router.post("/sendMessage", authenticateToken, rateLimit, async (req, res, next) => {
 
-router.post("/sendMessage", rateLimit, async (req, res, next) => {
     const userName = req.body.userName;
     const messageContent = req.body.messageContent;
     const chatType = req.body.type;
@@ -215,7 +222,7 @@ router.post("/sendMessage", rateLimit, async (req, res, next) => {
 
 // fetch previous messages up till var
 // refactor to one endpoint?
-router.get("/fetchMessages", async (req, res, next) => {
+router.get("/fetchMessages", authenticateToken,async (req, res, next) => {
     try {
         const userName = req.query.userName;
         const chatType = req.query.chatType;
@@ -228,7 +235,7 @@ router.get("/fetchMessages", async (req, res, next) => {
 });
 
 // can concat??^
-router.get("/loadMessages", async (req, res, next) => {
+router.get("/loadMessages", authenticateToken, async (req, res, next) => {
     try {
         const userName = req.query.userName;
         const chatType = req.query.chatType;

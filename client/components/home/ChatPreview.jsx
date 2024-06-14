@@ -3,19 +3,20 @@ import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
 import {ContactContext} from "../../ContactContext";
-import axios from "axios";
-import Global from "../Global";
+
+import api from "../../helperFunctions/Api";
 
 function ChatPreview({ medium, color, image }) {
     const { contact, updateContact } = useContext(ContactContext);
     const userName = contact.userName
     const [lastMessage, setLastMessage] = useState('Loading last message...');
 
+
     useFocusEffect(
         React.useCallback(() => {
             const fetchLastMessage = async () => {
                 try {
-                    const response = await axios.get(`${Global.ip}/ai/fetchMessages`, {
+                    const response = await api.get(`/ai/fetchMessages`, {
                         params: {
                             userName: userName,
                             chatType: medium,
@@ -33,6 +34,7 @@ function ChatPreview({ medium, color, image }) {
             fetchLastMessage();
         }, [userName, medium])
     );
+
 
 
     return (

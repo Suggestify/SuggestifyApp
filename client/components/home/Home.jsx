@@ -1,11 +1,10 @@
 import React, {useState, useContext} from 'react';
 import {Text, TouchableOpacity, Image, StyleSheet, View, ScrollView, ImageBackground} from "react-native";
-import {LinearGradient} from 'expo-linear-gradient';
 import ChatPreview from "./ChatPreview";
 import { ContactContext } from "../../ContactContext";
-import axios from "axios";
-import Global from "../Global";
 import wallpaper from "../../assets/backgrounds/wallpaper.png";
+
+import api from "../../helperFunctions/Api";
 
 function Home({navigation}) {
 
@@ -21,7 +20,6 @@ function Home({navigation}) {
         { medium: "Hobbies", color: "#4c2756", image: require('../../assets/icons/Hobbies.png') },
         { medium: "Games", color: "#204949", image: require('../../assets/icons/Games.png') }
     ];
-    const wallPaper = require('../../assets/backgrounds/wallpaper.png');
 
     const [myArray, setMyArray] = useState(reorderArray(initialArray, order));
 
@@ -50,7 +48,7 @@ function Home({navigation}) {
     async function handleClick(index) {
         const medium = myArray[index].medium;
         moveToFrontAndShift(myArray, index);
-        await axios.put(`${Global.ip}/settings/updateOrder`, {
+        await api.put(`/settings/updateOrder`, {
             userName: userName,
             newOrder: myArray.map(item => item.medium)
         })

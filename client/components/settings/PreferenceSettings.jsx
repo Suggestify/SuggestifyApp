@@ -2,7 +2,6 @@ import React, {useContext} from 'react';
 import {View, Text, StyleSheet, Alert, TouchableOpacity} from 'react-native';
 import {Heading} from "native-base";
 import {ContactContext} from "../../ContactContext";
-import Toast from "react-native-toast-message";
 function PreferenceSettings({ navigation }) {
     const {contact, updateContact} = useContext(ContactContext);
     const userName = contact.userName;
