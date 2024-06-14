@@ -1,13 +1,18 @@
 import express from "express";
 import dotenv from 'dotenv';
 import {OpenAI} from 'OpenAI';
+
 import AIMap from "../models/AIMap.js";
 import User from "../models/User.js";
+import rateLimit from "../middleWare/rate.js";
+
 
 dotenv.config();
 const router = express.Router();
 
+
 import {authenticateToken} from "../middleWare/secureEndPoint.js";
+
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 if (!process.env.A_B_ID || !process.env.A_M_ID || !process.env.A_M_ID || !process.env.A_P_ID || !process.env.A_S_ID || !process.env.A_MV_ID || !process.env.A_H_ID || !process.env.A_G_ID || !process.env.OPENAI_API) {
@@ -198,7 +203,8 @@ router.post("/create", async (req, res, next) => {
     }
 });
 
-router.post("/sendMessage", authenticateToken, async (req, res, next) => {
+router.post("/sendMessage", authenticateToken, rateLimit, async (req, res, next) => {
+
     const userName = req.body.userName;
     const messageContent = req.body.messageContent;
     const chatType = req.body.type;
@@ -242,7 +248,6 @@ router.get("/loadMessages", authenticateToken, async (req, res, next) => {
 });
 
 
-
-
+router.use(rateLimit);
 router.use(errorHandler);
 export default router;
