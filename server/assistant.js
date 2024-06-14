@@ -3,9 +3,13 @@ import dotenv from 'dotenv';
 import {OpenAI} from 'OpenAI';
 import AIMap from "./models/AIMap.js";
 import User from "./models/User.js";
+import rateLimit from "./rate.js";
+import rate from "./rate.js";
 
 dotenv.config();
 const router = express.Router();
+
+//rateLimit("user:1").then(console.log);
 
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -193,7 +197,7 @@ router.post("/create", async (req, res, next) => {
 });
 
 
-router.post("/sendMessage", async (req, res, next) => {
+router.post("/sendMessage", rateLimit, async (req, res, next) => {
     const userName = req.body.userName;
     const messageContent = req.body.messageContent;
     const chatType = req.body.type;
@@ -237,7 +241,6 @@ router.get("/loadMessages", async (req, res, next) => {
 });
 
 
-
-
+router.use(rateLimit);
 router.use(errorHandler);
 export default router;
