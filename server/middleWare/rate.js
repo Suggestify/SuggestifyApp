@@ -16,7 +16,7 @@ const rateLimit = async (req, res, next) => {
     console.log(req.body);
     const userId = req.body.userName || 'default_user';  // Adjust based on where you get the user ID from
     const key = `user:${userId}:message_count`;
-    const limit = 10;
+    const limit = 1;
 
     try {
         const currentCount = await client.get(key); // Get the current count first

@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import asyncStorage from '@react-native-async-storage/async-storage';
-
 import api from '../../helperFunctions/Api';
+import { useToast, Box} from 'native-base';
 
 function ChatInput(props) {
     const [userName, setUserName] = useState(null);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);  // Added loading state
     const type = props.chatType;
+    const toast = useToast();
 
     useEffect(() => {
         async function getUserName() {
@@ -34,7 +35,26 @@ function ChatInput(props) {
                 setMessage('');
             }
         } catch (error) {
-            console.error('Failed to send message:', error);
+            if(error.response.data == "Rate limit exceeded"){
+                toast.show({
+                    duration: 5000,
+                    render: () => {
+                        return <Box style={styles.pb} bg="red.50" px="5" py="3" rounded="md" mb={5}>
+                           Daily Limit Reached, Upgrade to Premium for Extended Access
+                        </Box>;
+                    }
+                });
+            }
+            else {
+                toast.show({
+                    duration: 1200,
+                    render: () => {
+                        return <Box style={styles.pb} bg="red.50" px="5" py="3" rounded="md" mb={5}>
+                            Error, PLease Try Again Later
+                        </Box>;
+                    }
+                });
+            }
         }
         setLoading(false);  // Reset loading state whether success or fail
     }
@@ -96,6 +116,9 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: 25,
         color: 'blue',
+    },
+    pb: {
+        marginBottom: 50,
     },
 });
 
