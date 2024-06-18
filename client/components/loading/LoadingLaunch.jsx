@@ -7,6 +7,7 @@ import api from "../../helperFunctions/Api";
 
 function Loading({ navigation }) {
     const { contact, updateContact } = useContext(ContactContext);
+
     useEffect(() => {
         const checkToken = async () => {
             const accessToken = await AsyncStorage.getItem('accessToken');
