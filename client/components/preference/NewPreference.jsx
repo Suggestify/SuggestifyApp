@@ -1,9 +1,8 @@
 import React, { useState, useEffect,useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import {ContactContext} from "../../ContactContext";
 
+import {ContactContext} from "../../helperFunctions/ContactContext";
 import api from "../../helperFunctions/Api";
-
 
 // Array of arrays containing different options
 const allOptions = [
@@ -76,10 +75,10 @@ function NewPreference({route, navigation}) {
             />
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleNextOrSkip}>
-                    <Text style={styles.buttonText}>Skip</Text>
+                    <Text style={styles.buttonText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.button, styles.nextButton]} onPress={handleNextOrSkip}>
-                    <Text style={styles.buttonText}>Next ({selectedOptions.length})</Text>
+                    <Text style={styles.buttonText}>Confirm Change ({selectedOptions.length})</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -90,6 +89,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         marginTop: 100,
+        marginBottom: 10,
+        marginHorizontal: 10
     },
     title:{
         textAlign: "center",

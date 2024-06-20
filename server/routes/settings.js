@@ -1,16 +1,18 @@
 import express from 'express'
+
 import User from "../models/User.js";
 import UserSettings from "../models/UserSettings.js";
-import dotenv from 'dotenv';
 
+import dotenv from 'dotenv';
 dotenv.config();
+
 const router = express.Router()
+
 import cron from 'node-cron';
 import pkg from '../../client/helperFunctions/Notification.js';
 const { sendPushNotifications } = pkg;
 
 import {authenticateToken} from "../middleWare/secureEndPoint.js";
-
 
 cron.schedule('0 21 * * 0', () => {
     console.log('This message logs every Sunday at 9 PM.');

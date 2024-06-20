@@ -1,11 +1,13 @@
 import React, {useContext, useState} from 'react';
-import * as Notifications from 'expo-notifications';
-import {StyleSheet, Text, TouchableOpacity, View, Switch, Alert,} from "react-native";
-import {Heading, Button, useToast, Box, Center, NativeBaseProvider} from 'native-base';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {ContactContext} from "../../ContactContext";
 
+import {StyleSheet, Text, TouchableOpacity, View, Switch} from "react-native";
+import {Heading, useToast, Box} from 'native-base';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import {ContactContext} from "../../helperFunctions/ContactContext";
 import api from "../../helperFunctions/Api";
+
+import * as Notifications from 'expo-notifications';
 function Settings({navigation}) {
     const { contact, updateContact } = useContext(ContactContext);
     const userName = contact.userName;

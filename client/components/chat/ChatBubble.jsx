@@ -1,6 +1,8 @@
 import React from 'react';
+
 import { View, Text, StyleSheet } from "react-native";
 import { Card } from "react-native-elements";
+
 import ChatIcon from "./ChatIcon";
 
 function ChatBubble(props) {
