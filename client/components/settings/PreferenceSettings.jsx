@@ -1,12 +1,13 @@
 import React, {useContext} from 'react';
 
-import {View, Text, StyleSheet, Alert, TouchableOpacity} from 'react-native';
-import {Heading} from "native-base";
+import {View, StyleSheet, Alert, TouchableOpacity} from 'react-native';
+import {Heading, useToast, Box, Text} from 'native-base';
 
 import {ContactContext} from "../../helperFunctions/ContactContext";
 function PreferenceSettings({ navigation }) {
     const {contact, updateContact} = useContext(ContactContext);
-    const userName = contact.userName;
+    const theme = contact.theme;
+    console.log(theme)
 
     function backToSettings() {
         navigation.navigate('Settings');
@@ -45,49 +46,52 @@ function PreferenceSettings({ navigation }) {
 
 
     return (
-        <View style={styles.container}>
-            <View style={styles.containerHeader}>
-                <TouchableOpacity onPress={backToSettings} style={styles.backBtn}>
-                    <Text style={styles.backBtnText}>&lt;</Text>
+        <Box style={styles.container} bg={theme ? `black` : `light.200`}>
+
+            <Box style={styles.containerHeader} bg={theme ? `trueGray.900` : `white`}>
+                <TouchableOpacity onPress={backToSettings} >
+                    <Heading fontSize={"md"} style={styles.backBtnText}>&lt;</Heading>
                 </TouchableOpacity>
-                <Heading style={styles.header} size="md" fontSize={50} bold color={"white"}>
+                <Heading  size="md" fontSize={50} bold color={theme ? `trueGray.300` : `trueGray.600`}>
                     Settings
                 </Heading>
-            </View>
-            <View style = {styles.headingBackground}>
-                <Text style = {styles.headingStyle}>Click on an option to reset chat history</Text>
-            </View>
-            <View style={styles.SettingsSection}>
+            </Box>
+            <Box style = {styles.headingBackground} bg={theme ? `trueGray.900` : `white`}>
+                <Text style = {styles.headingStyle} color={theme ? `trueGray.300` : `darkText`}>Click on an option to reset chat history</Text>
+            </Box>
+            <Box style={styles.SettingsSection} bg={theme ? `trueGray.900` : `white`}>
                 <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={() =>handleReset("Music")}>
-                    <Text style={styles.settingsOptionText}>Music</Text>
+                    <Text  color={theme ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Music</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={() =>handleReset("Book")}>
-                    <Text style={styles.settingsOptionText}>Book</Text>
+                    <Text  color={theme ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Book</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={() =>handleReset("Podcast")}>
-                    <Text style={styles.settingsOptionText}>Podcast</Text>
+                    <Text  color={theme ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Podcast</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={() =>handleReset("Show")}>
-                    <Text style={styles.settingsOptionText}>Show</Text>
+                    <Text  color={theme ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Show</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={() =>handleReset("Movie")}>
-                    <Text style={styles.settingsOptionText}>Movie</Text>
+                    <Text  color={theme ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Movie</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={() =>handleReset("Hobby")}>
-                    <Text style={styles.settingsOptionText}>Hobby</Text>
+                    <Text  color={theme ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Hobby</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.settingsOption} onPress={() =>handleReset("Game")}>
-                    <Text style={styles.settingsOptionText}>Game</Text>
+                    <Text  color={theme ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Game</Text>
                 </TouchableOpacity>
-            </View>
-            <View style={styles.SettingsSection}>
-                <TouchableOpacity style={styles.settingsOptionLogOut}  onPress={() =>handleReset("All")}>
-                    <Text style={styles.settingsOptionLogout}>Reset All Chats</Text>
+            </Box>
+            <View style={styles.logOutContainer} >
+            <Box bg={theme ? `trueGray.900` : `white`} style={styles.SettingsSection}>
+                <TouchableOpacity  style={styles.settingsOptionLogOut} onPress={() =>handleReset("All")}>
+                    <Heading color={theme ? `trueGray.300` : `darkText`} style={styles.settingsOptionLogout}>Reset All Chats</Heading>
                 </TouchableOpacity>
+            </Box>
             </View>
 
 
-        </View>
+        </Box>
     );
 }
 
@@ -96,7 +100,6 @@ export default PreferenceSettings;
 const styles = StyleSheet.create({
         container: {
             flex: 1,
-            backgroundColor: '#000000',
         },
         containerHeader: {
             flexDirection: 'row',  // Ensures horizontal layout
@@ -105,11 +108,10 @@ const styles = StyleSheet.create({
             paddingTop: 60,
             paddingBottom: 20,
             marginBottom: 20,
-            backgroundColor: '#1f1f1f',
+
         },
         headingBackground: {
             alignSelf: 'center',
-            backgroundColor: '#1f1f1f',
             width: "95%",
             padding: 10,
             alignItems: 'center',
@@ -117,7 +119,6 @@ const styles = StyleSheet.create({
             borderRadius: "20%",
         },
         headingStyle: {
-            color: "white",
             fontSize: 15,
         },
         backBtn: {
@@ -135,7 +136,6 @@ const styles = StyleSheet.create({
         SettingsSection: {
             alignSelf: 'center',
             marginTop: 20,
-            backgroundColor: '#1f1f1f',
             borderRadius: "20%",
             width: "95%",
         },
@@ -143,8 +143,7 @@ const styles = StyleSheet.create({
             marginTop: 20,
             paddingBottom: 20,
             paddingLeft: 20,
-            borderStyle: "solid",
-            borderColor:'#797979',
+
         },
 
         settingsBorder:{
@@ -152,24 +151,20 @@ const styles = StyleSheet.create({
             borderColor:'#797979',
         },
 
-        settingsOptionLogOut: {
-            marginTop: 20,
-            paddingBottom: 20,
-            borderStyle: "solid",
-            borderColor:'#797979',
-        },
+    settingsOptionLogOut: {
+        marginTop: 20,
+        paddingBottom: 20,
+    },
 
-        settingsOptionText: {
-            color: '#afafaf',
-            fontSize: 20,
-        },
-        settingsOptionLogout: {
-            color: '#afafaf',
-            fontSize: 25,
-            fontWeight: 'bold',
-            textDecorationLine: 'underline',
-            textAlign: "center",
-        },
+    settingsOptionText: {
+        fontSize: 20,
+    },
+    settingsOptionLogout: {
+        fontSize: 25,
+        fontWeight: 'bold',
+        textDecorationLine: 'underline',
+        textAlign: "center",
+    },
         settingsOptionToggle: {
             marginTop: 20,
             paddingBottom: 20,
@@ -181,11 +176,10 @@ const styles = StyleSheet.create({
             justifyContent: 'space-between', // Aligns items on opposite ends
             alignItems: 'center' // Aligns items vertically
         },
-        logOutContainer: {
-            flex: 1,
-            justifyContent: 'flex-end',
-            marginBottom: 36,
-            width: "100%",
+            logOutContainer: {
+                flex: 1,
+                justifyContent: 'flex-end',
+                marginBottom: 36,
         }
 
     }

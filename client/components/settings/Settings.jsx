@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 
-import {StyleSheet, Text, TouchableOpacity, View, Switch} from "react-native";
-import {Heading, useToast, Box} from 'native-base';
+import {StyleSheet, TouchableOpacity, View, Switch} from "react-native";
+import {Heading, useToast, Box, Text} from 'native-base';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {ContactContext} from "../../helperFunctions/ContactContext";
@@ -25,10 +25,10 @@ function Settings({navigation}) {
     }
 
     async function toggleNotifications() {
-        let response = await toggleSwitch("notificationOn", !notificationsEnabled);
-        if(response.status === 200){
-            await updateContact({notificationOn: !notificationsEnabled});
-            await setNotificationsEnabled(!notificationsEnabled);
+        await setNotificationsEnabled(!notificationsEnabled);
+        let response = await toggleSwitch("notificationOn", !contact.notificationOn);
+        if(response.status === 200) {
+            await updateContact({notificationOn: !contact.notificationOn});
             if (response.data.firstTime) {
                 const {status} = await Notifications.requestPermissionsAsync({
                     ios: {
@@ -51,14 +51,26 @@ function Settings({navigation}) {
                 })
 
             }
-            toast.show({
+            if (notificationsEnabled) {
+                toast.show({
                 duration: 1200,
                 render: () => {
-                    return <Box style={styles.pb} bg="green.50" px="5" py="3" rounded="md" mb={5}>
-                        Notifications Enabled
+                    return <Box style={styles.pb} bg="error.100" px="5" py="3" rounded="md" mb={5}>
+                        Notifications Disabled
                     </Box>;
                 }
-            });
+                });
+            }
+            else if (!notificationsEnabled){
+                toast.show({
+                    duration: 1200,
+                    render: () => {
+                        return <Box style={styles.pb} bg="success.100" px="5" py="3" rounded="md" mb={5}>
+                            Notifications Enabled
+                        </Box>;
+                    }
+                });
+            }
         }
         else{
             updateContact({notificationOn: !notificationsEnabled});
@@ -66,7 +78,7 @@ function Settings({navigation}) {
             toast.show({
                 duration: 1200,
                 render: () => {
-                    return <Box style={styles.pb} bg="red.50" px="5" py="3" rounded="md" mb={5}>
+                    return <Box style={styles.pb} bg="error.400" px="5" py="3" rounded="md" mb={5}>
                         Error, PLease Try Again Later
                     </Box>;
                 }
@@ -76,14 +88,15 @@ function Settings({navigation}) {
     }
 
     async function toggleTheme (){
-        let response = await toggleSwitch("theme",  !themeEnabled);
+        console.log(themeEnabled)
+        setThemeEnabled(!themeEnabled);
+        let response = await toggleSwitch("theme",  !contact.theme);
         if (response.status === 200) {
-            updateContact({theme: !themeEnabled});
-            setThemeEnabled(!themeEnabled);
+            updateContact({theme: !contact.theme});
             toast.show({
                 duration: 1200,
                 render: () => {
-                    return <Box style={styles.pb} bg="green.50" px="5" py="3" rounded="md" mb={5}>
+                    return <Box style={styles.pb} bg="success.100" px="5" py="3" rounded="md" mb={5}>
                         Theme Toggled
                     </Box>;
                 }
@@ -95,7 +108,7 @@ function Settings({navigation}) {
             toast.show({
                 duration: 1200,
                 render: () => {
-                    return <Box style={styles.pb} bg="red.50" px="5" py="3" rounded="md" mb={5}>
+                    return <Box style={styles.pb} bg="error.400" px="5" py="3" rounded="md" mb={5}>
                         Error, Please Try Again Later
                     </Box>;
                 }
@@ -129,34 +142,34 @@ function Settings({navigation}) {
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.containerHeader}>
+        <Box style={styles.container} bg={themeEnabled ? `black` : `light.200`}>
+            <Box style={styles.containerHeader} bg={themeEnabled ? `trueGray.900` : `white`}>
                 <TouchableOpacity onPress={backToHome} style={styles.backBtn}>
-                    <Text style={styles.backBtnText}>&lt;</Text>
+                    <Heading fontSize={"md"} style={styles.backBtnText}>&lt;</Heading>
                 </TouchableOpacity>
-                <Heading style={styles.header} size="md" fontSize={50} bold color={"white"}>
+                <Heading  size="md" fontSize={50} bold color={themeEnabled ? `trueGray.300` : `trueGray.600`}>
                     Settings
                 </Heading>
-            </View>
-            <View style={styles.SettingsSection}>
+            </Box>
+            <Box style={styles.SettingsSection} bg={themeEnabled ? `trueGray.900` : `white`}>
                 <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={preferenceReset}>
-                    <Text style={styles.settingsOptionText}>Reset Preference</Text>
+                    <Text color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Reset Preference</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.settingsOption} >
-                    <Text style={styles.settingsOptionText}>Buy Premium</Text>
+                    <Text color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Buy Premium</Text>
                 </TouchableOpacity>
-            </View>
+            </Box>
 
-            <View style={styles.SettingsSection}>
+            <Box style={styles.SettingsSection} bg={themeEnabled ? `trueGray.900` : `white`}>
                 <TouchableOpacity  style={[styles.settingsOption, styles.settingsBorder]}>
-                    <Text style={styles.settingsOptionText}>Rating & Feedback</Text>
+                    <Text color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Rating & Feedback</Text>
                 </TouchableOpacity>
                 <TouchableOpacity  style={[styles.settingsOption, styles.settingsBorder]}>
-                    <Text style={styles.settingsOptionText}>Contact</Text>
+                    <Text color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Contact</Text>
                 </TouchableOpacity>
                 <View style={[styles.settingsOptionToggle, styles.settingsBorder]}>
-                    <Text style={styles.settingsOptionText}>Allow Notifications</Text>
+                    <Text color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Allow Notifications</Text>
                     <Switch
                         trackColor={{ false: '#767577', true: '#81b0ff' }}
                         thumbColor={notificationsEnabled ? '#f5dd4b' : '#f4f3f4'}
@@ -166,7 +179,7 @@ function Settings({navigation}) {
                     />
                 </View>
                 <View style={styles.settingsOptionToggle}>
-                    <Text style={styles.settingsOptionText}>Toggle Theme</Text>
+                    <Text color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Toggle Theme</Text>
                     <Switch
                         trackColor={{ false: '#767577', true: '#81b0ff' }}
                         thumbColor={themeEnabled ? '#f5dd4b' : '#f4f3f4'}
@@ -175,23 +188,17 @@ function Settings({navigation}) {
                         value={themeEnabled}
                     />
                 </View>
-            </View>
+            </Box>
 
-            <View style={styles.SettingsSection}>
-                <TouchableOpacity style={styles.settingsOption}>
-                    <Text style={styles.settingsOptionText}>Forgot your password</Text>
-                </TouchableOpacity>
-            </View>
-
-            <View style={styles.logOutContainer}>
-                <View style={styles.SettingsSection}>
+            <View style={styles.logOutContainer} >
+                <Box style={styles.SettingsSection} bg={themeEnabled ? `trueGray.900` : `white`}>
                     <TouchableOpacity onPress={logout} style={styles.settingsOptionLogOut}>
-                        <Text style={styles.settingsOptionLogout}>Logout</Text>
+                        <Heading color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionLogout}>Logout</Heading>
                     </TouchableOpacity>
-                </View>
+                </Box>
             </View>
 
-        </View>
+        </Box>
     );
 }
 
@@ -200,7 +207,6 @@ export default Settings;
 const styles = StyleSheet.create({
         container: {
             flex: 1,
-            backgroundColor: '#000000',
         },
         containerHeader: {
             flexDirection: 'row',
@@ -209,7 +215,6 @@ const styles = StyleSheet.create({
             paddingTop: 60,
             paddingBottom: 20,
             marginBottom: 20,
-            backgroundColor: '#1f1f1f',
         },
         backBtn: {
             display: "flex",
@@ -218,9 +223,6 @@ const styles = StyleSheet.create({
         },
 
         backBtnText: {
-            color: "white",
-            fontSize: 20,
-            fontWeight: "bold",
             paddingLeft: 10,
             paddingRight: 10,
         },
@@ -229,14 +231,11 @@ const styles = StyleSheet.create({
             borderRadius: "20%",
             marginTop: 20,
             width: "95%",
-            backgroundColor: '#1f1f1f',
         },
         settingsOption: {
             marginTop: 20,
             paddingBottom: 20,
             paddingLeft: 20,
-            borderStyle: "solid",
-            borderColor:'#797979',
         },
 
         settingsBorder:{
@@ -247,16 +246,12 @@ const styles = StyleSheet.create({
         settingsOptionLogOut: {
             marginTop: 20,
             paddingBottom: 20,
-            borderStyle: "solid",
-            borderColor:'#797979',
         },
 
         settingsOptionText: {
-            color: '#afafaf',
             fontSize: 20,
         },
         settingsOptionLogout: {
-            color: '#afafaf',
             fontSize: 25,
             fontWeight: 'bold',
             textDecorationLine: 'underline',
