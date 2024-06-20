@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+
 import { SafeAreaView, StyleSheet, View, FlatList, RefreshControl, TouchableOpacity, Text } from 'react-native';
-import ChatBubble from './ChatBubble';
-import ChatInput from './ChatInput';
 import {Ionicons} from "@expo/vector-icons";
 
 import api from "../../helperFunctions/Api";
+
+import ChatBubble from './ChatBubble';
+import ChatInput from './ChatInput';
 
 function ChatScreen({ route, navigation }) {
     const [currHistory, setCurrHistory] = useState([]);

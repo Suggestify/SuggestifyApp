@@ -16,7 +16,8 @@ import ChatPreview from "./components/home/ChatPreview";
 import LoadingHome from "./components/loading/LoadingHome";
 import LoadingLaunch from "./components/loading/LoadingLaunch";
 
-import {ContactProvider} from './ContactContext';
+import {ContactProvider} from './helperFunctions/ContactContext';
+import LoadingPreference from "./components/loading/LoadingPreference";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +32,7 @@ export default function App() {
                         <Stack.Screen name="Home" component={Home}/>
                         <Stack.Screen name="SignUp" component={SignUp}/>
                         <Stack.Screen name="Preference" component={Preference}/>
+                        <Stack.Screen name="LoadingPreference" component={LoadingPreference}/>
                         <Stack.Screen name="NewPreference" component={NewPreference}/>
                         <Stack.Screen name="ChatPreview" component={ChatPreview}/>
                         <Stack.Screen name="LoadingHome" component={LoadingHome}/>

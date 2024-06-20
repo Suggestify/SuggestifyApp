@@ -1,23 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, {useContext, useState} from 'react';
+
 import { Text, View, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
-import asyncStorage from '@react-native-async-storage/async-storage';
+
+import { ContactContext } from "../../helperFunctions/ContactContext";
 import api from '../../helperFunctions/Api';
+
 import { useToast, Box} from 'native-base';
 
 function ChatInput(props) {
-    const [userName, setUserName] = useState(null);
+    const {contact, updateContact} = useContext(ContactContext);
+
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);  // Added loading state
     const type = props.chatType;
     const toast = useToast();
-
-    useEffect(() => {
-        async function getUserName() {
-            const res = await asyncStorage.getItem('userName');
-            setUserName(res);
-        }
-        getUserName();
-    }, []);
+    const userName = contact.userName;
 
     async function handleSend() {
         if (loading) return;  // Prevent multiple sends if already loading

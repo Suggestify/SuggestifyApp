@@ -1,10 +1,9 @@
 import React, { useState, useEffect,useContext } from 'react';
+
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
-import {ContactContext} from "../../ContactContext";
 
-import api from "../../helperFunctions/Api";
-
+import {ContactContext} from "../../helperFunctions/ContactContext";
 
 // Array of arrays containing different options
 const allOptions = [
@@ -19,6 +18,7 @@ const allOptions = [
 
 function Preference({navigation}) {
     const { contact, updateContact } = useContext(ContactContext);
+    const [allChoices, setAllChoices] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [currentArrayIndex, setCurrentArrayIndex] = useState(0); // Index to track the current array of options
     const [currentOptions, setCurrentOptions] = useState(allOptions[currentArrayIndex].options);
@@ -48,17 +48,11 @@ function Preference({navigation}) {
     };
 
     async function handleNextOrSkip() {
-        const response = await api.post(`/ai/create`, {
-            userName: userName,
-            medium: allOptions[currentArrayIndex].title,
-            options: selectedOptions
-        })
-        if(response.status === 200) {
-            if (currentArrayIndex < allOptions.length - 1) {
-                setCurrentArrayIndex(currentArrayIndex + 1);
-            } else {
-                navigation.navigate("Home")
-            }
+        setAllChoices([...allChoices, selectedOptions]);
+        if (currentArrayIndex < allOptions.length - 1) {
+            setCurrentArrayIndex(currentArrayIndex + 1);
+        } else {
+            navigation.navigate("LoadingPreference", {allChoices: allChoices})
         }
     };
 
@@ -99,6 +93,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         marginTop: 100,
+        marginBottom: 10,
+        marginHorizontal: 10
     },
     title:{
         textAlign: "center",

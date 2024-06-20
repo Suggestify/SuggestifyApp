@@ -1,9 +1,11 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useContext} from 'react';
+
 import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { LinearGradient } from "expo-linear-gradient";
-import {ContactContext} from "../../ContactContext";
 
+import { LinearGradient } from "expo-linear-gradient";
+
+import {ContactContext} from "../../helperFunctions/ContactContext";
 import api from "../../helperFunctions/Api";
 
 function ChatPreview({ medium, color, image }) {

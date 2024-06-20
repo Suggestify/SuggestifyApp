@@ -1,21 +1,23 @@
 import React, {useState, useContext} from "react";
-import {ImageBackground, StyleSheet, Text, View, TouchableOpacity} from "react-native";
 
+import {ImageBackground, StyleSheet, Text, View, TouchableOpacity} from "react-native";
 import {TextInput} from 'react-native-paper';
-import {Heading, Button} from "native-base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {Heading, Button} from "native-base";
+
 import axios from 'axios';
-import {ContactContext} from "../../ContactContext";
+import Global from "../../helperFunctions/Global";
+import {ContactContext} from "../../helperFunctions/ContactContext";
 
 const wallpaper = require('../../assets/backgrounds/bk1.png');
 
-import Global from "../../helperFunctions/Global";
-
 function SignIn({navigation }) {
     const { contact, updateContact } = useContext(ContactContext);
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+
     const [emailError, setEmailError] = useState("");
 
     function toggleShowPassword() {
@@ -128,7 +130,7 @@ function SignIn({navigation }) {
 export default SignIn;
 
 //
-const styles = StyleSheet.create({
+const styles= StyleSheet.create({
     container: {
         width: "80%",
     },

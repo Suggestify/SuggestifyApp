@@ -1,9 +1,12 @@
 import React, { useEffect, useContext } from 'react';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Text, View } from "react-native";
-import { ContactContext } from "../../ContactContext";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {Text, View } from "react-native";
+import {Heading, HStack, Spinner} from "native-base";
+
+import { ContactContext } from "../../helperFunctions/ContactContext";
 import api from "../../helperFunctions/Api";
+
 
 function Loading({ navigation }) {
     const { contact, updateContact } = useContext(ContactContext);
@@ -32,9 +35,16 @@ function Loading({ navigation }) {
 
         checkToken();
     }, [navigation]);
-
+    const SpinnerComp = () => {
+        return <HStack space={2} justifyContent="center">
+            <Spinner accessibilityLabel="Loading posts" />
+            <Heading color="primary.500" fontSize="xl">
+            </Heading>
+        </HStack>;
+    };
     return (
         <View style={styles.container}>
+            <SpinnerComp />
             <Text style={styles.text}>Loading...</Text>
         </View>
     );
