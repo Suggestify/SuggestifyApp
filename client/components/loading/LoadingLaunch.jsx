@@ -4,6 +4,8 @@ import { Text, View } from "react-native";
 import { ContactContext } from "../../ContactContext";
 
 import api from "../../helperFunctions/Api";
+import asyncStorage from "@react-native-async-storage/async-storage";
+
 
 function Loading({ navigation }) {
     const { contact, updateContact } = useContext(ContactContext);
