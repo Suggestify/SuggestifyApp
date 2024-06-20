@@ -9,6 +9,7 @@ import asyncStorage from "@react-native-async-storage/async-storage";
 
 function Loading({ navigation }) {
     const { contact, updateContact } = useContext(ContactContext);
+
     useEffect(() => {
         const checkToken = async () => {
             const accessToken = await AsyncStorage.getItem('accessToken');

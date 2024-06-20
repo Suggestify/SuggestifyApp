@@ -1,18 +1,17 @@
 import React, {useContext, useState} from 'react';
 import * as Notifications from 'expo-notifications';
 import {StyleSheet, Text, TouchableOpacity, View, Switch, Alert,} from "react-native";
-import {Heading} from 'native-base';
+import {Heading, Button, useToast, Box, Center, NativeBaseProvider} from 'native-base';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Toast from "react-native-toast-message";
 import {ContactContext} from "../../ContactContext";
 
 import api from "../../helperFunctions/Api";
 function Settings({navigation}) {
     const { contact, updateContact } = useContext(ContactContext);
     const userName = contact.userName;
-    console.log(contact)
     const [notificationsEnabled, setNotificationsEnabled] = useState(contact.notificationOn);
     const [themeEnabled, setThemeEnabled] = useState(contact.theme);
+    const toast = useToast();
 
     async function toggleSwitch(switchType, value ){
         const response = await api.post(`/settings/toggleSwitch`, {
@@ -24,10 +23,10 @@ function Settings({navigation}) {
     }
 
     async function toggleNotifications() {
-        contact.notificationsOn = !notificationsEnabled;
-        setNotificationsEnabled(contact.notificationsOn);
-        let response = await toggleSwitch("notificationOn", contact.notificationsOn);
+        let response = await toggleSwitch("notificationOn", !notificationsEnabled);
         if(response.status === 200){
+            await updateContact({notificationOn: !notificationsEnabled});
+            await setNotificationsEnabled(!notificationsEnabled);
             if (response.data.firstTime) {
                 const {status} = await Notifications.requestPermissionsAsync({
                     ios: {
@@ -50,40 +49,54 @@ function Settings({navigation}) {
                 })
 
             }
-            Toast.show({
-                type: 'success', // There are 'success', 'error', 'info' types available by default
-                text1: 'Settings Updated',
-                text2: 'Your changes have been saved successfully.'
+            toast.show({
+                duration: 1200,
+                render: () => {
+                    return <Box style={styles.pb} bg="green.50" px="5" py="3" rounded="md" mb={5}>
+                        Notifications Enabled
+                    </Box>;
+                }
             });
         }
         else{
-            contact.notificationsOn = !notificationsEnabled;
+            updateContact({notificationOn: !notificationsEnabled});
             setNotificationsEnabled(contact.notificationsOn);
-            Toast.show({
-                type: 'error', // There are 'success', 'error', 'info' types available by default
-                text1: 'Settings Not Updated',
-                text2: 'Your changes have not been saved successfully.'
+            toast.show({
+                duration: 1200,
+                render: () => {
+                    return <Box style={styles.pb} bg="red.50" px="5" py="3" rounded="md" mb={5}>
+                        Error, PLease Try Again Later
+                    </Box>;
+                }
             });
 
         }
     }
 
     async function toggleTheme (){
-        contact.theme = !themeEnabled;
-        setThemeEnabled(contact.theme);
-        let response = await toggleSwitch("theme",  contact.theme);
+        let response = await toggleSwitch("theme",  !themeEnabled);
         if (response.status === 200) {
-            Toast.show({
-                type: 'success', // There are 'success', 'error', 'info' types available by default
-                text2: 'Your changes have been saved successfully.'
+            updateContact({theme: !themeEnabled});
+            setThemeEnabled(!themeEnabled);
+            toast.show({
+                duration: 1200,
+                render: () => {
+                    return <Box style={styles.pb} bg="green.50" px="5" py="3" rounded="md" mb={5}>
+                        Theme Toggled
+                    </Box>;
+                }
             });
         }
         else{
-            contact.theme = !themeEnabled;
+            updateContact({theme: !themeEnabled});
             setThemeEnabled(contact.theme);
-            Toast.show({
-                type: 'error', // There are 'success', 'error', 'info' types available by default
-                text2: 'Your changes have not been saved successfully.'
+            toast.show({
+                duration: 1200,
+                render: () => {
+                    return <Box style={styles.pb} bg="red.50" px="5" py="3" rounded="md" mb={5}>
+                        Error, Please Try Again Later
+                    </Box>;
+                }
             });
         }
     }
@@ -261,7 +274,10 @@ const styles = StyleSheet.create({
             flex: 1,
             justifyContent: 'flex-end',
             marginBottom: 36,
-        }
+        },
+        pb: {
+            marginBottom: 50,
+        },
 
     }
 )
