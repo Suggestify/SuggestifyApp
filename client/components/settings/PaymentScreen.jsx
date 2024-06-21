@@ -3,6 +3,7 @@ import { View, Button } from 'react-native';
 import { CardField, useStripe, StripeProvider } from '@stripe/stripe-react-native';
 import axios from 'axios';
 import Global from "../../helperFunctions/Global";
+import { STRIPE_KEY } from '@env';
 
 function PaymentScreen() {
     const { confirmPayment } = useStripe();
@@ -24,10 +25,10 @@ function PaymentScreen() {
         const { error } = await confirmPayment(paymentIntent, {
             type: 'Card',  // Explicitly specify the payment method type
             paymentMethodType: 'Card',  // Explicitly specify the payment method type
+            // might not be needed
             billingDetails: {
-                name: 'Jane Doe', // Example name, adjust according to your form input if necessary
-                email: 'janedoe@example.com', // Similarly, include this if you have it
-                // Add other billing details if required by your Stripe setup
+                name: 'Jane Doe',
+                email: 'janedoe@example.com',
             },
         });
 
@@ -42,9 +43,9 @@ function PaymentScreen() {
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <CardField
-                postalCodeEnabled={true}  // Enable if you need to collect postal codes
+                postalCodeEnabled={true}
                 placeholder={{
-                    number: '4242 4242 4242 4242',  // Placeholder card number for guidance
+                    number: '4242 4242 4242 4242',
                 }}
                 cardStyle={{
                     backgroundColor: '#FFFFFF',
@@ -65,13 +66,9 @@ function PaymentScreen() {
     );
 }
 
-// Wrap your PaymentScreen component with StripeProvider at a higher level in your app,
-// ideally in the component where you handle routing or main component setup if this
-// component is the main part of your app.
-
 export default function PaymentScreenWrapper() {
     return (
-        <StripeProvider publishableKey="pk_test_51PTZfjRvKMJ5cw8kk4JqemkCvY0b9ftCnkT0EFTMHf0SghH5drljCUTJKr8KwF0hZdtrajWWi43OIE8EhfjUSSf800O6H2YEMp">
+        <StripeProvider publishableKey={STRIPE_KEY}>
             <PaymentScreen />
         </StripeProvider>
     );
