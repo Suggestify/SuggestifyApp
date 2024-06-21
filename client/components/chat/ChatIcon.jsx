@@ -1,7 +1,8 @@
 import React from 'react';
-import {StyleSheet, Text, View} from "react-native";
-import {Avatar, Badge, Icon} from "react-native-elements";
-function ChatIcon(props) {
+
+import {StyleSheet, View} from "react-native";
+import {Avatar} from "react-native-elements";
+function ChatIcon() {
     return (
         <View>
             <Avatar rounded source={{ uri: "https://picsum.photos/id/237/200/300" }}

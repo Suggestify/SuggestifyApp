@@ -1,10 +1,13 @@
 import React, {useState, useContext} from 'react';
-import {Text, TouchableOpacity, Image, StyleSheet, View, ScrollView, ImageBackground} from "react-native";
-import ChatPreview from "./ChatPreview";
-import { ContactContext } from "../../ContactContext";
-import wallpaper from "../../assets/backgrounds/wallpaper.png";
 
+import {Text, TouchableOpacity, Image, StyleSheet, View, ScrollView, ImageBackground} from "react-native";
+
+import { ContactContext } from "../../helperFunctions/ContactContext";
 import api from "../../helperFunctions/Api";
+
+import ChatPreview from "./ChatPreview";
+
+import wallpaper from "../../assets/backgrounds/wallpaper.png";
 
 function Home({navigation}) {
 

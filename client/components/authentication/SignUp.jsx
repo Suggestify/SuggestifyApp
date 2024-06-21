@@ -1,25 +1,27 @@
-import React, {useContext, useState} from "react";
-import {ImageBackground, StyleSheet, Text, View, TouchableOpacity} from "react-native";
+import React, {useState, useContext} from "react";
 
+import {ImageBackground, StyleSheet, Text, View, TouchableOpacity} from "react-native";
 import {TextInput} from 'react-native-paper';
-import {Heading, Button} from "native-base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {Heading, Button} from "native-base";
+
 import axios from 'axios';
+import Global from "../../helperFunctions/Global";
+import {ContactContext} from "../../helperFunctions/ContactContext";
 
 const wallpaper = require('../../assets/backgrounds/bk2.png');
 
-import Global from "../../helperFunctions/Global";
-import {ContactContext} from "../../ContactContext";
 
 function SignUp({navigation}) {
+    const { contact, updateContact } = useContext(ContactContext);
+
     const [email, setEmail] = useState("");
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+
     const [emailError, setEmailError] = useState("");
     const [userNameError, setUserNameError] = useState("");
-
-    const { contact, updateContact } = useContext(ContactContext);
 
     function toggleShowPassword() {
         setShowPassword(!showPassword);

@@ -1,14 +1,17 @@
 import express from 'express'
+
 import bodyParser from "body-parser";
 import User from "../models/User.js";
 import UserSettings from "../models/UserSettings.js";
 import dotenv from 'dotenv';
 import Stripe from "stripe";
+import UserSettings from "../models/UserSettings.js";
 
 dotenv.config();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET);
 const router = express.Router()
+
 import cron from 'node-cron';
 import pkg from '../../client/helperFunctions/Notification.js';
 const { sendPushNotifications } = pkg;
@@ -16,7 +19,6 @@ const { sendPushNotifications } = pkg;
 import {authenticateToken} from "../middleWare/secureEndPoint.js";
 
 router.use(bodyParser.json());
-
 
 cron.schedule('0 21 * * 0', () => {
     console.log('This message logs every Sunday at 9 PM.');
