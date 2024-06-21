@@ -141,6 +141,10 @@ function Settings({navigation}) {
         navigation.navigate('PreferenceSettings')
     }
 
+    function paymentScreen() {
+        navigation.navigate('PaymentScreen')
+    }
+
     return (
         <Box style={styles.container} bg={themeEnabled ? `black` : `light.200`}>
             <Box style={styles.containerHeader} bg={themeEnabled ? 'trueGray.900' : 'white'}>
@@ -161,7 +165,9 @@ function Settings({navigation}) {
                     <Text color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Reset Preference</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.settingsOption} >
+
+      
+                <TouchableOpacity style={styles.settingsOption} onPress={paymentScreen} >
                     <Text color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Buy Premium</Text>
                 </TouchableOpacity>
             </Box>

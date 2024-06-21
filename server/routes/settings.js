@@ -1,11 +1,15 @@
 import express from 'express'
 
+import bodyParser from "body-parser";
 import User from "../models/User.js";
 import UserSettings from "../models/UserSettings.js";
-
 import dotenv from 'dotenv';
+import Stripe from "stripe";
+import UserSettings from "../models/UserSettings.js";
+
 dotenv.config();
 
+const stripe = new Stripe(process.env.STRIPE_SECRET);
 const router = express.Router()
 
 import cron from 'node-cron';
@@ -13,6 +17,8 @@ import pkg from '../../client/helperFunctions/Notification.js';
 const { sendPushNotifications } = pkg;
 
 import {authenticateToken} from "../middleWare/secureEndPoint.js";
+
+router.use(bodyParser.json());
 
 cron.schedule('0 21 * * 0', () => {
     console.log('This message logs every Sunday at 9 PM.');
@@ -137,5 +143,34 @@ router.post("/toggleSwitch", authenticateToken, async (req, res) => {
         res.status(500).send({ message: "Failed to toggle switch due to a server error" });
     }
 });
+
+
+
+router.post("/payment", async (req, res) => {
+    const { amount } = req.body;
+
+    // Input validation
+    if (!amount || typeof amount !== 'number' || amount <= 0) {
+        return res.status(400).send({ error: 'Invalid amount provided.' });
+    }
+
+    console.log("Received payment request for amount:", amount);
+
+    try {
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount,
+            currency: "usd",  // Consider allowing currency to be specified in the request
+        });
+
+        res.send({ clientSecret: paymentIntent.client_secret });
+    } catch (err) {
+        console.error("Error when creating payment intent:", err);
+        res.status(500).send({ error: "An error occurred, please try again later." }); // Generic error message for production
+    }
+});
+
+
+
+
 
 export default router
