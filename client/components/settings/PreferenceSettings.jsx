@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 
-import {View, StyleSheet, Alert, TouchableOpacity} from 'react-native';
+import {View, StyleSheet, Alert, TouchableOpacity, Image} from 'react-native';
 import {Heading, Box, Text} from 'native-base';
 
 import {ContactContext} from "../../helperFunctions/ContactContext";
@@ -47,14 +47,18 @@ function PreferenceSettings({ navigation }) {
 
     return (
         <Box style={styles.container} bg={theme ? `black` : `light.200`}>
-
-            <Box style={styles.containerHeader} bg={theme ? `trueGray.900` : `white`}>
-                <TouchableOpacity onPress={backToSettings} >
-                    <Heading fontSize={"md"} style={styles.backBtnText}>&lt;</Heading>
+            <Box style={styles.containerHeader} bg={theme ? 'trueGray.900' : 'white'}>
+                <TouchableOpacity onPress={backToSettings} style={styles.backBtn}>
+                    <Image
+                        source={theme ? require('../../assets/icons/previousD.png') : require('../../assets/icons/previousL.png')}
+                        style={styles.backBtnImg}
+                    />
                 </TouchableOpacity>
-                <Heading  size="md" fontSize={50} bold color={theme ? `trueGray.300` : `trueGray.600`}>
-                    Settings
-                </Heading>
+                <View style={styles.headingContainer}>
+                    <Heading size="md" fontSize={40} bold color={theme ? 'trueGray.300' : 'trueGray.600'}>
+                        Preferences
+                    </Heading>
+                </View>
             </Box>
             <Box style = {styles.headingBackground} bg={theme ? `trueGray.900` : `white`}>
                 <Text style = {styles.headingStyle} color={theme ? `trueGray.300` : `darkText`}>Click on an option to reset chat history</Text>
@@ -98,18 +102,32 @@ function PreferenceSettings({ navigation }) {
 
 export default PreferenceSettings;
 const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-        },
-        containerHeader: {
-            flexDirection: 'row',  // Ensures horizontal layout
-            justifyContent: 'center', // Centers content horizontally
-            alignItems: 'center', // Centers content vertically
-            paddingTop: 60,
-            paddingBottom: 20,
-            marginBottom: 20,
-
-        },
+    container: {
+        flex: 1,
+    },
+    containerHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingTop: 60,
+        paddingBottom: 20,
+        marginBottom: 20,
+        paddingHorizontal: 20,
+    },
+    headingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    backBtn: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        display: 'flex',
+        borderRadius: 50,
+    },
+    backBtnImg: {
+        height: 32,
+        width: 32,
+    },
         headingBackground: {
             alignSelf: 'center',
             width: "95%",
@@ -121,18 +139,7 @@ const styles = StyleSheet.create({
         headingStyle: {
             fontSize: 15,
         },
-        backBtn: {
-            display: "flex",
-            color: "white",
-            borderRadius: 50,
-        },
-        backBtnText: {
-            color: "white",
-            fontSize: 20,
-            fontWeight: "bold",
-            paddingLeft: 10,
-            paddingRight: 10,
-        },
+
         SettingsSection: {
             alignSelf: 'center',
             marginTop: 20,

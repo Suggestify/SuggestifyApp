@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
 
-import {StyleSheet, TouchableOpacity, View, Switch} from "react-native";
+import {StyleSheet, TouchableOpacity, View, Switch, Image} from "react-native";
 import {Heading, useToast, Box, Text} from 'native-base';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -143,13 +143,18 @@ function Settings({navigation}) {
 
     return (
         <Box style={styles.container} bg={themeEnabled ? `black` : `light.200`}>
-            <Box style={styles.containerHeader} bg={themeEnabled ? `trueGray.900` : `white`}>
+            <Box style={styles.containerHeader} bg={themeEnabled ? 'trueGray.900' : 'white'}>
                 <TouchableOpacity onPress={backToHome} style={styles.backBtn}>
-                    <Heading fontSize={"md"} style={styles.backBtnText}>&lt;</Heading>
+                    <Image
+                        source={themeEnabled ? require('../../assets/icons/previousD.png') : require('../../assets/icons/previousL.png')}
+                        style={styles.backBtnImg}
+                    />
                 </TouchableOpacity>
-                <Heading  size="md" fontSize={50} bold color={themeEnabled ? `trueGray.300` : `trueGray.600`}>
-                    Settings
-                </Heading>
+                <View style={styles.headingContainer}>
+                    <Heading size="md" fontSize={50} bold color={themeEnabled ? 'trueGray.300' : 'trueGray.600'}>
+                        Settings
+                    </Heading>
+                </View>
             </Box>
             <Box style={styles.SettingsSection} bg={themeEnabled ? `trueGray.900` : `white`}>
                 <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={preferenceReset}>
@@ -171,9 +176,8 @@ function Settings({navigation}) {
                 <View style={[styles.settingsOptionToggle, styles.settingsBorder]}>
                     <Text color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Allow Notifications</Text>
                     <Switch
-                        trackColor={{ false: '#767577', true: '#81b0ff' }}
-                        thumbColor={notificationsEnabled ? '#f5dd4b' : '#f4f3f4'}
-                        ios_backgroundColor="#3e3e3e"
+                        trackColor={{  true: '#6ed02b' }}
+                        ios_backgroundColor='#DADADAFF'
                         onValueChange={toggleNotifications}
                         value={notificationsEnabled}
                     />
@@ -181,9 +185,8 @@ function Settings({navigation}) {
                 <View style={styles.settingsOptionToggle}>
                     <Text color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Toggle Theme</Text>
                     <Switch
-                        trackColor={{ false: '#767577', true: '#81b0ff' }}
-                        thumbColor={themeEnabled ? '#f5dd4b' : '#f4f3f4'}
-                        ios_backgroundColor="#3e3e3e"
+                        trackColor={{  true: '#6ed02b' }}
+                        ios_backgroundColor='#DADADAFF'
                         onValueChange={toggleTheme}
                         value={themeEnabled}
                     />
@@ -205,26 +208,31 @@ function Settings({navigation}) {
 export default Settings;
 
 const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-        },
-        containerHeader: {
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingTop: 60,
-            paddingBottom: 20,
-            marginBottom: 20,
-        },
-        backBtn: {
-            display: "flex",
-            color: "white",
-            borderRadius: 50,
-        },
-
-        backBtnText: {
-            paddingLeft: 10,
-            paddingRight: 10,
+    container: {
+        flex: 1,
+    },
+    containerHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingTop: 60,
+        paddingBottom: 20,
+        marginBottom: 20,
+        paddingHorizontal: 20,
+    },
+    headingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    backBtn: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        display: 'flex',
+        borderRadius: 50,
+    },
+    backBtnImg: {
+            height: 32,
+            width: 32,
         },
         SettingsSection: {
             alignSelf: 'center',
