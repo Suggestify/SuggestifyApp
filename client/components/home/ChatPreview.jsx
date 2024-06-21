@@ -11,6 +11,8 @@ import api from "../../helperFunctions/Api";
 function ChatPreview({ medium, color, image }) {
     const { contact, updateContact } = useContext(ContactContext);
     const userName = contact.userName
+    const theme = contact.theme;
+    const shift = theme ? '#131313' : '#e3e3e3';
     const [lastMessage, setLastMessage] = useState('Loading last message...');
 
 
@@ -40,7 +42,7 @@ function ChatPreview({ medium, color, image }) {
 
 
     return (
-        <LinearGradient style={[styles.container, {borderColor: color}]} colors={[color, '#131313']} start={{ x: 0.2, y: 1 }} end={{ x: 1.1, y: 1 }}>
+        <LinearGradient style={[styles.container, {borderColor: color}]} colors={[color, shift]} start={{ x: 0.2, y: 1 }} end={{ x: 1.1, y: 1 }}>
             <Image source={image} style={styles.image} />
             <View style={styles.textContainer}>
                 <Text style={styles.mediumText}>

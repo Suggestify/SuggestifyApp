@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 
 import {View, StyleSheet, Alert, TouchableOpacity} from 'react-native';
-import {Heading, useToast, Box, Text} from 'native-base';
+import {Heading, Box, Text} from 'native-base';
 
 import {ContactContext} from "../../helperFunctions/ContactContext";
 function PreferenceSettings({ navigation }) {

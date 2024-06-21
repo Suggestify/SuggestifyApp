@@ -1,48 +1,64 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 
-import {Text, TouchableOpacity, Image, StyleSheet, View, ScrollView, ImageBackground} from "react-native";
+import { TouchableOpacity, Image, StyleSheet, View, ScrollView, ImageBackground} from "react-native";
+import { Heading } from 'native-base';
 
 import { ContactContext } from "../../helperFunctions/ContactContext";
 import api from "../../helperFunctions/Api";
 
 import ChatPreview from "./ChatPreview";
 
-import wallpaper from "../../assets/backgrounds/wallpaper.png";
+import wallpaperD from "../../assets/backgrounds/wallpaperD.png";
+import wallpaperL from "../../assets/backgrounds/wallpaperL.png";
+
 
 function Home({navigation}) {
-
     const { contact, updateContact } = useContext(ContactContext);
     const userName = contact.userName
     const order = contact.mediumOrder;
+    const [theme, setTheme] = useState(contact.theme);
+    const wallpaper = theme ? wallpaperD : wallpaperL;
+
+    useEffect(() => {
+        setTheme(contact.theme); // Update theme when it changes in context
+    }, [contact.theme]);
+
+    const getColours = (isDark) => {
+        return isDark ? ["#593232", "#204823", "#6b6831", "#273052", "#6b412a", "#4c2756", "#204949"]
+            : ["#ffdada", "#d3ffd5", "#fffdd6", "#c8d2ff", "#ffd5c3", "#eec1ff", "#c9ffff"];
+    };
+
     const initialArray = [
-        { medium: "Music", color: "#593232", image: require('../../assets/icons/Music.png') },
-        { medium: "Books", color: "#204823", image: require('../../assets/icons/Books.png') },
-        { medium: "Podcasts", color: "#6b6831", image: require('../../assets/icons/Podcasts.png') },
-        { medium: "Shows", color: "#273052", image: require('../../assets/icons/Shows.png') },
-        { medium: "Movies", color: "#6b412a", image: require('../../assets/icons/Movies.png') },
-        { medium: "Hobbies", color: "#4c2756", image: require('../../assets/icons/Hobbies.png') },
-        { medium: "Games", color: "#204949", image: require('../../assets/icons/Games.png') }
+        { medium: "Music", image: require('../../assets/icons/Music.png') },
+        { medium: "Books", image: require('../../assets/icons/Books.png') },
+        { medium: "Podcasts", image: require('../../assets/icons/Podcasts.png') },
+        { medium: "Shows", image: require('../../assets/icons/Shows.png') },
+        { medium: "Movies", image: require('../../assets/icons/Movies.png') },
+        { medium: "Hobbies", image: require('../../assets/icons/Hobbies.png') },
+        { medium: "Games", image: require('../../assets/icons/Games.png') }
     ];
 
     const [myArray, setMyArray] = useState(reorderArray(initialArray, order));
 
-
     function reorderArray(arr, order) {
-        const newArr = [];
-        order.forEach(o => {
-            const found = arr.find(item => item.medium === o);
-            if (found) {
-                newArr.push(found);
-            }
+        const colours = getColours(theme); // Get colors based on theme
+        return order.map(medium => {
+            const found = arr.find(item => item.medium === medium);
+            return {...found, color: colours[arr.indexOf(found)]}; // Append color dynamically
         });
-        return newArr;
     }
+
+    useEffect(() => {
+        setMyArray(reorderArray(initialArray, order)); // Recompute when theme or order changes
+    }, [theme, order]);
     function moveToFrontAndShift(arr, index) {
         if (index < 0 || index >= arr.length) {
-            return; // Invalid index
+            return arr; // Return the original array if index is invalid
         }
-        const [item] = arr.splice(index, 1); // Remove the item from the array
-        arr.unshift(item); // Add it to the front of the array
+        const newArr = [...arr];
+        const item = newArr.splice(index, 1)[0]; // Remove the item and get it
+        newArr.unshift(item); // Add it to the front of the array
+        return newArr;
     }
     async function onSubmit() {
         navigation.navigate('Settings');
@@ -50,20 +66,25 @@ function Home({navigation}) {
 
     async function handleClick(index) {
         const medium = myArray[index].medium;
-        moveToFrontAndShift(myArray, index);
-        await api.put(`/settings/updateOrder`, {
-            userName: userName,
-            newOrder: myArray.map(item => item.medium)
-        })
-        setMyArray([...myArray]);
-        navigation.navigate('LoadingHome', {medium: medium});
+        const updatedArray = moveToFrontAndShift(myArray, index); // Get the updated array
+        setMyArray(updatedArray); // Set state with the updated array
+
+        try {
+            await api.put(`/settings/updateOrder`, {
+                userName: userName,
+                newOrder: updatedArray.map(item => item.medium)
+            });
+            navigation.navigate('LoadingHome', {medium: medium});
+        } catch (error) {
+            console.error('Failed to update order:', error);
+        }
     }
 
     return (
         <ImageBackground  source={wallpaper} resizeMode="cover" style={styles.linearGradient}>
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
                 <View style={styles.header}>
-                    <Text style={styles.headerText}>Suggestify</Text>
+                    <Heading fontSize={'4xl'} color={theme ? `trueGray.300` : `trueGray.600`}>Suggestify</Heading>
                     <TouchableOpacity onPress={onSubmit}>
                         <Image
                             source={require('../../assets/icons/profile.png')}
