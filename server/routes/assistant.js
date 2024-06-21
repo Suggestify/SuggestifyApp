@@ -6,10 +6,8 @@ import AIMap from "../models/AIMap.js";
 import User from "../models/User.js";
 import rateLimit from "../middleWare/rate.js";
 
-
 dotenv.config();
 const router = express.Router();
-
 
 import {authenticateToken} from "../middleWare/secureEndPoint.js";
 

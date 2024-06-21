@@ -1,7 +1,8 @@
 import React, {useState, useContext} from 'react';
 
 import { useFocusEffect } from '@react-navigation/native';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
+import {Text} from 'native-base';
 
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -11,6 +12,8 @@ import api from "../../helperFunctions/Api";
 function ChatPreview({ medium, color, image }) {
     const { contact, updateContact } = useContext(ContactContext);
     const userName = contact.userName
+    const theme = contact.theme;
+    const shift = theme ? '#131313' : '#e3e3e3';
     const [lastMessage, setLastMessage] = useState('Loading last message...');
 
 
@@ -27,7 +30,7 @@ function ChatPreview({ medium, color, image }) {
                     });
                     let message = response.data?.[0]?.message ?? "Start a conversation!";
                     message = message.slice(0, 30); // Limit the message to 30 characters
-                    setLastMessage(message);
+                    setLastMessage(message );
                 } catch (error) {
                     console.error('Failed to fetch last message:', error);
                     setLastMessage('Failed to load message.'); // Error text
@@ -40,13 +43,13 @@ function ChatPreview({ medium, color, image }) {
 
 
     return (
-        <LinearGradient style={[styles.container, {borderColor: color}]} colors={[color, '#131313']} start={{ x: 0.2, y: 1 }} end={{ x: 1.1, y: 1 }}>
+        <LinearGradient style={[styles.container, {borderColor: color}]} colors={[color, shift]} start={{ x: 0.2, y: 1 }} end={{ x: 1.1, y: 1 }}>
             <Image source={image} style={styles.image} />
             <View style={styles.textContainer}>
-                <Text style={styles.mediumText}>
+                <Text style={styles.mediumText} color={theme ? 'trueGray.300' : 'trueGray.600'}>
                     {medium}
                 </Text>
-                <Text style={styles.lastMessageText}>
+                <Text color={theme ? 'trueGray.300' : 'darkText'}>
                     {lastMessage}
                 </Text>
             </View>
@@ -77,10 +80,6 @@ const styles = StyleSheet.create({
     mediumText: {
         fontSize: 22,
         fontWeight: 'bold', // Optional: to highlight the medium text
-        color: '#ffffff',
-    },
-    lastMessageText: {
-        color: '#d7d7d7',
     },
 });
 
