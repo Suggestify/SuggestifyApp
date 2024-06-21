@@ -15,6 +15,7 @@ import ChatScreen from "./components/chat/ChatScreen";
 import ChatPreview from "./components/home/ChatPreview";
 import LoadingHome from "./components/loading/LoadingHome";
 import LoadingLaunch from "./components/loading/LoadingLaunch";
+import PaymentScreen from "./components/settings/PaymentScreen";
 
 import {ContactProvider} from './helperFunctions/ContactContext';
 import LoadingPreference from "./components/loading/LoadingPreference";
@@ -39,6 +40,7 @@ export default function App() {
                         <Stack.Screen name="ChatScreen" component={ChatScreen}/>
                         <Stack.Screen name="Settings" component={Settings}/>
                         <Stack.Screen name="PreferenceSettings" component={PreferenceSettings}/>
+                        <Stack.Screen name="PaymentScreen" component={PaymentScreen}/>
                     </Stack.Navigator>
                 </NavigationContainer>
             </ContactProvider>

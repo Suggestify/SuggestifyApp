@@ -128,6 +128,10 @@ function Settings({navigation}) {
         navigation.navigate('PreferenceSettings')
     }
 
+    function paymentScreen() {
+        navigation.navigate('PaymentScreen')
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.containerHeader}>
@@ -143,7 +147,7 @@ function Settings({navigation}) {
                     <Text style={styles.settingsOptionText}>Reset Preference</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.settingsOption} >
+                <TouchableOpacity style={styles.settingsOption} onPress={paymentScreen} >
                     <Text style={styles.settingsOptionText}>Buy Premium</Text>
                 </TouchableOpacity>
             </View>
