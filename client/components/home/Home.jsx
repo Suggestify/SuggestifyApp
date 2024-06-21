@@ -25,17 +25,17 @@ function Home({navigation}) {
 
     const getColours = (isDark) => {
         return isDark ? ["#593232", "#204823", "#6b6831", "#273052", "#6b412a", "#4c2756", "#204949"]
-            : ["#ffdada", "#d3ffd5", "#fffdd6", "#c8d2ff", "#ffd5c3", "#eec1ff", "#c9ffff"];
+            : ["#ff9595", "#9cffa2", "#fff995", "#8fa4ff", "#ffb08b", "#e69bff", "#93ffff"];
     };
 
     const initialArray = [
-        { medium: "Music", image: require('../../assets/icons/Music.png') },
-        { medium: "Books", image: require('../../assets/icons/Books.png') },
-        { medium: "Podcasts", image: require('../../assets/icons/Podcasts.png') },
-        { medium: "Shows", image: require('../../assets/icons/Shows.png') },
-        { medium: "Movies", image: require('../../assets/icons/Movies.png') },
-        { medium: "Hobbies", image: require('../../assets/icons/Hobbies.png') },
-        { medium: "Games", image: require('../../assets/icons/Games.png') }
+        { medium: "Music", iconLight: require('../../assets/icons/MusicL.png'), iconDark: require('../../assets/icons/MusicD.png') },
+        { medium: "Books", iconLight: require('../../assets/icons/BooksL.png'), iconDark: require('../../assets/icons/BooksD.png') },
+        { medium: "Podcasts", iconLight: require('../../assets/icons/PodcastsL.png'), iconDark: require('../../assets/icons/PodcastsD.png') },
+        { medium: "Shows", iconLight: require('../../assets/icons/ShowsL.png'), iconDark: require('../../assets/icons/ShowsD.png') },
+        { medium: "Movies", iconLight: require('../../assets/icons/MoviesL.png'), iconDark: require('../../assets/icons/MoviesD.png') },
+        { medium: "Hobbies", iconLight: require('../../assets/icons/HobbiesL.png'), iconDark: require('../../assets/icons/HobbiesD.png') },
+        { medium: "Games", iconLight: require('../../assets/icons/GamesL.png'), iconDark: require('../../assets/icons/GamesD.png') }
     ];
 
     const [myArray, setMyArray] = useState(reorderArray(initialArray, order));
@@ -44,7 +44,10 @@ function Home({navigation}) {
         const colours = getColours(theme); // Get colors based on theme
         return order.map(medium => {
             const found = arr.find(item => item.medium === medium);
-            return {...found, color: colours[arr.indexOf(found)]}; // Append color dynamically
+            return {
+                ...found,
+                color: colours[arr.indexOf(found)],
+                image: theme ? found.iconDark : found.iconLight}; // Append color dynamically
         });
     }
 
