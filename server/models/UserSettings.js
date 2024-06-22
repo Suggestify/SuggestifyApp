@@ -20,6 +20,11 @@ const UserSettingsSchema = new mongoose.Schema({
         required: true,
         default: ['Music', 'Books', 'Podcasts', 'Shows', 'Movies', 'Hobbies', 'Games']
     },
+    hasPremium: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
 });
 
 
