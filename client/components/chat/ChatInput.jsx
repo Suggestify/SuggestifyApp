@@ -19,6 +19,7 @@ function ChatInput(props) {
     async function handleSend() {
         if (loading) return;  // Prevent multiple sends if already loading
         setLoading(true);  // Set loading to true when send starts
+        await props.onUpdate(message, 'AI');
         try {
             const response = await api.post(`/ai/sendMessage`, {
                 userName: userName,
@@ -27,7 +28,6 @@ function ChatInput(props) {
             });
 
             if (response.status === 200) {
-                await props.onUpdate(message, 'AI');
                 await props.onUpdate(response.data, 'User');
                 setMessage('');
             }

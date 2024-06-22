@@ -5,7 +5,6 @@ import User from "../models/User.js";
 import UserSettings from "../models/UserSettings.js";
 import dotenv from 'dotenv';
 import Stripe from "stripe";
-import UserSettings from "../models/UserSettings.js";
 
 dotenv.config();
 

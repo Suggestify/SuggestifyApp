@@ -39,8 +39,8 @@ export default function App() {
                         <Stack.Screen name="LoadingHome" component={LoadingHome}/>
                         <Stack.Screen name="ChatScreen" component={ChatScreen}/>
                         <Stack.Screen name="Settings" component={Settings}/>
-                        <Stack.Screen name="PreferenceSettings" component={PreferenceSettings}/>
                         <Stack.Screen name="PaymentScreen" component={PaymentScreen}/>
+                        <Stack.Screen name="PreferenceSettings" component={PreferenceSettings}/>
                     </Stack.Navigator>
                 </NavigationContainer>
             </ContactProvider>
