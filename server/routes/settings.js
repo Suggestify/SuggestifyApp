@@ -2,14 +2,13 @@ import express from 'express'
 
 import bodyParser from "body-parser";
 import User from "../models/User.js";
-import UserSettings from "../models/UserSettings.js";
 import dotenv from 'dotenv';
 import Stripe from "stripe";
 
 dotenv.config();
 
-const stripe = new Stripe(process.env.STRIPE_SECRET);
 const router = express.Router()
+const stripe = new Stripe(process.env.STRIPE_SECRET);
 
 import cron from 'node-cron';
 import pkg from '../../client/helperFunctions/Notification.js';
@@ -146,7 +145,8 @@ router.post("/toggleSwitch", authenticateToken, async (req, res) => {
 
 
 router.post("/payment", async (req, res) => {
-    const { amount } = req.body;
+    const  amount  = req.body.amount;
+    const  userName  = req.body.userName;
 
     // Input validation
     if (!amount || typeof amount !== 'number' || amount <= 0) {
@@ -161,14 +161,21 @@ router.post("/payment", async (req, res) => {
             currency: "usd",  // Consider allowing currency to be specified in the request
         });
 
+        let user = await User.findOne({ userName: userName });
+        let userSettings = await UserSettings.findById(user.UserSettingsID);
+        await userSettings.updateOne({hasPremium: true});
+
+        req.session.user = {userName: userName, hasPremium: true}
+        await userSettings.save();
+
+
         res.send({ clientSecret: paymentIntent.client_secret });
+
     } catch (err) {
         console.error("Error when creating payment intent:", err);
         res.status(500).send({ error: "An error occurred, please try again later." }); // Generic error message for production
     }
 });
-
-
 
 
 

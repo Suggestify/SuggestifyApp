@@ -1,3 +1,4 @@
+
 import React, {useEffect, useState, useContext} from 'react';
 import {View, TouchableOpacity, Image, TextInput, Alert, StyleSheet} from 'react-native';
 import {StripeProvider, useStripe} from '@stripe/stripe-react-native';
@@ -7,6 +8,8 @@ import {STRIPE_KEY} from '@env';
 import {Box, Heading, Text, Input} from "native-base";
 import {ContactContext} from "../../helperFunctions/ContactContext";
 import { useNavigation } from '@react-navigation/native';
+
+
 
 function PaymentScreen() {
     const navigation = useNavigation();
@@ -22,8 +25,11 @@ function PaymentScreen() {
     }
 
 
+
+
     useEffect(() => {
-        axios.post(`${Global.ip}/settings/payment`, {amount: 99}) // Amount in cents
+        axios.post(`${Global.ip}/settings/payment`, { amount: 99, userName: contact.userName }) // Amount in cents
+
             .then(response => {
                 console.log('Payment intent created:', response.data);
             })

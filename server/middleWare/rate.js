@@ -1,6 +1,7 @@
 import { createClient } from 'redis';
 import moment from 'moment-timezone';
 
+
 const client = createClient({
     socket: {
         host: 'localhost',
@@ -12,15 +13,28 @@ client.on('connect', () => console.log('Connected to Redis'));
 client.on('error', (err) => console.error('Redis Client Error', err));
 client.connect();
 
+let limit = 10;
+
+
 const rateLimit = async (req, res, next) => {
+    console.log(req.session.user);
+
+    console.log(limit);
     console.log(req.body);
     const userId = req.body.userName || 'default_user';  // Adjust based on where you get the user ID from
     const key = `user:${userId}:message_count`;
     const limit = 10;
+    if(req.session.user){
+        if (req.session.user.hasPremium === true) {
+            limit = 30;
+        }
+    }
+
 
     try {
         const currentCount = await client.get(key); // Get the current count first
 
+        console.log(limit);
         if (currentCount !== null && parseInt(currentCount) >= limit) {
             console.log("Rate limit exceeded");
             return res.status(429).send('Rate limit exceeded');

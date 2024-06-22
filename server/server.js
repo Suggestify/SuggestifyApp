@@ -7,6 +7,7 @@ import cors from 'cors';
 import authRoutes from './routes/auth.js'
 import aiRoutes from "./routes/assistant.js";
 import settingRoutes from "./routes/settings.js";
+import session from 'express-session';
 
 
 const pwd = process.env.MONGO_Y;
@@ -26,6 +27,13 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(session({
+    secret: 'your_secret_key',  // add env secret
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: 'auto' } // Uses HTTPS if available
+}));
+
 
 app.use((req,res,next) =>{
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -35,6 +43,7 @@ app.use((req,res,next) =>{
 app.use("/ai", aiRoutes);
 app.use('/auth', authRoutes)
 app.use('/settings', settingRoutes)
+
 
 app.listen(port, ()=>{
     console.log(`Server Running On Port: ${port}`);
