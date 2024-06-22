@@ -19,6 +19,7 @@ function ChatInput(props) {
     async function handleSend() {
         if (loading) return;  // Prevent multiple sends if already loading
         setLoading(true);  // Set loading to true when send starts
+
         try {
             const response = await api.post(`/ai/sendMessage`, {
                 userName: userName,

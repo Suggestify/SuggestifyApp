@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Button } from 'react-native';
 import { CardField, useStripe, StripeProvider } from '@stripe/stripe-react-native';
 import axios from 'axios';
 import Global from "../../helperFunctions/Global";
+import { ContactContext } from "../../helperFunctions/ContactContext";
 import { STRIPE_KEY } from '@env';
 
+
 function PaymentScreen() {
+    const { contact, updateContact } = useContext(ContactContext);
     const { confirmPayment } = useStripe();
     const [paymentIntent, setPaymentIntent] = useState('');
 
     useEffect(() => {
-        axios.post(`${Global.ip}/settings/payment`, { amount: 99 }) // Amount in cents
+        axios.post(`${Global.ip}/settings/payment`, { amount: 99, userName: contact.userName }) // Amount in cents
             .then(response => {
                 setPaymentIntent(response.data.clientSecret);
             })

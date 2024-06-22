@@ -72,6 +72,7 @@ router.post("/SignUp", async (req,res)=>{
             userName: curUserName
         }
 
+        req.session.user = {userName: curUserName, hasPremium: false}
         res.json(token).status(200);
     }
     catch(err){
@@ -111,6 +112,11 @@ router.post("/SignIn", async (req,res)=>{
                 const newToken = new Token({token: refreshToken});
                 await newToken.save();
 
+                let userSettings = await UserSettings.findById(user.UserSettingsID);
+                let curStatus = userSettings.hasPremium;
+                req.session.user = {userName: userId, hasPremium: curStatus}
+
+                console.log(req.session.user);
                 res.status(200).json({
                     access: accessToken,
                     refresh: refreshToken,
