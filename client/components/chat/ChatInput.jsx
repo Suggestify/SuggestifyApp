@@ -9,7 +9,7 @@ import { useToast, Box} from 'native-base';
 
 function ChatInput(props) {
     const {contact, updateContact} = useContext(ContactContext);
-
+    const theme = contact.theme;
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);  // Added loading state
     const type = props.chatType;
@@ -59,7 +59,7 @@ function ChatInput(props) {
 
     return (
         <View style={styles.container}>
-            <View style={styles.inputContainer}>
+            <View style={styles.inputContainer} >
                 <TextInput
                     style={styles.input}
                     value={message}
@@ -69,9 +69,9 @@ function ChatInput(props) {
                 />
                 <TouchableOpacity style={styles.button} onPress={handleSend} disabled={loading}>
                     {loading ? (
-                        <ActivityIndicator size="small" color="#00ff00" />
+                        <ActivityIndicator size="small" color= {theme ? `white` : `trueGray.600`} />
                     ) : (
-                        <Text style={styles.buttonText}>→</Text>
+                        <Text style={[styles.buttonText, {color: theme ? `white` : `white`}]}>→</Text>
                     )}
                 </TouchableOpacity>
             </View>
@@ -84,7 +84,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         width: '100%',
         paddingBottom: 10,
-        backgroundColor: '#525252',
     },
     inputContainer: {
         flexDirection: 'row',
@@ -95,7 +94,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 25,
         backgroundColor: 'white',
-        height: 40,
+        height: 45,
     },
     input: {
         flex: 1,
@@ -109,11 +108,10 @@ const styles = StyleSheet.create({
         height: 30,
         width: 35,
         borderRadius: 25,
-        backgroundColor: 'black',
+        backgroundColor: 'purple',
     },
     buttonText: {
         fontSize: 25,
-        color: 'blue',
     },
     pb: {
         marginBottom: 50,
