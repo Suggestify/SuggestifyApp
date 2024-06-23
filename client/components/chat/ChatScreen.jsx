@@ -1,19 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 
-import { SafeAreaView, StyleSheet, View, FlatList, RefreshControl, TouchableOpacity, Text } from 'react-native';
+import {SafeAreaView, StyleSheet, View, FlatList, RefreshControl, TouchableOpacity, ImageBackground} from 'react-native';
+import {Text} from 'native-base'
 import {Ionicons} from "@expo/vector-icons";
 
 import api from "../../helperFunctions/Api";
 
 import ChatBubble from './ChatBubble';
 import ChatInput from './ChatInput';
+import {ContactContext} from "../../helperFunctions/ContactContext";
+const wallPaperD = require('../../assets/backgrounds/ChatD.png');
+const wallPaperL = require('../../assets/backgrounds/ChatL.png');
 
 function ChatScreen({ route, navigation }) {
     const [currHistory, setCurrHistory] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
     const [isAddingNewMessage, setIsAddingNewMessage] = useState(true);
+    const {contact, updateContact} = useContext(ContactContext);
+    const theme = contact.theme;
     const type = route.params.medium;
     const flatListRef = useRef(null);
+    const wallpaper = theme ? wallPaperD : wallPaperL;
 
     function formatMessages(messages) {
         const uniqueSuffix = Date.now();
@@ -81,20 +88,24 @@ function ChatScreen({ route, navigation }) {
 
     const ChatHeader = ({ onBackPress, title }) => (
         <View style={styles.headerContainer}>
+
             <TouchableOpacity onPress={onBackPress}>
-                <Ionicons name="arrow-back" size={24} color="white" />
+                <Ionicons name="arrow-back" size={24} color={theme ? '#b2b2b2' : 'darkText'} />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>{title}</Text>
+            <Text color={theme ? 'trueGray.300' : 'darkText'} style={styles.headerTitle}>{title}</Text>
         </View>
     );
 
 
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={[styles.container, {backgroundColor: theme ? '#1a1919' : '#f6f6f6'}]} >
+            <ImageBackground source={wallpaper} resizeMode="cover" style={styles.container}>
                 <ChatHeader
+                    style={[ {backgroundColor: theme ? 'black' : 'black'}]}
                     onBackPress={() =>   navigation.navigate("Home")}
                     title= {type}
                 />
+
                 <FlatList
                     ref={flatListRef}
                     data={currHistory}
@@ -109,10 +120,12 @@ function ChatScreen({ route, navigation }) {
                         />
                     }
                 />
-                <View style={styles.inputContainer}>
+                <View style={[styles.inputContainer, {backgroundColor: theme ? '#1a1919' : '#f6f6f6'}]}>
                     <ChatInput chatType={type} onUpdate={updateHistory} />
                 </View>
+            </ImageBackground>
             </SafeAreaView>
+
         );
     };
 
@@ -121,16 +134,16 @@ function ChatScreen({ route, navigation }) {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
-            backgroundColor: '#525252',
         },
         flatListContent: {
             flexGrow: 1,
             justifyContent: 'flex-end',
         },
         inputContainer: {
+            paddingTop: 30,
             justifyContent: 'flex-end',
             width: '100%',
-            backgroundColor: '#525252',
+
         },
         footer: {
             height: 10,
@@ -139,11 +152,10 @@ function ChatScreen({ route, navigation }) {
             flexDirection: 'row',
             alignItems: 'center',
             padding: 10,
-            backgroundColor: '#333',
+
             height: 50
         },
         headerTitle: {
-            color: 'white',
             fontSize: 18,
             marginLeft: 10,
         }
