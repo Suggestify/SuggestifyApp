@@ -12,13 +12,13 @@ function ChatBubble(props) {
                 <Card containerStyle={styles.card}>
                     <Text style={styles.text}>{props.message}</Text>
                 </Card>
-                <ChatIcon />
+                <ChatIcon initial = {props.initial}/>
             </View>
         );
     } else if (props.type === "User") {
         return (
             <View style={[styles.container, styles.UserText]}>
-                <ChatIcon />
+                <ChatIcon medium = {props.medium}/>
                 <Card containerStyle={styles.card}>
                     <Text style={styles.text}>{props.message}</Text>
                 </Card>

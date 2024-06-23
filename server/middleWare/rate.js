@@ -20,7 +20,6 @@ const rateLimit = async (req, res, next) => {
     console.log(req.session.user);
 
     console.log(limit);
-    console.log(req.body);
     const userId = req.body.userName || 'default_user';  // Adjust based on where you get the user ID from
     const key = `user:${userId}:message_count`;
 

@@ -57,33 +57,32 @@ function ChatScreen({ route, navigation }) {
     }
 
     async function onRefresh() {
-        setRefreshing(true);
-        setIsAddingNewMessage(false);
-        try {
-            let moreMessages = await loadMessages();
-            moreMessages = formatMessages(moreMessages);
-            setCurrHistory(prevState => [...moreMessages, ...prevState]);
-        } catch (error) {
-            console.error('Failed to refresh messages:', error);
-        }
-        setRefreshing(false);
+            setRefreshing(true);
+            setIsAddingNewMessage(false);
+            try {
+                let moreMessages = await loadMessages();
+                moreMessages = formatMessages(moreMessages);
+                setCurrHistory(prevState => [...moreMessages, ...prevState]);
+            } catch (error) {
+                console.error('Failed to refresh messages:', error);
+            }
+            setRefreshing(false);
     }
 
     async function loadMessages() {
-        try {
-            const response = await api.get(`/ai/loadMessages`, {
-                params: {
-                    userName: route.params.userName,
-                    chatType: type,
-                    earliestMessageId: currHistory[0].msgID,
-                }
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Failed to load messages:', error);
-            // error state
-            return [];
-        }
+            try {
+                const response = await api.get(`/ai/loadMessages`, {
+                    params: {
+                        userName: route.params.userName,
+                        chatType: type,
+                        earliestMessageId: currHistory[0].msgID,
+                    }
+                });
+                return response.data;
+            } catch (error) {
+                console.error('Failed to load messages:', error);
+                return [];
+            }
     }
 
     const ChatHeader = ({ onBackPress, title }) => (
@@ -109,7 +108,7 @@ function ChatScreen({ route, navigation }) {
                 <FlatList
                     ref={flatListRef}
                     data={currHistory}
-                    renderItem={({ item }) => <ChatBubble message={item.message} type={item.type} />}
+                    renderItem={({ item }) => <ChatBubble message={item.message} type={item.type} medium = {type} initial ={route.params.userName}/>}
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.flatListContent}
                     ListFooterComponent={<View style={styles.footer} />}

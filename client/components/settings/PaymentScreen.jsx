@@ -60,7 +60,7 @@ function PaymentScreen() {
                     marginVertical: 30,
                 }}
                 onCardChange={(cardDetails) => {
-                    console.log('Card details: ', cardDetails);
+                  //  console.log('Card details: ', cardDetails);
                 }}
             />
 
