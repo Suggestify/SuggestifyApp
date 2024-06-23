@@ -34,7 +34,6 @@ function errorHandler(err, req, res, next) {
     });
 }
 
-
 async function getMapFromUser(userName) {
     try {
         const myUser = await User.findOne({ userName: userName }).select('AIMap');
@@ -97,12 +96,12 @@ async function fetchMessages(userName, chatType, fetchAmt, earliestMessageId = n
             currAIMap = await getMapFromUser(userName);
         }
 
-        let options = { limit: fetchLimit + 1 }; // Always attempt to fetch one more than needed
+        let options = { limit: fetchLimit };
         let begin = 0;
 
         if (earliestMessageId) {
             options.after = earliestMessageId; // Fetch messages after the earliest known message ID
-            options.limit = 11;
+            options.limit = 10;
         }
 
         if(fetchAmt == 1){
@@ -128,6 +127,7 @@ async function fetchMessages(userName, chatType, fetchAmt, earliestMessageId = n
             message: message.content?.[0]?.text?.value || 'Error loading message',
             msgID: message.id
         }));
+
         returnMessages = returnMessages.slice(0, returnMessages.length - begin);
         return returnMessages.reverse();
     } catch (err) {
@@ -176,6 +176,7 @@ async function sendMessage(userName, chatType, messageContent, init) {
     }
 }
 
+
 router.post("/create", async (req, res, next) => {
     const chatType = req.body.medium;
     const userName = req.body.userName;
@@ -217,14 +218,13 @@ router.post("/sendMessage", authenticateToken, rateLimit, async (req, res, next)
 
 
 
-
 // fetch previous messages up till var
 // refactor to one endpoint?
 router.get("/fetchMessages", authenticateToken,async (req, res, next) => {
     try {
         const userName = req.query.userName;
         const chatType = req.query.chatType;
-        const fetchAmt = req.query.fetchAmt ?? "3";
+        const fetchAmt = req.query.fetchAmt ?? "10";
         const response = await fetchMessages(userName, chatType, fetchAmt);
         res.send(response);
     } catch (err) {
@@ -238,7 +238,7 @@ router.get("/loadMessages", authenticateToken, async (req, res, next) => {
         const userName = req.query.userName;
         const chatType = req.query.chatType;
         const earliestMessageId = req.query.earliestMessageId;
-        const response = await fetchMessages(userName, chatType, earliestMessageId);
+        const response = await fetchMessages(userName, chatType, 10, earliestMessageId);
         res.send(response);
     } catch (err) {
         next(err);

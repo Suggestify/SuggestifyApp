@@ -162,6 +162,11 @@ router.delete('/SignOut', authenticateToken, async (req, res) => {
         console.log(err);
     }
 
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).send('Failed to log out');
+        }
+    });
     res.sendStatus(204);
 });
 

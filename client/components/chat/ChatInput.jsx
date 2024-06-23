@@ -20,17 +20,19 @@ function ChatInput(props) {
         if (loading) return;  // Prevent multiple sends if already loading
         setLoading(true);  // Set loading to true when send starts
 
+        await props.onUpdate(message, 'AI');
+        const tempMessage = message;
+        setMessage('');
         try {
             const response = await api.post(`/ai/sendMessage`, {
                 userName: userName,
-                messageContent: message,
+                messageContent: tempMessage,
                 type: type,
             });
 
             if (response.status === 200) {
-                await props.onUpdate(message, 'AI');
                 await props.onUpdate(response.data, 'User');
-                setMessage('');
+
             }
         } catch (error) {
             if(error.response.data == "Rate limit exceeded"){
