@@ -3,6 +3,8 @@ import React from 'react'
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NativeBaseProvider} from 'native-base';
+import { StripeProvider} from "@stripe/stripe-react-native";
+import { STRIPE_KEY } from '@env';
 
 import SignIn from "./components/authentication/SignIn";
 import SignUp from "./components/authentication/SignUp";
@@ -26,23 +28,25 @@ export default function App() {
     return (
         <NativeBaseProvider>
             <ContactProvider>
-                <NavigationContainer>
-                    <Stack.Navigator screenOptions={{headerShown: false}}>
-                        <Stack.Screen name="loadingLaunch" component={LoadingLaunch}/>
-                        <Stack.Screen name="SignIn" component={SignIn}/>
-                        <Stack.Screen name="Home" component={Home}/>
-                        <Stack.Screen name="SignUp" component={SignUp}/>
-                        <Stack.Screen name="Preference" component={Preference}/>
-                        <Stack.Screen name="LoadingPreference" component={LoadingPreference}/>
-                        <Stack.Screen name="NewPreference" component={NewPreference}/>
-                        <Stack.Screen name="ChatPreview" component={ChatPreview}/>
-                        <Stack.Screen name="LoadingHome" component={LoadingHome}/>
-                        <Stack.Screen name="ChatScreen" component={ChatScreen}/>
-                        <Stack.Screen name="Settings" component={Settings}/>
-                        <Stack.Screen name="PreferenceSettings" component={PreferenceSettings}/>
-                        <Stack.Screen name="PaymentScreen" component={PaymentScreen}/>
-                    </Stack.Navigator>
-                </NavigationContainer>
+                <StripeProvider publishableKey={STRIPE_KEY}>
+                    <NavigationContainer>
+                        <Stack.Navigator screenOptions={{headerShown: false}}>
+                            <Stack.Screen name="loadingLaunch" component={LoadingLaunch}/>
+                            <Stack.Screen name="SignIn" component={SignIn}/>
+                            <Stack.Screen name="Home" component={Home}/>
+                            <Stack.Screen name="SignUp" component={SignUp}/>
+                            <Stack.Screen name="Preference" component={Preference}/>
+                            <Stack.Screen name="LoadingPreference" component={LoadingPreference}/>
+                            <Stack.Screen name="NewPreference" component={NewPreference}/>
+                            <Stack.Screen name="ChatPreview" component={ChatPreview}/>
+                            <Stack.Screen name="LoadingHome" component={LoadingHome}/>
+                            <Stack.Screen name="ChatScreen" component={ChatScreen}/>
+                            <Stack.Screen name="Settings" component={Settings}/>
+                            <Stack.Screen name="PreferenceSettings" component={PreferenceSettings}/>
+                            <Stack.Screen name="PaymentScreen" component={PaymentScreen}/>
+                        </Stack.Navigator>
+                    </NavigationContainer>
+                </StripeProvider>
             </ContactProvider>
         </NativeBaseProvider>
     );

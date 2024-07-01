@@ -1,78 +1,60 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Button } from 'react-native';
-import { CardField, useStripe, StripeProvider } from '@stripe/stripe-react-native';
-import axios from 'axios';
-import Global from "../../helperFunctions/Global";
+import {View, TouchableOpacity, Text} from 'react-native';
+import { useStripe } from '@stripe/stripe-react-native';
 import { ContactContext } from "../../helperFunctions/ContactContext";
-import { STRIPE_KEY } from '@env';
+import api from "../../helperFunctions/Api";
 
 
 function PaymentScreen() {
     const { contact, updateContact } = useContext(ContactContext);
-    const { confirmPayment } = useStripe();
+    const { initPaymentSheet, presentPaymentSheet } = useStripe();
     const [paymentIntent, setPaymentIntent] = useState('');
 
-    useEffect(() => {
-        axios.post(`${Global.ip}/settings/payment`, { amount: 99, userName: contact.userName }) // Amount in cents
-            .then(response => {
+    useEffect(async () => {
+       const response = await api.post(`/settings/paymentIntents`, { amount: 99, userName: contact.userName }) // Amount in cents
+        if(response.status === 200){
                 setPaymentIntent(response.data.clientSecret);
-            })
-            .catch(error => {
-                console.error("Error creating payment intent:", error);
-            });
+        }else {
+                console.error("Error creating payment intent:");
+            }
     }, []);
-
     const handlePayment = async () => {
-        if (!paymentIntent) return;  // Early return if there's no payment intent available
-
-        const { error } = await confirmPayment(paymentIntent, {
-            type: 'Card',  // Explicitly specify the payment method type
-            paymentMethodType: 'Card',  // Explicitly specify the payment method type
-            // might not be needed
-            billingDetails: {
-                name: 'Jane Doe',
-                email: 'janedoe@example.com',
-            },
+        if (!paymentIntent) {
+            console.log('No payment intent available.');
+            return;  // Early return if there's no payment intent available
+        }
+        console.log('Initializing payment sheet...');
+        const initResponse = await initPaymentSheet({
+            merchantDisplayName: 'Your Merchant Name',
+            paymentIntentClientSecret: paymentIntent,
+            returnURL: 'suggestify://Home',
         });
 
-        if (error) {
-            alert(`Payment Confirmation Error: ${error.message}`);
+        if (initResponse.error) {
+            console.error(`Initialization error: ${initResponse.error.message}`);
+            alert(`Error code: ${initResponse.error.code}`);
+            return;
+        }
+
+        console.log('Presenting payment sheet...');
+        const presentResponse = await presentPaymentSheet();
+        if (presentResponse.error) {
+            console.error(`Presentation error: ${presentResponse.error.message}`);
+            alert(`Error: ${presentResponse.error.message}`);
         } else {
-            alert('Payment Successful');
+            console.log('Payment successful!');
         }
     };
 
 
+
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <CardField
-                postalCodeEnabled={true}
-                placeholder={{
-                    number: '4242 4242 4242 4242',
-                }}
-                cardStyle={{
-                    backgroundColor: '#FFFFFF',
-                    textColor: '#000000',
-                }}
-                style={{
-                    width: '100%',
-                    height: 50,
-                    marginVertical: 30,
-                }}
-                onCardChange={(cardDetails) => {
-                  //  console.log('Card details: ', cardDetails);
-                }}
-            />
-
-            <Button onPress={handlePayment} title="Pay" />
+                <TouchableOpacity onPress={handlePayment}>
+                    <Text>text</Text>
+                </TouchableOpacity>
         </View>
     );
 }
 
-export default function PaymentScreenWrapper() {
-    return (
-        <StripeProvider publishableKey={STRIPE_KEY}>
-            <PaymentScreen />
-        </StripeProvider>
-    );
-}
+export default PaymentScreen;
