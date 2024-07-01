@@ -15,7 +15,10 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {},
+    "scheme": "suggestify",
+    "ios": {
+      "bundleIdentifier": "com.Suggestify.app"
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",

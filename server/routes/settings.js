@@ -145,7 +145,7 @@ router.post("/toggleSwitch", authenticateToken, async (req, res) => {
 
 
 
-router.post("/payment", async (req, res) => {
+router.post("/paymentIntents", async (req, res) => {
     const  amount  = req.body.amount;
     const  userName  = req.body.userName;
 
@@ -160,6 +160,9 @@ router.post("/payment", async (req, res) => {
         const paymentIntent = await stripe.paymentIntents.create({
             amount,
             currency: "usd",  // Consider allowing currency to be specified in the request
+            automatic_payment_methods: {
+                enabled: true,
+            }
         });
 
         let user = await User.findOne({ userName: userName });
@@ -170,7 +173,7 @@ router.post("/payment", async (req, res) => {
         await userSettings.save();
 
 
-        res.send({ clientSecret: paymentIntent.client_secret });
+        res.send({ clientSecret: paymentIntent.client_secret }).status(200);
 
     } catch (err) {
         console.error("Error when creating payment intent:", err);
