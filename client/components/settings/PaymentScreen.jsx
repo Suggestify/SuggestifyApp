@@ -46,21 +46,20 @@ function PaymentScreen() {
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <CardField
-                postalCodeEnabled={true}
+                postalCodeEnabled={false}
                 placeholder={{
                     number: '4242 4242 4242 4242',
                 }}
                 cardStyle={{
-                    backgroundColor: '#FFFFFF',
-                    textColor: '#000000',
+                    backgroundColor: '#FFFFFF',   // White background color
+                    textColor: '#000000',         // Black text color
+                    borderRadius: 8,              // Rounded corners
+                    fontSize: 16,                 // Font size
                 }}
                 style={{
-                    width: '100%',
-                    height: 50,
-                    marginVertical: 30,
-                }}
-                onCardChange={(cardDetails) => {
-                  //  console.log('Card details: ', cardDetails);
+                    width: '100%',                // Full width
+                    height: 50,                   // Fixed height
+                    marginVertical: 30,           // Vertical margin
                 }}
             />
 
