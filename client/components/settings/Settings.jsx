@@ -166,7 +166,7 @@ function Settings({navigation}) {
                 </TouchableOpacity>
 
 
-      
+
                 <TouchableOpacity style={styles.settingsOption} onPress={paymentScreen} >
                     <Text color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Buy Premium</Text>
                 </TouchableOpacity>
