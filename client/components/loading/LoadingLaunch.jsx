@@ -7,8 +7,10 @@ import {Heading, HStack, Spinner} from "native-base";
 import { ContactContext } from "../../helperFunctions/ContactContext";
 import api from "../../helperFunctions/Api";
 import asyncStorage from "@react-native-async-storage/async-storage";
+
 import Global from "../../helperFunctions/Global";
 import axios from "axios";
+
 
 function Loading({ navigation }) {
     const { contact, updateContact } = useContext(ContactContext);

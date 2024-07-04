@@ -1,17 +1,5 @@
-import { createClient } from 'redis';
+import {client} from './redisClient.js';
 import moment from 'moment-timezone';
-
-
-const client = createClient({
-    socket: {
-        host: 'localhost',
-        port: 6379
-    }
-});
-
-client.on('connect', () => console.log('Connected to Redis'));
-client.on('error', (err) => console.error('Redis Client Error', err));
-client.connect();
 
 let limit = 10;
 
@@ -20,7 +8,7 @@ const rateLimit = async (req, res, next) => {
     console.log(req.session.user);
 
     console.log(limit);
-    const userId = req.body.userName || 'default_user';  // Adjust based on where you get the user ID from
+    const userId = req.body.userName || 'default_user';
     const key = `user:${userId}:message_count`;
 
     if(req.session.user){
