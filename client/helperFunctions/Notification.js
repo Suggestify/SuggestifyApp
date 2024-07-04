@@ -3,9 +3,16 @@ let expo = new Expo();
 
 async function getTokensFromDB() {
     try {
-        const { default: User } = await import('../../server/models/User.js'); // Ensure the path is correct
-        const users = await User.find({ notificationToken: { $ne: null } });
-        return users.map(user => user.notificationToken);
+        const { default: UserSettings } = await import('../../server/models/UserSettings.js');
+        const userSettings = await UserSettings.find({
+            notificationOn: true,
+            lastActive: "3",
+            notificationToken: { $ne: null }
+        }, 'notificationToken');
+
+        console.log("here");
+        return userSettings.map(user => user.notificationToken);
+
     } catch (error) {
         console.error("Error fetching tokens from DB:", error);
         return [];

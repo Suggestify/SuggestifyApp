@@ -25,6 +25,10 @@ const UserSettingsSchema = new mongoose.Schema({
         required: true,
         default: false
     },
+    lastActive:{
+        type: String,
+        default: 0
+    }
 });
 
 
