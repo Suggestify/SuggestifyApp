@@ -18,6 +18,7 @@ import ChatPreview from "./components/home/ChatPreview";
 import LoadingHome from "./components/loading/LoadingHome";
 import LoadingLaunch from "./components/loading/LoadingLaunch";
 import PaymentScreen from "./components/settings/PaymentScreen";
+import Verify from "./components/authentication/Verify";
 
 import {ContactProvider} from './helperFunctions/ContactContext';
 import LoadingPreference from "./components/loading/LoadingPreference";
@@ -44,6 +45,7 @@ export default function App() {
                             <Stack.Screen name="Settings" component={Settings}/>
                             <Stack.Screen name="PreferenceSettings" component={PreferenceSettings}/>
                             <Stack.Screen name="PaymentScreen" component={PaymentScreen}/>
+                            <Stack.Screen name="Verify" component={Verify}/>
                         </Stack.Navigator>
                     </NavigationContainer>
                 </StripeProvider>

@@ -7,8 +7,8 @@ import {Heading, HStack, Spinner} from "native-base";
 import { ContactContext } from "../../helperFunctions/ContactContext";
 import api from "../../helperFunctions/Api";
 import asyncStorage from "@react-native-async-storage/async-storage";
-
-
+import Global from "../../helperFunctions/Global";
+import axios from "axios";
 
 function Loading({ navigation }) {
     const { contact, updateContact } = useContext(ContactContext);
@@ -25,13 +25,23 @@ function Loading({ navigation }) {
                     }
                 })
                 if (response.status === 200) {
-                    updateContact({theme: response.data.theme});
-                    updateContact({notificationOn: response.data.notificationOn});
-                    updateContact({mediumOrder: response.data.mediumOrder});
-                    navigation.navigate('Home')
+                        updateContact({theme: response.data.theme});
+                        updateContact({notificationOn: response.data.notificationOn});
+                        updateContact({mediumOrder: response.data.mediumOrder});
+                        navigation.navigate('Home')
+                }
+                else{
+                    console.log("error")
                 }
             } else {
-                navigation.navigate('SignIn');
+                const verified = await AsyncStorage.getItem('verification');
+                if(verified){
+                    const tempUserName = await AsyncStorage.getItem('tempUserName');
+                    navigation.navigate('Verify', {userName: tempUserName});
+                }
+                else{
+                    navigation.navigate('SignIn');
+                }
             }
         };
 

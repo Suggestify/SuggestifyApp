@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 
 
 const aiSchema = new mongoose.Schema({
-    Music: String,
-    Books: String,
-    Shows: String,
-    Podcasts: String,
-    Movies: String,
-    Hobbies: String,
-    Games: String,
+    Music: {type: String, default: "NULL"},
+    Books: {type: String, default: "NULL"},
+    Shows: {type: String, default: "NULL"},
+    Podcasts: {type: String, default: "NULL"},
+    Movies: {type: String, default: "NULL"},
+    Hobbies: {type: String, default: "NULL"},
+    Games: {type: String, default: "NULL"},
 
 }, {strict: true});
 

@@ -44,40 +44,19 @@ function SignUp({navigation}) {
             setUserNameError("");
         }
         try {
-
+            console.log("making request")
             const response = await axios.post(`${Global.ip}/auth/SignUp`, {
                 email: email,
                 userName: userName,
                 password: password
             })
-
+            console.log("response.status" + response.status)
             if (response.status !== 200) {
                 setEmailError(`*${response.data.message}`)
-
             } else {
-                const accessToken = response.data.access;
-                const refreshToken = response.data.refresh;
-                const userName = response.data.userName;
-
-                await AsyncStorage.setItem('accessToken', accessToken);
-                await AsyncStorage.setItem('refreshToken', refreshToken);
-                await AsyncStorage.setItem('userName', userName);
-                updateContact({userName: userName});
-                const response2 = await axios.get(`${Global.ip}/settings/fetchSettings`, {
-                    params: {
-                        userName: userName
-                    }
-                });
-                console.log("res2 = " + response2.status)
-
-                if (response2.status === 200) {
-                    console.log("bingus")
-                    updateContact({theme: response2.data.theme});
-                    updateContact({notificationsOn: response2.data.notificationsOn});
-                    updateContact({mediumOrder: response2.data.mediumOrder});
-                    navigation.navigate('Preference');
-                }
-
+                await AsyncStorage.setItem('tempUserName', userName);
+                await AsyncStorage.setItem('verification', "false");
+                navigation.navigate('Verify', {userName: userName});
             }
         } catch (err) {
             if (err.response && err.response.status === 400) {
