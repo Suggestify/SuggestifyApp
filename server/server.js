@@ -8,6 +8,8 @@ import authRoutes from './routes/auth.js'
 import aiRoutes from "./routes/assistant.js";
 import settingRoutes from "./routes/settings.js";
 import session from 'express-session';
+import {scheduleFetchTask} from "./middleWare/notification.js";
+import {checkNotifications} from "./middleWare/notificationSend.js";
 
 
 const pwd = process.env.MONGO_Y;
@@ -43,6 +45,9 @@ app.use((req,res,next) =>{
 app.use("/ai", aiRoutes);
 app.use('/auth', authRoutes)
 app.use('/settings', settingRoutes)
+
+scheduleFetchTask();
+checkNotifications();
 
 
 app.listen(port, ()=>{
