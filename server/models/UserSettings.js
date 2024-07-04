@@ -13,7 +13,7 @@ const UserSettingsSchema = new mongoose.Schema({
     theme: {
         type: Boolean,
         required: true,
-        default: false
+        default: true
     },
     mediumOrder: {
         type: Array,
