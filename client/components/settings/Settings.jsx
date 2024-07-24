@@ -45,7 +45,7 @@ function Settings({navigation}) {
                 const token = (await Notifications.getExpoPushTokenAsync({
                     projectId: '1e87624a-57f3-4080-9cf6-b8b7471ab184' // Replace 'your-username' with your actual Expo username
                 })).data;
-                await api.post(`/settings/setNotifications`, {
+                await api.post('/settings/setNotifications', {
                     userName: userName,
                     token: token
                 })
@@ -53,12 +53,12 @@ function Settings({navigation}) {
             }
             if (notificationsEnabled) {
                 toast.show({
-                duration: 1200,
-                render: () => {
-                    return <Box style={styles.pb} bg="error.100" px="5" py="3" rounded="md" mb={5}>
-                        Notifications Disabled
-                    </Box>;
-                }
+                    duration: 1200,
+                    render: () => {
+                        return <Box style={styles.pb} bg="error.100" px="5" py="3" rounded="md" mb={5}>
+                            Notifications Disabled
+                        </Box>;
+                    }
                 });
             }
             else if (!notificationsEnabled){
@@ -87,14 +87,18 @@ function Settings({navigation}) {
         }
     }
 
+
+
+
     async function toggleTheme (){
         console.log(themeEnabled)
         setThemeEnabled(!themeEnabled);
         let response = await toggleSwitch("theme",  !contact.theme);
+
         if (response.status === 200) {
             updateContact({theme: !contact.theme});
             toast.show({
-                duration: 1200,
+                duration: 1100,
                 render: () => {
                     return <Box style={styles.pb} bg="success.100" px="5" py="3" rounded="md" mb={5}>
                         Theme Toggled
@@ -106,7 +110,7 @@ function Settings({navigation}) {
             updateContact({theme: !themeEnabled});
             setThemeEnabled(contact.theme);
             toast.show({
-                duration: 1200,
+                duration: 1100,
                 render: () => {
                     return <Box style={styles.pb} bg="error.400" px="5" py="3" rounded="md" mb={5}>
                         Error, Please Try Again Later
@@ -114,6 +118,7 @@ function Settings({navigation}) {
                 }
             });
         }
+
     }
 
     async function logout() {
@@ -164,8 +169,6 @@ function Settings({navigation}) {
                 <TouchableOpacity style={[styles.settingsOption, styles.settingsBorder]} onPress={preferenceReset}>
                     <Text color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Reset Preference</Text>
                 </TouchableOpacity>
-
-
 
                 <TouchableOpacity style={styles.settingsOption} onPress={paymentScreen} >
                     <Text color={themeEnabled ? `trueGray.300` : `darkText`} style={styles.settingsOptionText}>Buy Premium</Text>
