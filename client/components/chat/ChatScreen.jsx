@@ -1,6 +1,6 @@
-import React, {useState, useEffect, useRef, useContext} from 'react';
+git import React, {useState, useEffect, useRef, useContext} from 'react';
 
-import {SafeAreaView, StyleSheet, View, FlatList, RefreshControl, TouchableOpacity, ImageBackground} from 'react-native';
+import {SafeAreaView, StyleSheet, View, FlatList, RefreshControl, TouchableOpacity, ImageBackground,  KeyboardAvoidingView, Platform} from 'react-native';
 import {Text} from 'native-base'
 import {Ionicons} from "@expo/vector-icons";
 
@@ -97,32 +97,39 @@ function ChatScreen({ route, navigation }) {
 
 
         return (
-            <SafeAreaView style={[styles.container, {backgroundColor: theme ? '#1a1919' : '#f6f6f6'}]} >
-            <ImageBackground source={wallpaper} resizeMode="cover" style={styles.container}>
-                <ChatHeader
-                    style={[ {backgroundColor: theme ? 'black' : 'black'}]}
-                    onBackPress={() =>   navigation.navigate("Home")}
-                    title= {type}
-                />
+            <SafeAreaView style={[styles.container, {backgroundColor: theme ? '#1a1919' : '#f6f6f6'}]}>
+                <ImageBackground source={wallpaper} resizeMode="cover" style={styles.container}>
+                    <ChatHeader
+                        style={[ {backgroundColor: theme ? 'black' : 'black'}]}
+                        onBackPress={() => navigation.navigate("Home")}
+                        title={type}
+                    />
 
-                <FlatList
-                    ref={flatListRef}
-                    data={currHistory}
-                    renderItem={({ item }) => <ChatBubble message={item.message} type={item.type} medium = {type} initial ={route.params.userName}/>}
-                    keyExtractor={(item) => item.id.toString()}
-                    contentContainerStyle={styles.flatListContent}
-                    ListFooterComponent={<View style={styles.footer} />}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={onRefresh}
+                    {/* Wrap FlatList and input container with KeyboardAvoidingView */}
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                        style={{ flex: 1 }}
+                        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+                    >
+                        <FlatList
+                            ref={flatListRef}
+                            data={currHistory}
+                            renderItem={({ item }) => <ChatBubble message={item.message} type={item.type} medium={type} initial={route.params.userName}/>}
+                            keyExtractor={(item) => item.id.toString()}
+                            contentContainerStyle={styles.flatListContent}
+                            ListFooterComponent={<View style={styles.footer} />}
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={refreshing}
+                                    onRefresh={onRefresh}
+                                />
+                            }
                         />
-                    }
-                />
-                <View style={[styles.inputContainer, {backgroundColor: theme ? '#1a1919' : '#f6f6f6'}]}>
-                    <ChatInput chatType={type} onUpdate={updateHistory} />
-                </View>
-            </ImageBackground>
+                        <View style={[styles.inputContainer, {backgroundColor: theme ? '#1a1919' : '#f6f6f6'}]}>
+                            <ChatInput chatType={type} onUpdate={updateHistory} />
+                        </View>
+                    </KeyboardAvoidingView>
+                </ImageBackground>
             </SafeAreaView>
 
         );

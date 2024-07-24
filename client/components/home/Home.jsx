@@ -1,7 +1,7 @@
 import React, {useState, useContext, useEffect} from 'react';
 
 import { TouchableOpacity, Image, StyleSheet, View, ScrollView, ImageBackground} from "react-native";
-import { Heading } from 'native-base';
+import {Box, Heading, useToast} from 'native-base';
 
 import { ContactContext } from "../../helperFunctions/ContactContext";
 import api from "../../helperFunctions/Api";
@@ -18,6 +18,7 @@ function Home({navigation}) {
     const order = contact.mediumOrder;
     const [theme, setTheme] = useState(contact.theme);
     const wallpaper = theme ? wallpaperD : wallpaperL;
+    const toast = useToast();
 
     useEffect(() => {
         setTheme(contact.theme); // Update theme when it changes in context
@@ -73,14 +74,30 @@ function Home({navigation}) {
         setMyArray(updatedArray); // Set state with the updated array
 
         try {
-            await api.put(`/settings/updateOrder`, {
+            const response = await api.put(`/settings/updateOrder`, {
                 userName: userName,
                 newOrder: updatedArray.map(item => item.medium)
             });
-            navigation.navigate('LoadingHome', {medium: medium});
+            if(response.status !== 200) {
+                showToast("error please try again later");
+            }
+            else {
+                navigation.navigate('LoadingHome', {medium: medium});
+            }
         } catch (error) {
             console.error('Failed to update order:', error);
         }
+    }
+
+    function showToast(message) {
+        toast.show({
+            duration: 1100,
+            render: () => {
+                return <Box style={styles.pb} bg={ "error.100"} px="5" py="3" rounded="md" mb={5}>
+                    {message}
+                </Box>;
+            }
+        });
     }
 
     return (

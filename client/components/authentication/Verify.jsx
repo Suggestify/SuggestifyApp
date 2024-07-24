@@ -1,4 +1,4 @@
-import React, { useEffect, useContext} from 'react';
+import React, {useEffect, useContext} from 'react';
 
 import {Image, StyleSheet, TouchableOpacity, View} from "react-native";
 import {Heading, Box, Text} from 'native-base';
@@ -6,18 +6,20 @@ import axios from "axios";
 import {ContactContext} from "../../helperFunctions/ContactContext";
 import Global from "../../helperFunctions/Global";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 function Verify({route, navigation}) {
-    const { contact, updateContact } = useContext(ContactContext);
+    const {contact, updateContact} = useContext(ContactContext);
     const userName = route.params.userName;
 
     useEffect(() => {
         async function checkVerification() {
             console.log("checking verification");
             try {
-                const response = await axios.get(`${Global.ip}/auth/verified`, {
+                const response = await axios.get(`${Global.ip}/verification/verified`, {
                     params: {
                         userName: userName
-                    }});
+                    }
+                });
                 if (response.status === 200) {
                     console.log("verified");
                     const accessToken = response.data.access;
@@ -39,9 +41,7 @@ function Verify({route, navigation}) {
                     await AsyncStorage.removeItem('verification');
                     await AsyncStorage.removeItem('tempUserName');
                     navigation.navigate('SignIn');
-                }
-
-                else {
+                } else {
                     setTimeout(checkVerification, 4000);  // Retry after 5 seconds
                 }
             } catch (error) {
@@ -50,10 +50,10 @@ function Verify({route, navigation}) {
         }
 
         checkVerification();
-        },[userName]);
+    }, [userName]);
 
     async function backToHome() {
-        const response  = await axios.delete(`${Global.ip}/auth/cancel`, {
+        const response = await axios.delete(`${Global.ip}/verification/cancel`, {
             params: {
                 userName: userName
             }
@@ -65,25 +65,32 @@ function Verify({route, navigation}) {
         }
     }
 
-
-
-
     return (
-        <Box style={styles.container} bg={ `black`}>
-            <Box style={styles.containerHeader} bg={'trueGray.900' }>
-                <TouchableOpacity onPress={backToHome} style={styles.backBtn}>
-                    <Image
-                        source={ require('../../assets/icons/previousD.png')}
-                        style={styles.backBtnImg}
-                    />
-                </TouchableOpacity>
+        <Box style={styles.container} bg={`black`}>
+            <Box style={styles.containerHeader} bg={'trueGray.900'}>
                 <View style={styles.headingContainer}>
-                    <Heading size="md" fontSize={50} bold color={'trueGray.300' }>
+                    <Heading size="md" fontSize={50} bold color={'trueGray.300'}>
                         Verification
                     </Heading>
                 </View>
             </Box>
-            <Text> Please Verify your email to continue </Text>
+            <View style={styles.center}>
+                <View style={styles.emailContainer}>
+                    <Image
+                        source={require('../../assets/icons/mail.png')}
+                        style={styles.email}
+                    />
+                    <Text color={'trueGray.300'} style={{ fontSize: 20, marginTop: 20, textAlign: 'center'}}>Please check your email for a verification link</Text>
+                    <Text color={'trueGray.300'} style={{ fontSize: 15 , marginTop: 10, textAlign: 'center'}}>this link will expire in 5 minutes</Text>
+                </View>
+            </View>
+            <View style={styles.logOutContainer} >
+                <Box style={styles.SettingsSection} bg={ `trueGray.900`}>
+                    <TouchableOpacity onPress={backToHome} style={styles.settingsOptionLogOut}>
+                        <Heading color={ `trueGray.300`} style={styles.settingsOptionLogout}>Cancel</Heading>
+                    </TouchableOpacity>
+                </Box>
+            </View>
         </Box>
     );
 }
@@ -93,6 +100,8 @@ export default Verify;
 const styles = StyleSheet.create({
         container: {
             flex: 1,
+
+
         },
         containerHeader: {
             flexDirection: 'row',
@@ -101,6 +110,20 @@ const styles = StyleSheet.create({
             paddingBottom: 20,
             marginBottom: 20,
             paddingHorizontal: 20,
+        },
+        center: {
+            flex: 1,
+            alignItems: 'center',
+            textAlign: 'center',
+        },
+        emailContainer: {
+            width: '75%',
+            alignItems: 'center',
+            textAlign: 'center',
+        },
+        email: {
+            marginTop: '45%',
+            width: 100,
         },
         headingContainer: {
             flex: 1,
@@ -121,7 +144,7 @@ const styles = StyleSheet.create({
             alignSelf: 'center',
             borderRadius: "20%",
             marginTop: 20,
-            width: "95%",
+            width: "75%",
         },
         settingsOption: {
             marginTop: 20,
@@ -129,9 +152,9 @@ const styles = StyleSheet.create({
             paddingLeft: 20,
         },
 
-        settingsBorder:{
+        settingsBorder: {
             borderBottomWidth: 1,
-            borderColor:'#797979',
+            borderColor: '#797979',
         },
 
         settingsOptionLogOut: {
@@ -153,7 +176,7 @@ const styles = StyleSheet.create({
             paddingBottom: 20,
             paddingHorizontal: 20,
             borderStyle: "solid",
-            borderColor:'#797979',
+            borderColor: '#797979',
             flexDirection: 'row',
             justifyContent: 'space-between', // Aligns items on opposite ends
             alignItems: 'center' // Aligns items vertically

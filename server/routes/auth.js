@@ -1,271 +1,197 @@
 import express from 'express'
+const router = express.Router()
 
 import bcryptjs from "bcryptjs";
 import jwt from 'jsonwebtoken'
-import { v4 as uuidv4 } from 'uuid';
 import nodemailer from'nodemailer';
 
 import User from "../models/User.js";
-import AIMap from "../models/AIMap.js";
 import TempUser from "../models/TempUser.js";
 import UserSettings from '../models/UserSettings.js';
 import Token from '../models/RefreshTokens.js';
 
 import dotenv from 'dotenv';
 dotenv.config();
-const router = express.Router()
 
-let refreshTokens = [];
-const saltRounds = 10;
-
-
+import { v4 as uuidv4 } from 'uuid';
 import {authenticateToken} from "../middleWare/secureEndPoint.js";
 
-
-async function deleteUser(userName){
-    await TempUser.deleteOne({userName: userName});
-}
+const saltRounds = 10;
 
 router.post('/token', async (req, res) => {
     const refreshToken = req.body.token;
-    const tokenExists = await Token.findOne({token: refreshToken});
-    if (!refreshToken || !tokenExists){
-        return res.sendStatus(403);
+    if (!refreshToken) {
+        return res.status(401).json({ message: "No refresh token provided" });
     }
-
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err) {
-            // Remove the invalid refresh token
-            refreshTokens = refreshTokens.filter(token => token !== refreshToken);
-            return res.sendStatus(403);
+    try {
+        const tokenExists = await Token.findOne({token: refreshToken});
+        if (!tokenExists){
+            return res.status(403).json({ message: "Invalid refresh token" });
         }
-        const newAccessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1m' });
-        res.json({ accessToken: newAccessToken });
-    });
+
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
+            if (err) {
+                await Token.deleteOne({ token: refreshToken });
+                return res.status(403).json({ message: "Failed to verify refresh token" });
+            }
+            const newAccessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1m' });
+            res.json({ accessToken: newAccessToken });
+        });
+    } catch (error) {
+        console.error("Error handling refresh token:", error);
+        res.status(500).json({ message: "Internal server error during token refresh" });
+    }
 });
 
-
-router.post("/SignUp", async (req,res)=>{
-    try{
-        const userExists = await User.findOne({ $or: [{ email: req.body.email }, { userName: req.body.userName }] });
-        if (userExists) {
-            return res.status(400).send({ message: "An account with that email or username already exists." });
+router.post("/SignUp", async (req, res) => {
+    try {
+        const { email, userName, password } = req.body;
+        if (!email || !userName || !password) {
+            return res.status(400).json({ message: "Missing required fields" });
         }
 
-        const secret = process.env.B_SECRET;
-        const pwdDB = secret + req.body.password;
+        const emailExists = await User.findOne({ email });
+        if (emailExists) {
+            return res.status(409).json({ message: "An account with that email already exists", field: "email" });
+        }
 
-        const hashedPWD = await bcryptjs.hash(pwdDB, saltRounds)  // hashed password to pass into database
-        const curEmail = req.body.email;
-        const curUserName = req.body.userName;
+        const userNameExists = await User.findOne({ userName });
+        if (userNameExists) {
+            return res.status(409).json({ message: "An account with that username already exists", field: "userName" });
+        }
 
+        const pwdDB = process.env.B_SECRET + password;
+        const hashedPWD = await bcryptjs.hash(pwdDB, saltRounds);
         const emailVerificationToken = uuidv4();
-
-        const data = {email: curEmail, userName: curUserName, password: hashedPWD, token: emailVerificationToken};
+        const data = { email, userName, password: hashedPWD, token: emailVerificationToken };
         const newTempUser = new TempUser(data);
         await newTempUser.save();
 
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false, // use false for STARTTLS; true for SSL on port 465
-            auth: {
-                user: 'suggestify.verify@gmail.com',
-                pass: process.env.APP_PASSWORD,
-            }
-        });
-        const link = `https://lafanda.github.io/VerificationPage/?token=${emailVerificationToken}`;
-
-        const mailOptions = {
-            from: 'suggestify.verify@gmail.com',
-            to: curEmail,
-            subject: 'Suggestify Email Verification, this link will expire in 5 minutes',
-            text: link
-        };
-
-        transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-                console.log('Error:', error);
-            } else {
-                console.log('Email sent: ', info.response);
-            }
-        });
-
-        //req.session.user = {userName: curUserName, hasPremium: false}
-        setTimeout(deleteUser, 300000);
-        res.status(200).json({message: "Email sent for verification"})
-    }
-    catch(err){
-        console.log(err)
-        if(err.code === 11000){
-            const field = Object.keys(err.keyValue)[0];
-            res.status(400).send({ field: field,  message: `An account with that ${field} already exists.` });
+        const emailSent = await sendVerificationEmail(email, emailVerificationToken);
+        if (!emailSent) {
+            return res.status(500).json({ message: "Failed to send verification email" });
         }
-        else{
-            res.status(400).send({ message: "Error creating account, please try again later" });
-        }
+
+        setTimeout(() => deleteUser(userName), 300000); // Adjust timeout to 5 minutes
+        res.status(200).json({ message: "Email sent for verification" });
+    } catch (err) {
+        console.error("Error during sign-up:", err);
+        res.status(500).json({ message: "Internal server error during sign-up" });
     }
 });
 
-router.post("/SignIn", async (req,res)=>{
-    try{
-        const userId = req.body.UserId;
-        let user;
-        if(userId.includes("@")){
-             user = await User.findOne({email: userId});
-        }else{
-             user = await User.findOne({userName: userId});
-        }
+
+router.post("/SignIn", async (req, res) => {
+    const { UserId } = req.body;
+    if (!UserId) {
+        return res.status(400).json({ message: "User identification is required" });
+    }
+
+    try {
+        const userQuery = UserId.includes("@") ? { email: UserId } : { userName: UserId };
+        const user = await User.findOne(userQuery);
 
         if (!user) {
-            return res.status(401).send({ message: "Invalid login credentials" });
+            return res.status(401).json({ message: "Invalid login credentials" });
         }
 
-        const pwdDB = user.password;  // password from database
-        const pwdUser = process.env.B_SECRET + req.body.password;  // password on current input
-        try {
-            const match = await bcryptjs.compare(pwdUser, pwdDB);
-            if (match) {
-                const accessToken = jwt.sign({ username: user.userName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1m' });
-                const refreshToken = jwt.sign({ username: user.userName }, process.env.REFRESH_TOKEN_SECRET);
-
-                const newToken = new Token({token: refreshToken});
-                await newToken.save();
-
-                let userSettings = await UserSettings.findById(user.UserSettingsID);
-                let curStatus = userSettings.hasPremium;
-                req.session.user = {userName: userId, hasPremium: curStatus}
-
-                console.log(req.session.user);
-                res.status(200).json({
-                    access: accessToken,
-                    refresh: refreshToken,
-                    userName: user.userName
-                });
-            } else {
-                res.status(401).send({ message: "Invalid login credentials" });
-            }
-        } catch (bcryptError) {
-            console.error(bcryptError);
-            res.status(500).send({ message: "An error occurred during the login process." });
+        const pwdUser = process.env.B_SECRET + req.body.password;
+        const match = await bcryptjs.compare(pwdUser, user.password);
+        if (!match) {
+            return res.status(401).json({ message: "Invalid login credentials" });
         }
-    } catch(err){
-        res.status(400).send({message: "Invalid login credentials"});
+
+        const accessToken = jwt.sign({ username: user.userName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1m' });
+        const refreshToken = jwt.sign({ username: user.userName }, process.env.REFRESH_TOKEN_SECRET);
+        const newToken = new Token({ token: refreshToken });
+        await newToken.save();
+
+        const userSettings = await UserSettings.findById(user.UserSettingsID);
+        req.session.user = { userName: user.userName, hasPremium: userSettings?.hasPremium || false };
+
+        res.status(200).json({
+            access: accessToken,
+            refresh: refreshToken,
+            userName: user.userName
+        });
+    } catch (error) {
+        console.error("Sign-in error:", error);
+        res.status(500).json({ message: "An error occurred during the login process" });
     }
 });
 
+
+// Endpoint for user sign-out
 router.delete('/SignOut', authenticateToken, async (req, res) => {
-    const token = req.body.token;
-    console.log(token)
-    const userName = req.body.userName;
-    let user;
-    try{
-
-        user = await User.findOne({userName: userName});
-        if (!user) {
-            return res.status(404).send({ message: "User not found" });
-        }
-        let userSettings;
-        try{
-            userSettings = await UserSettings.findById(user.UserSettingsID);
-            if (!userSettings) {
-                return res.status(404).send({ message: "User settings not found" });
-            }
-            userSettings.notificationToken = undefined;
-            userSettings.notificationsOn = false;
-            await Token.deleteOne({token: token});
-            await userSettings.save();
-        }catch (err){
-            console.log(err);
-        }
-    }catch (err){
-        console.log(err);
+    const { token, userName } = req.body;
+    if (!token || !userName) {
+        return res.status(400).json({ message: "Token and user name are required for sign-out" });
     }
 
-    req.session.destroy((err) => {
-        if (err) {
-            return res.status(500).send('Failed to log out');
+    try {
+        const user = await User.findOne({ userName });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const userSettings = await UserSettings.findById(user.UserSettingsID);
+        if (!userSettings) {
+            return res.status(404).json({ message: "User settings not found" });
+        }
+
+        userSettings.notificationToken = undefined;
+        userSettings.notificationsOn = false;
+        await userSettings.save();
+        await Token.deleteOne({ token });
+
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("Session destruction error:", err);
+                return res.status(500).json({ message: "Failed to log out" });
+            }
+            res.sendStatus(204);  // No content to send back
+        });
+    } catch (error) {
+        console.error("Sign-out error:", error);
+        res.status(500).json({ message: "An error occurred during the sign-out process" });
+    }
+});
+
+async function sendVerificationEmail(email, token) {
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+            user: 'suggestify.verify@gmail.com',
+            pass: process.env.APP_PASSWORD,
         }
     });
-    res.sendStatus(204);
-});
+    const link = `https://lafanda.github.io/VerificationPage/?token=${token}`;
+    const mailOptions = {
+        from: 'suggestify.verify@gmail.com',
+        to: email,
+        subject: 'Suggestify Email Verification, this link will expire in 5 minutes',
+        text: link
+    };
 
-router.get('/verify-email', async (req, res) => {
-    console.log("called")
-    const { token } = req.query;
     try {
-        const tokenExists = await TempUser.findOne({ token: token });
-        if (!tokenExists) return res.status(400).send('Invalid or expired token.');
-
-        tokenExists.token = "Verified";
-        await tokenExists.save();
-        res.send('Email verified successfully!');
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Email sent: ', info.response);
+        return true;
     } catch (error) {
-        res.status(500).send('Internal Server Error');
+        console.error('Error sending email:', error);
+        return false;
     }
-});
+}
 
-router.get('/verified', async (req, res) => {
-    console.log("verify called");
-    const userName = req.query.userName;  // Accessing userName from query parameters
-    console.log(userName);
-    if (!userName) {
-        return res.status(400).send({ message: "No username provided" });
-    }
-    try {
-        const user = await TempUser.findOne({ userName: userName });
-        if (!user) {
-            return res.status(404).send({ message: "User not found" });
-        }
-        if (user.token === "Verified") {
-            const userSettings = new UserSettings();
-            await userSettings.save();
-
-            const newAIMap = new AIMap();
-            await newAIMap.save();
-
-            const newUser = new User({ email: user.email, userName: userName, password: user.password, AIMap: newAIMap._id, UserSettingsID: userSettings._id });
-            await newUser.save();
-            const accessToken =  jwt.sign({ username: userName }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1m' });
-            const refreshToken =  await jwt.sign({ username: userName }, process.env.REFRESH_TOKEN_SECRET);
-            if (refreshToken) {
-                const newToken = new Token({ token: refreshToken });
-                if(newToken.token != null) {
-                    await newToken.save();
-                }
-            } else {
-                console.error("Failed to generate a valid token.");
-            }
-            await TempUser.deleteOne({ userName: userName });
-
-            const token = {
-                access: accessToken,
-                refresh: refreshToken,
-                userName: userName
-            }
-            req.session.user = {userName: userName, hasPremium: false}
-            res.json(token).status(200);
-        } else {
-            console.log("Email not")
-            res.status(204).send({ message: "Email not verified" });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: "Internal server error" });
-    }
-});
-
-router.delete('/cancel', async (req, res) => {
-    const userName = req.query.userName;
+async function deleteUser(userName){
     try {
         await TempUser.deleteOne({userName: userName});
-        res.status(200).send({message: "User creation cancelled"});
-    } catch (err) {
-        res.status(500).send({message: "Internal server error"});
+    } catch (error) {
+        console.error("Failed to delete temporary user:", error);
     }
-});
-
-
+}
 
 
 export default router

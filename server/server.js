@@ -7,6 +7,7 @@ import cors from 'cors';
 import authRoutes from './routes/auth.js'
 import aiRoutes from "./routes/assistant.js";
 import settingRoutes from "./routes/settings.js";
+import verificationRoutes from "./routes/verification.js";
 import session from 'express-session';
 import {scheduleFetchTask} from "./middleWare/notification.js";
 import {checkNotifications} from "./middleWare/notificationSend.js";
@@ -45,6 +46,7 @@ app.use((req,res,next) =>{
 app.use("/ai", aiRoutes);
 app.use('/auth', authRoutes)
 app.use('/settings', settingRoutes)
+app.use('/verification', verificationRoutes)
 
 scheduleFetchTask();
 checkNotifications();

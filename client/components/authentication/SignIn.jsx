@@ -28,36 +28,51 @@ function SignIn({navigation }) {
             const response = await axios.post(`${Global.ip}/auth/SignIn`, {
                 UserId: email,
                 password: password
-            })
-            if (response.status !== 200) {
-                setEmailError(response.data.message)
-            } else {
-                const accessToken = response.data.access;
-                const refreshToken = response.data.refresh;
-                const userName = response.data.userName;
+            });
 
-                await AsyncStorage.setItem('accessToken', accessToken);
-                await AsyncStorage.setItem('refreshToken', refreshToken);
-                await AsyncStorage.setItem('userName', userName);
-                updateContact({userName: userName});
-                const response2 = await axios.get(`${Global.ip}/settings/fetchSettings`, {
-                    params: {
-                        userName: userName
-                    }
+            if (response.status === 200) {
+                const { access, refresh, userName } = response.data;
+                const settingsResponse = await axios.get(`${Global.ip}/settings/fetchSettings`, {
+                    params: { userName }
                 });
+                if (settingsResponse.status === 200) {
+                    const { theme, notificationsOn, mediumOrder } = settingsResponse.data;
+                    await AsyncStorage.setItem('accessToken', access);
+                    await AsyncStorage.setItem('refreshToken', refresh);
+                    await AsyncStorage.setItem('userName', userName);
 
-                if (response2.status === 200) {
-                    updateContact({theme: response2.data.theme});
-                    updateContact({notificationsOn: response2.data.notificationsOn});
-                    updateContact({mediumOrder: response2.data.mediumOrder});
-                    navigation.navigate('Home')
+                    updateContact({ userName });
+                    updateContact({ theme, notificationsOn, mediumOrder });
+                    navigation.navigate('Home');
+                } else {
+                    setEmailError(settingsResponse.data.message || "Failed to fetch user settings");
                 }
-
+            } else {
+                setEmailError(response.data.message);
             }
         } catch (err) {
-            setEmailError(err.response.data.message)
+            if (err.response) {
+                const { status, data } = err.response;
+                switch (status) {
+                    case 400:
+                        setEmailError("*" + data.message); // Handles missing UserId specific error
+                        break;
+                    case 401:
+                        setEmailError("*Invalid login credentials. Please try again.");
+                        break;
+                    case 500:
+                        setEmailError("*Server error. Please try again later.");
+                        break;
+                    default:
+                        setEmailError("*An unexpected error occurred. Please try again.");
+                        break;
+                }
+            } else {
+                setEmailError("*Network error or server is down. Please try again later.");
+            }
         }
     }
+
 
 
     const goToSignUp = () => {

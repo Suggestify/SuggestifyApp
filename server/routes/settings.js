@@ -11,99 +11,88 @@ dotenv.config();
 const router = express.Router()
 const stripe = new Stripe(process.env.STRIPE_SECRET);
 
-import cron from 'node-cron';
-import pkg from '../../client/helperFunctions/Notification.js';
-const { sendPushNotifications } = pkg;
-
 import {authenticateToken} from "../middleWare/secureEndPoint.js";
 
 router.use(bodyParser.json());
 
-cron.schedule('0 21 * * 0', () => {
-    console.log('This message logs every Sunday at 9 PM.');
-    sendPushNotifications();
-});
 router.post("/setNotifications", authenticateToken, async (req, res) => {
     const { userName, token } = req.body;
 
     if (!userName || !token) {
-        return res.status(400).send({ message: "Missing userID or token" });
+        return res.status(400).json({ message: "Missing userID or token" });
     }
+
     try {
-        let user = await User.findOne({ userName: userName});
+        const user = await User.findOne({ userName: userName });
         if (!user) {
-            return res.status(404).send({ message: "User not found" });
+            return res.status(404).json({ message: "User not found" });
         }
 
-        let userSettings = await UserSettings.findById(user.UserSettingsID);
+        const userSettings = await UserSettings.findById(user.UserSettingsID);
         if (!userSettings) {
-            return res.status(404).send({ message: "User settings not found" });
+            return res.status(404).json({ message: "User settings not found" });
         }
 
-        userSettings.notificationToken = token; // Directly assign the token to the user model
-        try {
-            await userSettings.save();
-            res.status(200).json({ message: "Notification token updated successfully" });
-        } catch (saveError) {
-            res.status(500).send({ message: "Failed to save notification token" });
-        }
-    } catch (err) {
-        res.status(500).send({ message: "Failed to update notification token" });
+        userSettings.notificationToken = token;
+        await userSettings.save();
+        res.status(200).json({ message: "Notification token updated successfully" });
+    } catch (error) {
+        console.error("Failed to update notification token:", error);
+        res.status(500).json({ message: "Failed to update notification token" });
     }
 });
 
 router.get("/fetchSettings", async (req, res) => {
-    const userName = req.query.userName;
+    const { userName } = req.query;
     if (!userName) {
-        return res.status(400).send({ message: "Missing or invalid userName parameter" });
+        return res.status(400).json({ message: "Missing or invalid userName parameter" });
     }
     try {
-        let user = await User.findOne({ userName: userName });
+        const user = await User.findOne({ userName: userName }).lean();
         if (!user) {
-            return res.status(404).send({ message: "User not found" });
+            return res.status(404).json({ message: "User not found" });
         }
 
-        let userSettings = await UserSettings.findById(user.UserSettingsID);
+        const userSettings = await UserSettings.findById(user.UserSettingsID).lean();
         if (!userSettings) {
-            return res.status(404).send({ message: "User settings not found" });
+            return res.status(404).json({ message: "User settings not found" });
         }
 
-        res.status(200).json(userSettings);
+        res.json(userSettings);
     } catch (err) {
-        console.error(err);
-        res.status(500).send({ message: "Failed to fetch user settings due to a server error" });
+        console.error("Error fetching user settings:", err);
+        res.status(500).json({ message: "Failed to fetch user settings due to a server error" });
     }
 });
+
 
 
 router.put("/updateOrder", authenticateToken, async (req, res) => {
     const { userName, newOrder } = req.body;
-    // Validate inputs
     if (!userName || !newOrder) {
-        return res.status(400).send({ message: "Missing userName or order in request" });
+        return res.status(400).json({ message: "Missing userName or order in request" });
     }
+
     try {
-        // Fetch user and their settings
-        let user = await User.findOne({ userName: userName });
+        const user = await User.findOne({ userName });
         if (!user) {
-            return res.status(404).send({ message: "User not found" });
+            return res.status(404).json({ message: "User not found" });
         }
 
-        let userSettings = await UserSettings.findById(user.UserSettingsID);
+        const userSettings = await UserSettings.findById(user.UserSettingsID);
         if (!userSettings) {
-            return res.status(404).send({ message: "User settings not found" });
+            return res.status(404).json({ message: "User settings not found" });
         }
 
-        // Update and save user settings
         userSettings.mediumOrder = newOrder;
         await userSettings.save();
-
-        res.status(200).send({ message: "User settings updated successfully" });
-    } catch (err) {
-        console.error(err); // Consider more secure logging strategies
-        res.status(500).send({ message: "Failed to update user settings due to a server error" });
+        res.status(200).json({ message: "User settings updated successfully" });
+    } catch (error) {
+        console.error("Failed to update user settings:", error); // More detailed error logging might be needed
+        res.status(500).json({ message: "Failed to update user settings due to a server error" });
     }
 });
+
 
 router.post("/toggleSwitch", authenticateToken, async (req, res) => {
 

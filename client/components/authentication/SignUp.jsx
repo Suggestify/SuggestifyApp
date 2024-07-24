@@ -7,14 +7,11 @@ import {Heading, Button} from "native-base";
 
 import axios from 'axios';
 import Global from "../../helperFunctions/Global";
-import {ContactContext} from "../../helperFunctions/ContactContext";
 
 const wallpaper = require('../../assets/backgrounds/bk2.png');
 
 
 function SignUp({navigation}) {
-    const { contact, updateContact } = useContext(ContactContext);
-
     const [email, setEmail] = useState("");
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
@@ -37,12 +34,14 @@ function SignUp({navigation}) {
         } else {
             setEmailError("");
         }
+
         if (!usernameRegex.test(userName)) {
             setUserNameError("*Username can only contain letters and numbers.");
             return;
         } else {
             setUserNameError("");
         }
+
         try {
             console.log("making request")
             const response = await axios.post(`${Global.ip}/auth/SignUp`, {
@@ -50,22 +49,31 @@ function SignUp({navigation}) {
                 userName: userName,
                 password: password
             })
-            console.log("response.status" + response.status)
-            if (response.status !== 200) {
-                setEmailError(`*${response.data.message}`)
-            } else {
+            if (response.status === 200) {
                 await AsyncStorage.setItem('tempUserName', userName);
                 await AsyncStorage.setItem('verification', "false");
                 navigation.navigate('Verify', {userName: userName});
+            } else {
+                const errorMessage = response.data.message || "An unexpected error occurred";
+                setEmailError(`*${errorMessage}`);
             }
-        } catch (err) {
-            if (err.response && err.response.status === 400) {
-                if (err.response.data.field === "email") {
-                    setEmailError("*An account with that email is already taken");
+        }  catch (err) {
+            if (err.response) {
+                const { status, data } = err.response;
+                switch(status) {
+                    case 400:
+                        setEmailError(`*${data.message}`);
+                        break;
+                    case 409:
+                        const fieldError = data.message.includes('email') ? setEmailError : setUserNameError;
+                        fieldError(`*${data.message}`);
+                        break;
+                    default:
+                        setEmailError("*An unexpected error occurred. Please try again.");
+                        break;
                 }
-                if (err.response.data.field === "userName") {
-                    setUserNameError("*An account with that username is already taken");
-                }
+            } else {
+                setEmailError("*Network error or server is down. Please try again.");
             }
         }
     }
@@ -123,9 +131,6 @@ function SignUp({navigation}) {
                         }
                     />
                 </View>
-                <Text style={styles.signupwhite}>
-                    Forgot Your Password?
-                </Text>
 
                 <View
                     style={styles.buttonContainer}>
@@ -208,9 +213,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         justifyContent: "center",
     },
-
     nativeBaseBtnText: {
-        fontSize: 20, // Adjust text size as needed
-        color: "white", // Adjust text color as needed
+        fontSize: 20,
+        color: "white",
     },
 });
